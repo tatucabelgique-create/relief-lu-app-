@@ -133,6 +133,15 @@ export default function BagDetail({ bag, rating, isFavorite, onToggleFavorite, o
           {bag.quantity_left} {t("badge.available")}
         </div>
 
+        {onToggleFavorite && (
+          <button className="notify-toggle-row" onClick={() => onToggleFavorite(bag.merchant_id)}>
+            <span>🔔 {t("bagDetail.notify")}</span>
+            <span className={`toggle-switch ${isFavorite ? "on" : ""}`}>
+              <span className="toggle-knob" />
+            </span>
+          </button>
+        )}
+
         {bag.description && (
           <>
             <div className="divider" />
