@@ -133,16 +133,6 @@ export default function BagDetail({ bag, rating, isFavorite, onToggleFavorite, o
           {bag.quantity_left} {t("badge.available")}
         </div>
 
-        {address && (
-          <>
-            <div className="divider" />
-            <a className="bag-detail-address" href={directionsUrl || "#"} target={directionsUrl ? "_blank" : undefined} rel="noreferrer">
-              <span>📍 {address}</span>
-              <span className="chevron">›</span>
-            </a>
-          </>
-        )}
-
         {bag.description && (
           <>
             <div className="divider" />
@@ -181,23 +171,35 @@ export default function BagDetail({ bag, rating, isFavorite, onToggleFavorite, o
           </>
         )}
 
-        {hasCoords && (
+        {address && (
           <>
             <div className="divider" />
-            <div className="map-container" style={{ height: 160 }}>
-              <MapContainer center={[merchant.lat, merchant.lng]} zoom={14} scrollWheelZoom={false} dragging={false} style={{ width: "100%", height: "100%" }}>
-                <TileLayer
-                  attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-                  url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                />
-                <Marker position={[merchant.lat, merchant.lng]} icon={merchantMarkerIcon(merchant.logo_url)} />
-              </MapContainer>
+            <h2>{t("bagDetail.itinerary.title")}</h2>
+            <div className="bag-detail-row" style={{ marginBottom: hasCoords ? 12 : 0 }}>
+              <span>📍 {address}</span>
             </div>
-            <a className="btn secondary" style={{ display: "block", textAlign: "center", marginTop: 12 }} href={directionsUrl} target="_blank" rel="noreferrer">
-              {t("bagDetail.directions")}
-            </a>
+            {hasCoords && (
+              <>
+                <div className="map-container" style={{ height: 200 }}>
+                  <MapContainer center={[merchant.lat, merchant.lng]} zoom={14} scrollWheelZoom={false} dragging={false} style={{ width: "100%", height: "100%" }}>
+                    <TileLayer
+                      attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+                      url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                    />
+                    <Marker position={[merchant.lat, merchant.lng]} icon={merchantMarkerIcon(merchant.logo_url)} />
+                  </MapContainer>
+                </div>
+                <a className="btn secondary" style={{ display: "block", textAlign: "center", marginTop: 12 }} href={directionsUrl} target="_blank" rel="noreferrer">
+                  {t("bagDetail.directions")}
+                </a>
+              </>
+            )}
           </>
         )}
+
+        <div className="divider" />
+        <h2>{t("bagDetail.collect.title")}</h2>
+        <p className="page-sub" style={{ marginBottom: 0 }}>{t("bagDetail.collect.text")}</p>
 
         <div className="divider" />
         <h2>{t("bagDetail.packaging.title")}</h2>
