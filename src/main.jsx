@@ -33,7 +33,13 @@ function UpdatePrompt() {
           if (registration.installing) trackInstalling(registration.installing);
         });
 
-        // Revérifie régulièrement — iOS ne le fait pas assez souvent tout seul.
+        // Vérifie tout de suite, puis à chaque retour au premier plan et
+        // régulièrement en arrière-plan — iOS ne le fait pas assez souvent
+        // tout seul, surtout pour une PWA relancée depuis l'écran d'accueil.
+        registration.update();
+        document.addEventListener("visibilitychange", () => {
+          if (document.visibilityState === "visible") registration.update();
+        });
         setInterval(() => registration.update(), 60 * 60 * 1000);
       })
       .catch(() => {});

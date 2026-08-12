@@ -41,8 +41,11 @@ self.addEventListener("fetch", (event) => {
     // hashées par le build, donc une réponse mise en cache une fois serait
     // resservie pour toujours — une PWA installée ne verrait jamais les mises
     // à jour. On ne retombe sur le cache qu'en cas d'échec réseau (hors-ligne).
+    // cache: "no-store" ignore aussi le cache HTTP du navigateur — GitHub Pages
+    // sert app.html avec "Cache-Control: max-age=600", donc sans ça, un simple
+    // fetch() pouvait resservir une réponse vieille de 10 min sans repasser réseau.
     event.respondWith(
-      fetch(req)
+      fetch(req, { cache: "no-store" })
         .then((res) => {
           const copy = res.clone();
           caches.open(CACHE).then((cache) => cache.put(req, copy));
