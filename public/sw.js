@@ -14,7 +14,13 @@ self.addEventListener("install", (event) => {
   event.waitUntil(
     caches.open(CACHE).then((cache) => cache.addAll(ASSETS))
   );
-  self.skipWaiting();
+  // Pas de skipWaiting() ici : le nouveau service worker reste en attente
+  // jusqu'à ce que l'utilisateur clique "Mettre à jour" dans la bannière
+  // (voir UpdatePrompt dans main.jsx) — jamais de bascule silencieuse.
+});
+
+self.addEventListener("message", (event) => {
+  if (event.data === "SKIP_WAITING") self.skipWaiting();
 });
 
 self.addEventListener("activate", (event) => {
