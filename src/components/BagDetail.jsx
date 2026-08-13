@@ -142,13 +142,13 @@ export default function BagDetail({ bag, rating, isFavorite, onToggleFavorite, o
           </button>
         )}
 
-        {bag.description && (
-          <>
-            <div className="divider" />
-            <h2>{t("bagDetail.about")}</h2>
-            <p className="page-sub" style={{ marginBottom: 0 }}>{bag.description}</p>
-          </>
-        )}
+        <div className="divider" />
+        <h2>{t("bagDetail.about")}</h2>
+        <p className="page-sub" style={{ marginBottom: 10 }}>🌱 {t("bagDetail.about.intro")}</p>
+        <p className="page-sub" style={{ marginBottom: 10 }}>{t(`bagDetail.about.${bag.category || "autre"}`)}</p>
+        <p className="page-sub" style={{ marginBottom: 10 }}>👉 {t("bagDetail.about.surprise")}</p>
+        <p className="page-sub" style={{ marginBottom: 12 }}>💡 {t("bagDetail.about.fact")}</p>
+        <span className="chip-pill-outline">{t(`merchant.category.${bag.category || "autre"}`)}</span>
 
         {rating?.criteria && Object.keys(rating.criteria).length > 0 && (
           <>
