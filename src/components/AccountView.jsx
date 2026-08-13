@@ -38,21 +38,28 @@ export default function AccountView({ user }) {
                 <div className="info">
                   <b>{r.bags?.title}</b>
                   <span>
-                    {r.bags?.merchants?.business_name} · {formatPickupWindow(r.bags?.pickup_start, r.bags?.pickup_end, lang)} ·{" "}
-                    {t(`status.${r.status}`)}
+                    {r.bags?.merchants?.business_name} · {formatPickupWindow(r.bags?.pickup_start, r.bags?.pickup_end, lang)}
                   </span>
+                  <div style={{ display: "flex", gap: 6, flexWrap: "wrap", marginTop: 6 }}>
+                    <span className="chip-pill-outline">{t(`status.${r.status}`)}</span>
+                    <span className={`chip-pill-outline payment-chip-${r.payment_status}`}>{t(`payment.status.${r.payment_status}`)}</span>
+                  </div>
                   {r.payment_status === "paid" && r.status === "confirmed" && (
-                    <span className="page-sub" style={{ fontWeight: 700 }}>
+                    <span className="page-sub" style={{ fontWeight: 700, display: "block", marginTop: 6 }}>
                       {t("reserve.codeLabel")} : {r.pickup_code}
                     </span>
                   )}
-                  {existingReview ? (
-                    <div className="stars">{"★".repeat(existingReview.rating)}{"☆".repeat(5 - existingReview.rating)}</div>
-                  ) : (
-                    <button className="btn secondary small" style={{ marginTop: 8 }} onClick={() => setReviewing(r)}>
-                      {t("review.leaveOne")}
-                    </button>
-                  )}
+                  {r.payment_status === "paid" &&
+                    (existingReview ? (
+                      <div className="stars" style={{ marginTop: 6 }}>
+                        {"★".repeat(existingReview.rating)}
+                        {"☆".repeat(5 - existingReview.rating)}
+                      </div>
+                    ) : (
+                      <button className="btn secondary small" style={{ marginTop: 8 }} onClick={() => setReviewing(r)}>
+                        {t("review.leaveOne")}
+                      </button>
+                    ))}
                 </div>
                 <div className="price">{((r.bags?.price_cents || 0) / 100).toFixed(2)} €</div>
               </div>
