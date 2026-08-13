@@ -9,12 +9,14 @@ import MerchantView from "./components/MerchantView.jsx";
 import AccountView from "./components/AccountView.jsx";
 import FavoritesView from "./components/FavoritesView.jsx";
 import LegalModal from "./components/LegalModal.jsx";
+import PaymentResult from "./components/PaymentResult.jsx";
 import SocialLinks from "./components/SocialLinks.jsx";
 
 export default function App() {
   const [view, setView] = useState("public");
   const [user, setUser] = useState(undefined); // undefined = loading, null = signed out
   const [legalModal, setLegalModal] = useState(null);
+  const [paymentResult, setPaymentResult] = useState(null); // { reservationId, success }
   const [pendingReserveBagId, setPendingReserveBagId] = useState(null);
   const [authError, setAuthError] = useState(null);
   // undefined = pas encore vérifié, null = pas (encore) commerçant.
@@ -103,6 +105,21 @@ export default function App() {
     if (requestedView) setView(requestedView);
   }, []);
 
+  // Retour de Stripe Checkout — voir success_url/cancel_url dans
+  // create-checkout-session (Edge Function).
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const reservationId = params.get("reservation");
+    const paid = params.get("paid");
+    if (reservationId && paid != null) {
+      setPaymentResult({ reservationId, success: paid === "1" });
+      const url = new URL(window.location.href);
+      url.searchParams.delete("paid");
+      url.searchParams.delete("reservation");
+      window.history.replaceState({}, "", url);
+    }
+  }, []);
+
   return (
     <LangProvider>
       <div className="wrap">
@@ -147,6 +164,14 @@ export default function App() {
       </div>
 
       <BottomNav view={view} onNavigate={setView} />
+
+      {paymentResult && (
+        <PaymentResult
+          reservationId={paymentResult.reservationId}
+          success={paymentResult.success}
+          onClose={() => setPaymentResult(null)}
+        />
+      )}
 
       {legalModal && (
         <LegalModal

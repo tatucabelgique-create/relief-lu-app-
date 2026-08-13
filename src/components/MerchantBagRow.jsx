@@ -54,10 +54,10 @@ export default function MerchantBagRow({ bag, onChanged }) {
                 <div className="info">
                   <b>{r.email}</b>
                   <span>
-                    {r.pickup_code} · {r.quantity}x · {t(`status.${r.status}`)}
+                    {r.pickup_code} · {r.quantity}x · {t(`status.${r.status}`)} · {t(`payment.status.${r.payment_status}`)}
                   </span>
                 </div>
-                {r.status === "confirmed" && (
+                {r.status === "confirmed" && r.payment_status === "paid" && (
                   <div style={{ display: "flex", gap: 6 }}>
                     <button className="btn small" onClick={() => setStatus(r.id, "picked_up")}>
                       {t("merchant.markPickedUp")}

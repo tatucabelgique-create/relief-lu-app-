@@ -41,6 +41,11 @@ export default function AccountView({ user }) {
                     {r.bags?.merchants?.business_name} · {formatPickupWindow(r.bags?.pickup_start, r.bags?.pickup_end, lang)} ·{" "}
                     {t(`status.${r.status}`)}
                   </span>
+                  {r.payment_status === "paid" && r.status === "confirmed" && (
+                    <span className="page-sub" style={{ fontWeight: 700 }}>
+                      {t("reserve.codeLabel")} : {r.pickup_code}
+                    </span>
+                  )}
                   {existingReview ? (
                     <div className="stars">{"★".repeat(existingReview.rating)}{"☆".repeat(5 - existingReview.rating)}</div>
                   ) : (

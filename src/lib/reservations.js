@@ -9,6 +9,12 @@ export async function reserveBag(bagId, quantity) {
   return Array.isArray(data) ? data[0] : data;
 }
 
+export async function getReservation(id) {
+  const { data, error } = await supabase.from("reservations").select("*").eq("id", id).single();
+  if (error) throw error;
+  return data;
+}
+
 export async function getReservationsForBag(bagId) {
   const { data, error } = await supabase
     .from("reservations")
