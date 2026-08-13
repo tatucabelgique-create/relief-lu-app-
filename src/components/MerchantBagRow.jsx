@@ -54,7 +54,13 @@ export default function MerchantBagRow({ bag, onChanged }) {
                 <div className="info">
                   <b>{r.email}</b>
                   <span>
-                    {r.pickup_code} · {r.quantity}x · {t(`status.${r.status}`)} · {t(`payment.status.${r.payment_status}`)}
+                    {r.pickup_code} · {r.quantity}x · {t(`status.${r.status}`)}
+                  </span>
+                  <span
+                    className={`chip-pill-outline payment-chip-${r.payment_status}`}
+                    style={{ display: "inline-block", width: "fit-content", marginTop: 6 }}
+                  >
+                    {t(`payment.status.${r.payment_status}`)}
                   </span>
                 </div>
                 {r.status === "confirmed" && r.payment_status === "paid" && (
