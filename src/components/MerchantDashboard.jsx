@@ -113,6 +113,7 @@ export default function MerchantDashboard({ user, merchant, onMerchantChanged })
               <option value="boulangerie">Boulangerie</option>
               <option value="restaurant">Restaurant</option>
               <option value="epicerie">Épicerie</option>
+              <option value="supermarche">Supermarché</option>
               <option value="traiteur">Traiteur / cantine</option>
               <option value="autre">Autre</option>
             </select>

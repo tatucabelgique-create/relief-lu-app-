@@ -1,6 +1,6 @@
 import { useI18n } from "../lib/i18n.jsx";
 
-const CATEGORIES = ["boulangerie", "restaurant", "epicerie", "traiteur", "autre"];
+const CATEGORIES = ["boulangerie", "restaurant", "epicerie", "supermarche", "traiteur", "autre"];
 
 export default function FiltersBar({ category, setCategory, sort, setSort, search, setSearch, onLocate, geoStatus, viewMode, setViewMode }) {
   const { t } = useI18n();
