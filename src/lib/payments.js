@@ -2,7 +2,7 @@ import { supabase } from "./supabase";
 
 // Le nom réel de la fonction déployée dans le dashboard Supabase (peut différer
 // du nom du dossier source si renommée au déploiement — voir notify.js).
-const CHECKOUT_FUNCTION_NAME = "create-checkout-session";
+const CHECKOUT_FUNCTION_NAME = "clever-handler";
 
 export async function createCheckoutSession(reservationId) {
   const {
