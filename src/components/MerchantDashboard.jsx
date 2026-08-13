@@ -22,6 +22,7 @@ const emptyForm = {
 export default function MerchantDashboard({ user, merchant, onMerchantChanged }) {
   const { t } = useI18n();
   const [form, setForm] = useState(emptyForm);
+  const [priceTouched, setPriceTouched] = useState(false);
   const [photo, setPhoto] = useState(null);
   const [msg, setMsg] = useState(null);
   const [myBags, setMyBags] = useState([]);
@@ -38,6 +39,22 @@ export default function MerchantDashboard({ user, merchant, onMerchantChanged })
 
   function set(field, value) {
     setForm((f) => ({ ...f, [field]: value }));
+  }
+
+  // Le prix réduit se calcule automatiquement à -50% du prix normal tant que
+  // le commerçant n'a pas modifié ce champ lui-même — sitôt qu'il y touche,
+  // on respecte son choix et on arrête de l'écraser.
+  function setOriginalPrice(value) {
+    setForm((f) => ({
+      ...f,
+      originalPrice: value,
+      price: priceTouched ? f.price : value ? (parseFloat(value) / 2).toFixed(2) : f.price,
+    }));
+  }
+
+  function setPrice(value) {
+    setPriceTouched(true);
+    set("price", value);
   }
 
   async function handlePublish() {
@@ -84,6 +101,7 @@ export default function MerchantDashboard({ user, merchant, onMerchantChanged })
           : { type: "success", text: "Sachet publié !" }
       );
       setForm(emptyForm);
+      setPriceTouched(false);
       setPhoto(null);
       refreshMyBags();
     } catch (err) {
@@ -131,13 +149,15 @@ export default function MerchantDashboard({ user, merchant, onMerchantChanged })
               min="0"
               step="0.5"
               value={form.originalPrice}
-              onChange={(e) => set("originalPrice", e.target.value)}
+              onChange={(e) => setOriginalPrice(e.target.value)}
               placeholder={t("merchant.f.originalPricePlaceholder")}
             />
+            <span className="field-hint">{t("merchant.f.originalPriceHint")}</span>
           </div>
           <div className="field">
             <label>{t("merchant.f.price")}</label>
-            <input type="number" min="1" step="0.5" value={form.price} onChange={(e) => set("price", e.target.value)} />
+            <input type="number" min="1" step="0.5" value={form.price} onChange={(e) => setPrice(e.target.value)} />
+            <span className="field-hint">{t("merchant.f.priceHint")}</span>
           </div>
         </div>
         <div className="two-col">

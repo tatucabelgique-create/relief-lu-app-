@@ -138,6 +138,7 @@ h1.page-title {
   border-radius: 9px; padding: 11px 13px; color: var(--paper); font-size: 14px;
 }
 .field textarea { min-height: 70px; resize: vertical; }
+.field-hint { display: block; font-size: 11px; color: var(--paper-dim); margin-top: 4px; }
 .code-box {
   background: var(--navy); border: 2px dashed var(--honey); border-radius: 12px;
   padding: 22px; text-align: center; margin-top: 6px;
