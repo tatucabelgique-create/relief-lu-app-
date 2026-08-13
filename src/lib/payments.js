@@ -16,7 +16,9 @@ export async function createCheckoutSession(reservationId) {
       Authorization: `Bearer ${session?.access_token}`,
       apikey: import.meta.env.VITE_SUPABASE_ANON_KEY,
     },
-    body: JSON.stringify({ reservation_id: reservationId }),
+    // On transmet l'adresse exacte de retour (avec le sous-dossier /relief-lu-app-/) —
+    // deviner à partir du seul header Origin ct̂é serveur perdait ce sous-dossier.
+    body: JSON.stringify({ reservation_id: reservationId, return_base: window.location.origin + import.meta.env.BASE_URL }),
   });
   const data = await res.json();
   if (!res.ok) throw new Error(data.error || "Erreur de paiement.");

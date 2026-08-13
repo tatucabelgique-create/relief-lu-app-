@@ -28,7 +28,7 @@ Deno.serve(async (req) => {
       return new Response(JSON.stringify({ error: "Non authentifié." }), { status: 401, headers: corsHeaders });
     }
 
-    const { reservation_id } = await req.json();
+    const { reservation_id, return_base } = await req.json();
 
     const { data: reservation, error } = await supabase
       .from("reservations")
@@ -46,7 +46,10 @@ Deno.serve(async (req) => {
       return new Response(JSON.stringify({ error: "Cette réservation a déjà été traitée." }), { status: 400, headers: corsHeaders });
     }
 
-    const origin = req.headers.get("origin") || "https://relief-lu.online";
+    // return_base inclut déjà le sous-dossier (ex. /relief-lu-app-/) — envoyé
+    // par le client (voir payments.js), plus fiable que de le déduire du seul
+    // header Origin côté serveur (qui ne contient jamais de chemin).
+    const base = (return_base || "https://relief-lu.online/").replace(/\/+$/, "");
 
     const session = await stripe.checkout.sessions.create({
       mode: "payment",
@@ -62,8 +65,8 @@ Deno.serve(async (req) => {
         },
       ],
       metadata: { reservation_id: reservation.id },
-      success_url: `${origin}/app.html?paid=1&reservation=${reservation.id}`,
-      cancel_url: `${origin}/app.html?paid=0&reservation=${reservation.id}`,
+      success_url: `${base}/app.html?paid=1&reservation=${reservation.id}`,
+      cancel_url: `${base}/app.html?paid=0&reservation=${reservation.id}`,
     });
 
     await supabase.from("reservations").update({ stripe_session_id: session.id }).eq("id", reservation.id);
