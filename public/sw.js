@@ -34,6 +34,13 @@ self.addEventListener("activate", (event) => {
 
 self.addEventListener("fetch", (event) => {
   const req = event.request;
+
+  // Le Cache API ne gère que les requêtes GET — laisser passer directement
+  // au réseau tout le reste (POST vers les fonctions Edge Supabase pour le
+  // paiement, etc.), sinon caches.match() sur une requête POST fait planter
+  // toute la requête côté Safari ("FetchEvent.respondWith received an error").
+  if (req.method !== "GET") return;
+
   const isHTML = req.mode === "navigate" || req.headers.get("accept")?.includes("text/html");
 
   if (isHTML) {
