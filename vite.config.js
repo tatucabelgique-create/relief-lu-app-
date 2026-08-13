@@ -3,9 +3,8 @@ import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 
 export default defineConfig({
-  // Le site est servi depuis /relief-lu-app-/ sur tatucabelgique-create.github.io (pas la racine du domaine),
-  // et depuis / une fois le domaine relief.lu branché — voir le workflow de déploiement.
-  base: process.env.VITE_BASE_PATH || "/relief-lu-app-/",
+  // Servi depuis la racine de relief-lu.online (domaine personnalisé, voir public/CNAME).
+  base: process.env.VITE_BASE_PATH || "/",
   plugins: [react()],
   build: {
     rollupOptions: {
