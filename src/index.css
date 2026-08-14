@@ -139,6 +139,27 @@ h1.page-title {
 }
 .field textarea { min-height: 70px; resize: vertical; }
 .field-hint { display: block; font-size: 11px; color: var(--paper-dim); margin-top: 4px; }
+
+.figures { font-family: 'IBM Plex Mono', monospace; font-variant-numeric: tabular-nums; }
+
+.reserve-time-row { display: flex; align-items: center; gap: 8px; margin: 14px 0 20px; }
+.reserve-time-badge {
+  background: rgba(127,168,140,0.16); color: var(--sage); font-weight: 700;
+  font-size: 13px; padding: 5px 12px; border-radius: 100px;
+}
+.reserve-row {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 12px 0; border-top: 1px solid rgba(239,230,211,0.1); font-size: 14px; color: var(--paper-dim);
+}
+.reserve-total { font-size: 15px; color: var(--paper); border-bottom: 1px solid rgba(239,230,211,0.1); margin-bottom: 18px; }
+.reserve-total b { font-size: 18px; color: var(--honey); }
+.qty-stepper { display: flex; align-items: center; gap: 14px; }
+.qty-stepper button {
+  width: 30px; height: 30px; border-radius: 50%; border: 1px solid rgba(239,230,211,0.25);
+  background: none; color: var(--paper); font-size: 16px; line-height: 1; cursor: pointer;
+}
+.qty-stepper button:disabled { opacity: 0.35; cursor: default; }
+.qty-stepper span { min-width: 16px; text-align: center; color: var(--paper); font-weight: 600; }
 .code-box {
   background: var(--navy); border: 2px dashed var(--honey); border-radius: 12px;
   padding: 22px; text-align: center; margin-top: 6px;
