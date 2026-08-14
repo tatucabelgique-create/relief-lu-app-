@@ -69,9 +69,9 @@ const CONTENT = {
     cookies: {
       title: "Cookies",
       paragraphs: [
-        "Ce site utilise uniquement des cookies et espaces de stockage techniques, nécessaires à son fonctionnement (garder votre connexion, mémoriser votre langue, votre position pour trier par distance).",
-        "Aucun cookie de mesure d'audience ou de publicité n'est utilisé.",
-        "En continuant à naviguer sur Relief.lu, vous acceptez cette utilisation strictement technique.",
+        "Ce site utilise des cookies et espaces de stockage techniques, nécessaires à son fonctionnement (garder votre connexion, mémoriser votre langue, votre position pour trier par distance) — ceux-ci sont toujours actifs, sans demande de consentement puisqu'ils sont indispensables au service.",
+        "Ce site utilise également, avec votre consentement, des cookies de mesure d'audience (Google Analytics) et de publicité (Meta Pixel). Ils ne sont déposés qu'après acceptation explicite via le bandeau affiché lors de votre première visite.",
+        "Vous pouvez à tout moment modifier votre choix via le lien « Gérer les cookies » en bas de page.",
       ],
     },
   },
@@ -141,9 +141,9 @@ const CONTENT = {
     cookies: {
       title: "Cookies",
       paragraphs: [
-        "Diese Website verwendet ausschließlich technisch notwendige Cookies und Speicher (Anmeldung aufrechterhalten, Sprache merken, Standort für die Sortierung nach Entfernung).",
-        "Es werden keine Analyse- oder Werbe-Cookies verwendet.",
-        "Durch die weitere Nutzung von Relief.lu stimmen Sie dieser rein technischen Verwendung zu.",
+        "Diese Website verwendet technisch notwendige Cookies und Speicher (Anmeldung aufrechterhalten, Sprache merken, Standort für die Sortierung nach Entfernung) — diese sind immer aktiv und erfordern keine Zustimmung, da sie für den Dienst unerlässlich sind.",
+        "Mit Ihrer Zustimmung verwendet diese Website außerdem Cookies zur Reichweitenmessung (Google Analytics) und Werbung (Meta Pixel). Diese werden erst nach ausdrücklicher Zustimmung über das beim ersten Besuch angezeigte Banner gesetzt.",
+        "Sie können Ihre Wahl jederzeit über den Link „Cookies verwalten" am Seitenende ändern.",
       ],
     },
   },
@@ -213,9 +213,9 @@ const CONTENT = {
     cookies: {
       title: "Cookies",
       paragraphs: [
-        "This site only uses technical cookies and storage necessary for it to function (keeping you signed in, remembering your language, your position to sort by distance).",
-        "No audience-measurement or advertising cookies are used.",
-        "By continuing to browse Relief.lu, you accept this strictly technical use.",
+        "This site uses technical cookies and storage necessary for it to function (keeping you signed in, remembering your language, your position to sort by distance) — these are always active and require no consent, as they're essential to the service.",
+        "With your consent, this site also uses audience-measurement (Google Analytics) and advertising (Meta Pixel) cookies. These are only set after explicit acceptance via the banner shown on your first visit.",
+        "You can change your choice at any time via the \"Manage cookies\" link at the bottom of the page.",
       ],
     },
   },

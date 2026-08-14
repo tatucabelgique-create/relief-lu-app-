@@ -10,6 +10,7 @@ import AccountView from "./components/AccountView.jsx";
 import FavoritesView from "./components/FavoritesView.jsx";
 import LegalModal from "./components/LegalModal.jsx";
 import PaymentResult from "./components/PaymentResult.jsx";
+import CookieConsent, { reopenCookieConsent } from "./components/CookieConsent.jsx";
 import SocialLinks from "./components/SocialLinks.jsx";
 
 export default function App() {
@@ -158,6 +159,9 @@ export default function App() {
             <button className="btn secondary small" onClick={() => setLegalModal("cookies")}>
               Cookies
             </button>
+            <button className="btn secondary small" onClick={reopenCookieConsent}>
+              Gérer les cookies
+            </button>
           </div>
           <SocialLinks />
         </footer>
@@ -172,6 +176,8 @@ export default function App() {
           onClose={() => setPaymentResult(null)}
         />
       )}
+
+      <CookieConsent />
 
       {legalModal && (
         <LegalModal
