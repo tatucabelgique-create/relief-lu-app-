@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
+import { MapContainer, TileLayer, Marker } from "react-leaflet";
 import { useI18n } from "../lib/i18n.jsx";
 import { formatPickupWindow } from "./BagCard.jsx";
+import { merchantMarkerIcon } from "../lib/leafletIcon";
 
 function isToday(iso) {
   const d = new Date(iso);
@@ -45,6 +47,8 @@ export default function BagDetail({ bag, rating, isFavorite, onToggleFavorite, o
   }, []);
 
   const address = [merchant?.address, merchant?.city].filter(Boolean).join(", ");
+  const hasCoords = merchant?.lat != null && merchant?.lng != null;
+  const directionsUrl = hasCoords ? `https://www.google.com/maps/dir/?api=1&destination=${merchant.lat},${merchant.lng}` : null;
 
   function handleShare() {
     if (navigator.share) {
@@ -187,6 +191,25 @@ export default function BagDetail({ bag, rating, isFavorite, onToggleFavorite, o
                   </div>
                 )
             )}
+          </>
+        )}
+
+        {hasCoords && (
+          <>
+            <div className="divider" />
+            <h2>{t("bagDetail.itinerary.title")}</h2>
+            <div className="map-container" style={{ height: 200 }}>
+              <MapContainer center={[merchant.lat, merchant.lng]} zoom={14} scrollWheelZoom={false} dragging={false} style={{ width: "100%", height: "100%" }}>
+                <TileLayer
+                  attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+                  url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                />
+                <Marker position={[merchant.lat, merchant.lng]} icon={merchantMarkerIcon(merchant.logo_url)} />
+              </MapContainer>
+            </div>
+            <a className="btn secondary" style={{ display: "block", textAlign: "center", marginTop: 12 }} href={directionsUrl} target="_blank" rel="noreferrer">
+              {t("bagDetail.directions")}
+            </a>
           </>
         )}
 
