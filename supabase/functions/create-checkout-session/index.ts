@@ -53,7 +53,10 @@ Deno.serve(async (req) => {
 
     const session = await stripe.checkout.sessions.create({
       mode: "payment",
-      payment_method_types: ["card"],
+      // "card" couvre déjà Apple Pay / Google Pay (détectés automatiquement
+      // par Stripe selon l'appareil du client) — "bancontact" ajoute le
+      // moyen de paiement belge/luxembourgeois le plus courant après la carte.
+      payment_method_types: ["card", "bancontact"],
       line_items: [
         {
           price_data: {
