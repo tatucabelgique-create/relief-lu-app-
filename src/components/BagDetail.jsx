@@ -1,8 +1,6 @@
 import { useEffect, useState } from "react";
-import { MapContainer, TileLayer, Marker } from "react-leaflet";
 import { useI18n } from "../lib/i18n.jsx";
 import { formatPickupWindow } from "./BagCard.jsx";
-import { merchantMarkerIcon } from "../lib/leafletIcon";
 
 function isToday(iso) {
   const d = new Date(iso);
@@ -30,11 +28,10 @@ function ShareIcon() {
 // "Emballages" et "Ingrédients & Allergènes" reprennent le texte générique
 // fixe de la référence — le contenu d'un panier surprise varie chaque jour,
 // donc TGTG ne demande pas au commerçant de le détailler à chaque sachet.
-export default function BagDetail({ bag, rating, isFavorite, onToggleFavorite, onBack, onReserve }) {
+export default function BagDetail({ bag, rating, isFavorite, onToggleFavorite, onBack, onReserve, onOpenMerchant }) {
   const { lang, t } = useI18n();
   const merchant = bag.merchants;
   const hasDiscount = bag.original_price_cents && bag.original_price_cents > bag.price_cents;
-  const hasCoords = merchant?.lat != null && merchant?.lng != null;
   const [scrolled, setScrolled] = useState(false);
   const [allergensOpen, setAllergensOpen] = useState(false);
 
@@ -48,7 +45,6 @@ export default function BagDetail({ bag, rating, isFavorite, onToggleFavorite, o
   }, []);
 
   const address = [merchant?.address, merchant?.city].filter(Boolean).join(", ");
-  const directionsUrl = hasCoords ? `https://www.google.com/maps/dir/?api=1&destination=${merchant.lat},${merchant.lng}` : null;
 
   function handleShare() {
     if (navigator.share) {
@@ -129,6 +125,20 @@ export default function BagDetail({ bag, rating, isFavorite, onToggleFavorite, o
           <span>🕒 {t("pickupWindow")} {formatPickupWindow(bag.pickup_start, bag.pickup_end, lang)}</span>
           {isToday(bag.pickup_start) && <span className="chip-pill-outline">{t("bagDetail.today")}</span>}
         </div>
+
+        {address && onOpenMerchant && (
+          <>
+            <div className="divider" />
+            <button className="bag-detail-address" onClick={() => onOpenMerchant({ ...merchant, id: bag.merchant_id })}>
+              <span>
+                📍 {address}
+                <span className="bag-detail-address-sub">{t("bagDetail.seeMerchant")}</span>
+              </span>
+              <span className="chevron">›</span>
+            </button>
+          </>
+        )}
+
         <div className="bag-detail-availability-banner">
           {bag.quantity_left} {t("badge.available")}
         </div>
@@ -176,32 +186,6 @@ export default function BagDetail({ bag, rating, isFavorite, onToggleFavorite, o
                     </div>
                   </div>
                 )
-            )}
-          </>
-        )}
-
-        {address && (
-          <>
-            <div className="divider" />
-            <h2>{t("bagDetail.itinerary.title")}</h2>
-            <div className="bag-detail-row" style={{ marginBottom: hasCoords ? 12 : 0 }}>
-              <span>📍 {address}</span>
-            </div>
-            {hasCoords && (
-              <>
-                <div className="map-container" style={{ height: 200 }}>
-                  <MapContainer center={[merchant.lat, merchant.lng]} zoom={14} scrollWheelZoom={false} dragging={false} style={{ width: "100%", height: "100%" }}>
-                    <TileLayer
-                      attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-                      url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                    />
-                    <Marker position={[merchant.lat, merchant.lng]} icon={merchantMarkerIcon(merchant.logo_url)} />
-                  </MapContainer>
-                </div>
-                <a className="btn secondary" style={{ display: "block", textAlign: "center", marginTop: 12 }} href={directionsUrl} target="_blank" rel="noreferrer">
-                  {t("bagDetail.directions")}
-                </a>
-              </>
             )}
           </>
         )}

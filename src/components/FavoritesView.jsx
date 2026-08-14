@@ -4,6 +4,7 @@ import { loadActiveBags } from "../lib/bags";
 import { useFavorites } from "../lib/favorites";
 import BagCard from "./BagCard.jsx";
 import BagDetail from "./BagDetail.jsx";
+import MerchantProfile from "./MerchantProfile.jsx";
 import ReserveModal from "./ReserveModal.jsx";
 import AuthPrompt from "./AuthPrompt.jsx";
 import NotificationToggle from "./NotificationToggle.jsx";
@@ -13,6 +14,7 @@ export default function FavoritesView({ user }) {
   const [bags, setBags] = useState(null);
   const [reserving, setReserving] = useState(null);
   const [viewingDetail, setViewingDetail] = useState(null);
+  const [viewingMerchant, setViewingMerchant] = useState(null);
   const { favoriteIds, toggleFavorite } = useFavorites(user);
 
   async function refresh() {
@@ -61,9 +63,21 @@ export default function FavoritesView({ user }) {
           isFavorite={favoriteIds.has(viewingDetail.merchant_id)}
           onToggleFavorite={toggleFavorite}
           onBack={() => setViewingDetail(null)}
+          onOpenMerchant={setViewingMerchant}
           onReserve={(bag) => {
             setViewingDetail(null);
             setReserving(bag);
+          }}
+        />
+      )}
+      {viewingMerchant && (
+        <MerchantProfile
+          merchant={viewingMerchant}
+          bags={(bags || []).filter((b) => b.merchant_id === viewingMerchant.id)}
+          onBack={() => setViewingMerchant(null)}
+          onOpenBag={(bag) => {
+            setViewingMerchant(null);
+            setViewingDetail(bag);
           }}
         />
       )}
