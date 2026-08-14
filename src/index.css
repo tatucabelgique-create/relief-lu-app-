@@ -144,7 +144,7 @@ h1.page-title {
 
 .reserve-time-row { display: flex; align-items: center; gap: 8px; margin: 14px 0 20px; }
 .reserve-time-badge {
-  background: rgba(127,168,140,0.16); color: var(--sage); font-weight: 700;
+  background: rgba(232,163,61,0.16); color: var(--honey); font-weight: 700;
   font-size: 13px; padding: 5px 12px; border-radius: 100px;
 }
 .reserve-row {
