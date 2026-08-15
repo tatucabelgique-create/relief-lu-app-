@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useI18n } from "../lib/i18n.jsx";
 import { updateMerchantProfile } from "../lib/merchants";
+import { geocodeAddress } from "../lib/geolocation";
 
 export default function MerchantRegistrationForm({ user, merchant, onDone }) {
   const { t } = useI18n();
@@ -26,7 +27,10 @@ export default function MerchantRegistrationForm({ user, merchant, onDone }) {
     }
     setSaving(true);
     try {
-      await updateMerchantProfile(user.id, form);
+      // Géocode l'adresse tapée en coordonnées GPS automatiquement — le
+      // commerçant n'a plus besoin de positionner un repère sur une carte.
+      const coords = await geocodeAddress(form.address, form.city);
+      await updateMerchantProfile(user.id, { ...form, lat: coords?.lat, lng: coords?.lng });
       onDone();
     } catch (err) {
       setMsg({ type: "error", text: err.message });

@@ -3,7 +3,6 @@ import { useI18n } from "../lib/i18n.jsx";
 import { loadMerchantBags, publishBag, uploadBagPhoto } from "../lib/bags";
 import { notifyNewBag } from "../lib/notify";
 import { getErrorMessage } from "../lib/auth";
-import MerchantLocationPicker from "./MerchantLocationPicker.jsx";
 import MerchantLogoUpload from "./MerchantLogoUpload.jsx";
 import MerchantStats from "./MerchantStats.jsx";
 import MerchantBagRow from "./MerchantBagRow.jsx";
@@ -152,8 +151,6 @@ export default function MerchantDashboard({ user, merchant, onMerchantChanged })
           }}
         />
       )}
-
-      {merchant && <MerchantLocationPicker user={user} merchant={merchant} />}
 
       <div className="panel">
         <h2>{t("merchant.newBag")}</h2>

@@ -32,6 +32,24 @@ export function savePosition(pos) {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(pos));
 }
 
+// Géocodage via Nominatim (OpenStreetMap) — gratuit, sans clé API, cohérent
+// avec les tuiles OSM déjà utilisées pour les cartes. Retourne null si
+// aucune correspondance (le commerçant garde alors juste son adresse texte,
+// sans coordonnées — pas bloquant pour publier des sachets).
+export async function geocodeAddress(address, city) {
+  const query = [address, city].filter(Boolean).join(", ");
+  if (!query) return null;
+  const url = `https://nominatim.openstreetmap.org/search?format=json&limit=1&q=${encodeURIComponent(query)}`;
+  try {
+    const res = await fetch(url, { headers: { Accept: "application/json" } });
+    const results = await res.json();
+    if (!results?.length) return null;
+    return { lat: parseFloat(results[0].lat), lng: parseFloat(results[0].lon) };
+  } catch {
+    return null;
+  }
+}
+
 export function locate() {
   return new Promise((resolve, reject) => {
     if (!navigator.geolocation) {
