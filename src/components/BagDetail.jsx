@@ -166,7 +166,7 @@ export default function BagDetail({ bag, rating, isFavorite, onToggleFavorite, o
               <div>
                 <h2>{t("bagDetail.overallExperience")}</h2>
                 <p className="page-sub" style={{ marginTop: -4 }}>
-                  {t("bagDetail.basedOnReviewsPrefix")} {rating.count} {t("bagDetail.basedOnReviewsSuffix")}
+                  {t("bagDetail.basedOnReviewsPrefix")} {rating.count} {t(rating.count === 1 ? "bagDetail.basedOnReviewsSuffixSingular" : "bagDetail.basedOnReviewsSuffix")}
                 </p>
               </div>
               <div className="overall-rating-box">
