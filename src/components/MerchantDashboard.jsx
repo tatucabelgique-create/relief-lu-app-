@@ -17,6 +17,7 @@ const emptyForm = {
   qty: 5,
   start: "",
   end: "",
+  recurring: false,
 };
 
 export default function MerchantDashboard({ user, merchant, onMerchantChanged }) {
@@ -92,6 +93,7 @@ export default function MerchantDashboard({ user, merchant, onMerchantChanged })
         quantity_left: parseInt(form.qty || "1", 10),
         pickup_start: form.start,
         pickup_end: form.end,
+        is_recurring: form.recurring,
         image_url,
       });
       notifyNewBag(newBag);
@@ -176,6 +178,14 @@ export default function MerchantDashboard({ user, merchant, onMerchantChanged })
             <input type="datetime-local" value={form.end} onChange={(e) => set("end", e.target.value)} />
           </div>
         </div>
+        <label className="checkbox-field">
+          <input type="checkbox" checked={form.recurring} onChange={(e) => set("recurring", e.target.checked)} />
+          <span>
+            {t("merchant.f.recurring")}
+            <span className="field-hint" style={{ display: "block" }}>{t("merchant.f.recurringHint")}</span>
+          </span>
+        </label>
+
         <div className="field">
           <label>{t("merchant.f.photo")}</label>
           <input type="file" accept="image/*" onChange={(e) => setPhoto(e.target.files[0] || null)} />

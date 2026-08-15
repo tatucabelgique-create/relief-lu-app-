@@ -2,14 +2,8 @@ import { useState } from "react";
 import { useI18n } from "../lib/i18n.jsx";
 import { reserveBag } from "../lib/reservations";
 import { createCheckoutSession } from "../lib/payments";
-import { formatPickupWindow } from "./BagCard.jsx";
+import { formatPickupWindow, isToday, isTomorrow } from "./BagCard.jsx";
 import AuthPrompt from "./AuthPrompt.jsx";
-
-function isToday(iso) {
-  const d = new Date(iso);
-  const now = new Date();
-  return d.toDateString() === now.toDateString();
-}
 
 export default function ReserveModal({ bag, user, onClose, onReserved }) {
   const { lang, t } = useI18n();
@@ -62,6 +56,7 @@ export default function ReserveModal({ bag, user, onClose, onReserved }) {
 
             <div className="reserve-time-row">
               {isToday(bag.pickup_start) && <span className="chip-pill-outline">{t("bagDetail.today")}</span>}
+              {isTomorrow(bag.pickup_start) && <span className="chip-pill-outline">{t("bagDetail.tomorrow")}</span>}
               <span className="reserve-time-badge figures">{formatPickupWindow(bag.pickup_start, bag.pickup_end, lang)}</span>
             </div>
 

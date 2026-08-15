@@ -31,6 +31,7 @@ export default function MerchantBagRow({ bag, onChanged }) {
           <b>{bag.title}</b>
           <span>
             {bag.quantity_left}/{bag.quantity_total} {t("left")} · {(bag.price_cents / 100).toFixed(2)} € · {bag.status}
+            {bag.is_recurring && <> · 🔁 {t("merchant.f.recurring")}</>}
           </span>
         </div>
         <div style={{ display: "flex", gap: 8 }}>

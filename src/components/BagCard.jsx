@@ -12,6 +12,16 @@ export function formatPickupWindow(startISO, endISO, lang) {
   return s.toLocaleTimeString(lang, opts) + " – " + e.toLocaleTimeString(lang, opts);
 }
 
+export function isToday(iso) {
+  return new Date(iso).toDateString() === new Date().toDateString();
+}
+
+export function isTomorrow(iso) {
+  const tomorrow = new Date();
+  tomorrow.setDate(tomorrow.getDate() + 1);
+  return new Date(iso).toDateString() === tomorrow.toDateString();
+}
+
 function formatDuration(ms) {
   const totalMin = Math.max(0, Math.round(ms / 60000));
   const h = Math.floor(totalMin / 60);

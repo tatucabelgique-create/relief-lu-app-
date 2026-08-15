@@ -1,14 +1,8 @@
 import { useEffect, useState } from "react";
 import { MapContainer, TileLayer, Marker } from "react-leaflet";
 import { useI18n } from "../lib/i18n.jsx";
-import { formatPickupWindow } from "./BagCard.jsx";
+import { formatPickupWindow, isToday, isTomorrow } from "./BagCard.jsx";
 import { merchantMarkerIcon } from "../lib/leafletIcon";
-
-function isToday(iso) {
-  const d = new Date(iso);
-  const now = new Date();
-  return d.toDateString() === now.toDateString();
-}
 
 // Icône "Share2" de Lucide (trois points reliés) — même icône que celle
 // utilisée pour "Partager" dans tatuca, pour rester cohérent entre les apps.
@@ -128,6 +122,7 @@ export default function BagDetail({ bag, rating, isFavorite, onToggleFavorite, o
         <div className="bag-detail-row">
           <span>🕒 {t("pickupWindow")} {formatPickupWindow(bag.pickup_start, bag.pickup_end, lang)}</span>
           {isToday(bag.pickup_start) && <span className="chip-pill-outline">{t("bagDetail.today")}</span>}
+          {isTomorrow(bag.pickup_start) && <span className="chip-pill-outline">{t("bagDetail.tomorrow")}</span>}
         </div>
 
         {address && onOpenMerchant && (
