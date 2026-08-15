@@ -140,10 +140,27 @@ export default function BagDetail({ bag, rating, isFavorite, onToggleFavorite, o
         )}
 
         <div className="bag-detail-availability-banner">
-          {bag.quantity_left} {t("badge.available")}
+          {soldOut ? t("badge.soldOut") : `${bag.quantity_left} ${t("badge.available")}`}
         </div>
 
-        {onToggleFavorite && (
+        {/* Sachet épuisé : on remplace l'incitation aux notifications par une
+            invitation à mettre le commerçant en favori (façon TGTG), plus la
+            prochaine heure de disponibilité si le sachet est récurrent —
+            réserver n'étant plus possible, l'incitation change d'objectif. */}
+        {soldOut && onToggleFavorite && !isFavorite && (
+          <button className="notify-toggle-row" onClick={() => onToggleFavorite(bag.merchant_id)}>
+            <span>{t("bagDetail.favoritePrompt")}</span>
+            <span>♡</span>
+          </button>
+        )}
+        {soldOut && bag.is_recurring && (
+          <div className="revisit-row">
+            📅 {t("bagDetail.comeBackAt")}{" "}
+            <b>{new Date(bag.pickup_start).toLocaleTimeString(lang, { hour: "2-digit", minute: "2-digit" })}</b> {t("bagDetail.tomorrowLower")}
+          </div>
+        )}
+
+        {!soldOut && onToggleFavorite && (
           <button className="notify-toggle-row" onClick={() => onToggleFavorite(bag.merchant_id)}>
             <span>🔔 {t("bagDetail.notify")}</span>
             <span className={`toggle-switch ${isFavorite ? "on" : ""}`}>
