@@ -28,6 +28,7 @@ export default function BagDetail({ bag, rating, isFavorite, onToggleFavorite, o
   const { lang, t } = useI18n();
   const merchant = bag.merchants;
   const hasDiscount = bag.original_price_cents && bag.original_price_cents > bag.price_cents;
+  const soldOut = bag.status === "sold_out";
   const [scrolled, setScrolled] = useState(false);
   const [allergensOpen, setAllergensOpen] = useState(false);
 
@@ -247,8 +248,8 @@ export default function BagDetail({ bag, rating, isFavorite, onToggleFavorite, o
           {hasDiscount && <span className="price-original">{(bag.original_price_cents / 100).toFixed(2)} €</span>}
           <span className="price">{(bag.price_cents / 100).toFixed(2)} €</span>
         </span>
-        <button className="btn" onClick={() => onReserve(bag)}>
-          {t("reserve")}
+        <button className="btn" disabled={soldOut} onClick={() => !soldOut && onReserve(bag)}>
+          {soldOut ? t("badge.soldOut") : t("reserve")}
         </button>
       </div>
     </div>
