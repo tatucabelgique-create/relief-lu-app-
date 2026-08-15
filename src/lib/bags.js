@@ -1,11 +1,16 @@
 import { supabase } from "./supabase";
 
 export async function loadActiveBags() {
+  // pickup_end dans le futur : un sachet dont le créneau de retrait est
+  // dépassé n'a plus de sens à afficher/réserver, récurrent ou non — pour
+  // un sachet récurrent, il redevient visible une fois reprogrammé par
+  // refresh_recurring_bags() (tâche planifiée, voir schema-v9).
   const { data, error } = await supabase
     .from("bags")
     .select("*, merchants(business_name, city, lat, lng, logo_url)")
     .eq("status", "active")
     .gt("quantity_left", 0)
+    .gt("pickup_end", new Date().toISOString())
     .order("created_at", { ascending: false });
   if (error) throw error;
   return data;
