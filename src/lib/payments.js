@@ -16,8 +16,8 @@ export async function createCheckoutSession(reservationId) {
       Authorization: `Bearer ${session?.access_token}`,
       apikey: import.meta.env.VITE_SUPABASE_ANON_KEY,
     },
-    // On transmet l'adresse exacte de retour (avec le sous-dossier /relief-lu-app-/) —
-    // deviner à partir du seul header Origin ct̂é serveur perdait ce sous-dossier.
+    // On transmet l'adresse exacte de retour (BASE_URL, "/" en prod) — deviner
+    // à partir du seul header Origin côté serveur perdait le bon chemin.
     body: JSON.stringify({ reservation_id: reservationId, return_base: window.location.origin + import.meta.env.BASE_URL }),
   });
   const data = await res.json();
