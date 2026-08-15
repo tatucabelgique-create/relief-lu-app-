@@ -7,6 +7,7 @@ import MerchantLocationPicker from "./MerchantLocationPicker.jsx";
 import MerchantLogoUpload from "./MerchantLogoUpload.jsx";
 import MerchantStats from "./MerchantStats.jsx";
 import MerchantBagRow from "./MerchantBagRow.jsx";
+import MerchantRegistrationForm from "./MerchantRegistrationForm.jsx";
 
 const emptyForm = {
   title: "",
@@ -30,6 +31,7 @@ export default function MerchantDashboard({ user, merchant, onMerchantChanged })
   const [msg, setMsg] = useState(null);
   const [myBags, setMyBags] = useState([]);
   const [statsKey, setStatsKey] = useState(0);
+  const [editingInfo, setEditingInfo] = useState(false);
 
   async function refreshMyBags() {
     setMyBags(await loadMerchantBags(user.id));
@@ -128,6 +130,29 @@ export default function MerchantDashboard({ user, merchant, onMerchantChanged })
       </div>
 
       {merchant && <MerchantLogoUpload user={user} merchant={merchant} onUpdated={onMerchantChanged} />}
+
+      {merchant && !editingInfo && (
+        <div className="panel">
+          <h2>{merchant.business_name}</h2>
+          <p className="page-sub" style={{ marginBottom: 12 }}>
+            {[merchant.address, merchant.city].filter(Boolean).join(", ") || t("merchant.noAddressSet")}
+          </p>
+          <button className="btn secondary small" onClick={() => setEditingInfo(true)}>
+            {t("merchant.editInfo")}
+          </button>
+        </div>
+      )}
+      {merchant && editingInfo && (
+        <MerchantRegistrationForm
+          user={user}
+          merchant={merchant}
+          onDone={() => {
+            setEditingInfo(false);
+            onMerchantChanged();
+          }}
+        />
+      )}
+
       {merchant && <MerchantLocationPicker user={user} merchant={merchant} />}
 
       <div className="panel">
