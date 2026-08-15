@@ -19,7 +19,7 @@ export default function SocialLinks() {
           <circle cx="31.6" cy="16.4" r="1.6" fill="#fff" />
         </svg>
       </a>
-      <a href="#" aria-label="Facebook" style={{ lineHeight: 0 }}>
+      <a href="https://www.facebook.com/profile.php?id=61593060962783" target="_blank" rel="noreferrer" aria-label="Facebook" style={{ lineHeight: 0 }}>
         <svg viewBox="0 0 48 48" width="24" height="24">
           <rect width="48" height="48" rx="12" fill="#1877F2" />
           <path
