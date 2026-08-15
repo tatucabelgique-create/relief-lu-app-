@@ -51,7 +51,9 @@ export default function MerchantDashboard({ user, merchant, onMerchantChanged })
     setForm((f) => ({
       ...f,
       originalPrice: value,
-      price: priceTouched ? f.price : value ? (parseFloat(value) / 2).toFixed(2) : f.price,
+      // Arrondi vers le bas (pas .toFixed, qui arrondirait 9,99/2 = 4,995 à
+      // 5,00) — la réduction affichée ne doit jamais être inférieure à 50 %.
+      price: priceTouched ? f.price : value ? (Math.floor(parseFloat(value) * 50) / 100).toFixed(2) : f.price,
     }));
   }
 
