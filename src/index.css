@@ -80,8 +80,11 @@ h1.page-title {
 .card .row { display: flex; align-items: center; justify-content: space-between; }
 .price { font-family: 'IBM Plex Mono', monospace; font-weight: 600; color: var(--honey); font-size: 16px; }
 .co2-pill {
+  /* Vert forêt volontairement distinct du sage (var(--sage), trop proche du
+     vert TGTG) — réservé à ce badge écologique précis, pas une couleur
+     d'accent générale de l'app. */
   margin-top: 10px; padding: 6px 10px; border-radius: 8px;
-  background: rgba(232,163,61,0.14); color: var(--honey);
+  background: rgba(61,107,74,0.22); color: #6FBE85;
   font-size: 12px; font-weight: 600; text-align: center;
 }
 .qty { font-size: 12px; color: var(--paper-dim); }
