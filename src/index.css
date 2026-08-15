@@ -110,7 +110,11 @@ h1.page-title {
   font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600;
 }
 .badge-availability { left: 10px; background: var(--honey); color: var(--navy); }
+.badge-availability.badge-sold-out { background: rgba(22,35,44,0.75); color: var(--paper-dim); }
 .badge-rating { right: 10px; background: rgba(22,35,44,0.85); color: var(--honey); }
+
+.card-sold-out .thumb { filter: grayscale(0.85); opacity: 0.55; }
+.card-sold-out h3, .card-sold-out .price, .card-sold-out .price-original { opacity: 0.55; }
 .price-original {
   font-family: 'IBM Plex Mono', monospace; font-size: 13px; color: var(--paper-dim);
   text-decoration: line-through; margin-right: 6px;

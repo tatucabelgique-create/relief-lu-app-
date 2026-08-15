@@ -47,13 +47,18 @@ export default function BagCard({ bag, onReserve, onToggleFavorite, isFavorite, 
   const { lang, t } = useI18n();
   const countdown = useCountdown(bag.pickup_start, bag.pickup_end, t);
   const hasDiscount = bag.original_price_cents && bag.original_price_cents > bag.price_cents;
+  const soldOut = bag.status === "sold_out";
 
   return (
-    <div className="card" onClick={() => onOpenDetail?.(bag)} style={onOpenDetail ? { cursor: "pointer" } : undefined}>
+    <div
+      className={`card ${soldOut ? "card-sold-out" : ""}`}
+      onClick={() => onOpenDetail?.(bag)}
+      style={onOpenDetail ? { cursor: "pointer" } : undefined}
+    >
       <div className="thumb" style={bag.image_url ? { backgroundImage: `url('${bag.image_url}')` } : undefined}>
         {!bag.image_url && "🥡"}
-        <div className="badge-availability">
-          {bag.quantity_left} {t("badge.available")}
+        <div className={`badge-availability ${soldOut ? "badge-sold-out" : ""}`}>
+          {soldOut ? t("badge.soldOut") : `${bag.quantity_left} ${t("badge.available")}`}
         </div>
         {rating && (
           <div className="badge-rating">
@@ -92,15 +97,17 @@ export default function BagCard({ bag, onReserve, onToggleFavorite, isFavorite, 
             {hasDiscount && <span className="price-original">{(bag.original_price_cents / 100).toFixed(2)} €</span>}
             <span className="price">{(bag.price_cents / 100).toFixed(2)} €</span>
           </span>
-          <button
-            className="btn small"
-            onClick={(e) => {
-              e.stopPropagation();
-              onReserve(bag);
-            }}
-          >
-            {t("reserve")}
-          </button>
+          {!soldOut && (
+            <button
+              className="btn small"
+              onClick={(e) => {
+                e.stopPropagation();
+                onReserve(bag);
+              }}
+            >
+              {t("reserve")}
+            </button>
+          )}
         </div>
         <div className="co2-pill">🌍 ~{CO2_KG_PER_BAG} {t("badge.co2Suffix")}</div>
       </div>

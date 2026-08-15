@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { useI18n } from "../lib/i18n.jsx";
-import { loadActiveBags } from "../lib/bags";
+import { loadActiveBags, loadSoldOutToday } from "../lib/bags";
 import { haversineKm, loadSavedPosition, locate } from "../lib/geolocation";
 import { useFavorites } from "../lib/favorites";
 import { getMerchantRatings } from "../lib/reviews";
@@ -27,9 +27,11 @@ export default function PublicView({ user, pendingReserveBagId, onPendingReserve
   const [geoStatus, setGeoStatus] = useState("idle");
   const { favoriteIds, toggleFavorite } = useFavorites(user);
   const [ratings, setRatings] = useState({});
+  const [soldOutToday, setSoldOutToday] = useState([]);
 
   async function refresh() {
     setBags(await loadActiveBags());
+    setSoldOutToday(await loadSoldOutToday());
   }
 
   useEffect(() => {
@@ -113,6 +115,26 @@ export default function PublicView({ user, pendingReserveBagId, onPendingReserve
                   onReserve={setReserving}
                   onOpenDetail={setViewingDetail}
                   distanceKm={bag.distanceKm}
+                  onToggleFavorite={user ? toggleFavorite : undefined}
+                  isFavorite={favoriteIds.has(bag.merchant_id)}
+                  rating={ratings[bag.merchant_id]}
+                />
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {soldOutToday.length > 0 && (
+        <div className="carousel-section">
+          <h2>{t("public.soldOutToday")}</h2>
+          <div className="carousel-track">
+            {soldOutToday.map((bag) => (
+              <div className="carousel-card" key={bag.id}>
+                <BagCard
+                  bag={bag}
+                  onReserve={setReserving}
+                  onOpenDetail={setViewingDetail}
                   onToggleFavorite={user ? toggleFavorite : undefined}
                   isFavorite={favoriteIds.has(bag.merchant_id)}
                   rating={ratings[bag.merchant_id]}

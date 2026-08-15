@@ -16,6 +16,26 @@ export async function loadActiveBags() {
   return data;
 }
 
+// "Ils ont eu du succès aujourd'hui" façon TGTG : preuve sociale, sachets
+// épuisés dont le créneau de retrait tombe aujourd'hui.
+export async function loadSoldOutToday() {
+  const startOfDay = new Date();
+  startOfDay.setHours(0, 0, 0, 0);
+  const endOfDay = new Date();
+  endOfDay.setHours(23, 59, 59, 999);
+
+  const { data, error } = await supabase
+    .from("bags")
+    .select("*, merchants(business_name, city, lat, lng, logo_url)")
+    .eq("status", "sold_out")
+    .gte("pickup_start", startOfDay.toISOString())
+    .lte("pickup_start", endOfDay.toISOString())
+    .order("created_at", { ascending: false })
+    .limit(8);
+  if (error) throw error;
+  return data;
+}
+
 export async function loadMerchantBags(merchantId) {
   const { data, error } = await supabase
     .from("bags")
