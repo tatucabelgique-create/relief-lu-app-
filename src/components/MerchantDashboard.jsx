@@ -18,6 +18,8 @@ const emptyForm = {
   start: "",
   end: "",
   recurring: false,
+  containerProvided: false,
+  bagProvided: false,
 };
 
 export default function MerchantDashboard({ user, merchant, onMerchantChanged }) {
@@ -94,6 +96,8 @@ export default function MerchantDashboard({ user, merchant, onMerchantChanged })
         pickup_start: form.start,
         pickup_end: form.end,
         is_recurring: form.recurring,
+        container_provided: form.containerProvided,
+        bag_provided: form.bagProvided,
         image_url,
       });
       notifyNewBag(newBag);
@@ -184,6 +188,16 @@ export default function MerchantDashboard({ user, merchant, onMerchantChanged })
             {t("merchant.f.recurring")}
             <span className="field-hint" style={{ display: "block" }}>{t("merchant.f.recurringHint")}</span>
           </span>
+        </label>
+
+        <label className="checkbox-field">
+          <input type="checkbox" checked={form.containerProvided} onChange={(e) => set("containerProvided", e.target.checked)} />
+          <span>{t("merchant.f.containerProvided")}</span>
+        </label>
+
+        <label className="checkbox-field">
+          <input type="checkbox" checked={form.bagProvided} onChange={(e) => set("bagProvided", e.target.checked)} />
+          <span>{t("merchant.f.bagProvided")}</span>
         </label>
 
         <div className="field">

@@ -218,15 +218,21 @@ export default function BagDetail({ bag, rating, isFavorite, onToggleFavorite, o
           <div className="packaging-card">
             <span className="packaging-icon">📦</span>
             <b>{t("bagDetail.packaging.container")}</b>
-            <span className="page-sub" style={{ margin: 0 }}>{t("bagDetail.packaging.notProvided")}</span>
+            <span className="page-sub" style={{ margin: 0 }}>
+              {bag.container_provided ? t("bagDetail.packaging.provided") : t("bagDetail.packaging.notProvided")}
+            </span>
           </div>
           <div className="packaging-card">
             <span className="packaging-icon">🛍️</span>
             <b>{t("bagDetail.packaging.bag")}</b>
-            <span className="page-sub" style={{ margin: 0 }}>{t("bagDetail.packaging.notProvided")}</span>
+            <span className="page-sub" style={{ margin: 0 }}>
+              {bag.bag_provided ? t("bagDetail.packaging.provided") : t("bagDetail.packaging.notProvided")}
+            </span>
           </div>
         </div>
-        <div className="info-banner">ℹ️ {t("bagDetail.packaging.info")}</div>
+        {(!bag.container_provided || !bag.bag_provided) && (
+          <div className="info-banner">ℹ️ {t("bagDetail.packaging.info")}</div>
+        )}
 
         <div className="divider" />
         <button className="accordion-toggle" onClick={() => setAllergensOpen((v) => !v)}>
