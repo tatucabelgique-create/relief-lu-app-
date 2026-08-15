@@ -37,6 +37,16 @@ export default function PublicView({ user, pendingReserveBagId, onPendingReserve
   useEffect(() => {
     refresh();
     getMerchantRatings().then(setRatings);
+
+    // Recharge la liste à chaque retour au premier plan — sans ça, un sachet
+    // publié pendant que l'app était en arrière-plan (ou ouverte depuis une
+    // notification) restait invisible tant qu'on ne fermait/rouvrait pas
+    // complètement l'app.
+    function onVisible() {
+      if (document.visibilityState === "visible") refresh();
+    }
+    document.addEventListener("visibilitychange", onVisible);
+    return () => document.removeEventListener("visibilitychange", onVisible);
   }, []);
 
   // Rouvre la modale de réservation sur le sachet précis après un retour de

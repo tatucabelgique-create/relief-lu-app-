@@ -23,6 +23,11 @@ export default function FavoritesView({ user }) {
 
   useEffect(() => {
     refresh();
+    function onVisible() {
+      if (document.visibilityState === "visible") refresh();
+    }
+    document.addEventListener("visibilitychange", onVisible);
+    return () => document.removeEventListener("visibilitychange", onVisible);
   }, []);
 
   const favBags = (bags || []).filter((b) => favoriteIds.has(b.merchant_id));
