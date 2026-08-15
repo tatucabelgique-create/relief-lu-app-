@@ -97,17 +97,16 @@ export default function BagCard({ bag, onReserve, onToggleFavorite, isFavorite, 
             {hasDiscount && <span className="price-original">{(bag.original_price_cents / 100).toFixed(2)} €</span>}
             <span className="price">{(bag.price_cents / 100).toFixed(2)} €</span>
           </span>
-          {!soldOut && (
-            <button
-              className="btn small"
-              onClick={(e) => {
-                e.stopPropagation();
-                onReserve(bag);
-              }}
-            >
-              {t("reserve")}
-            </button>
-          )}
+          <button
+            className="btn small"
+            disabled={soldOut}
+            onClick={(e) => {
+              e.stopPropagation();
+              if (!soldOut) onReserve(bag);
+            }}
+          >
+            {soldOut ? t("badge.soldOut") : t("reserve")}
+          </button>
         </div>
         <div className="co2-pill">🌍 ~{CO2_KG_PER_BAG} {t("badge.co2Suffix")}</div>
       </div>
