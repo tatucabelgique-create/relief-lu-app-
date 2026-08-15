@@ -54,7 +54,7 @@ export default function MerchantProfile({ merchant, bags, rating, distanceKm, on
           <>
             <div className="divider" />
             <a className="bag-detail-address" href={directionsUrl || "#"} target={directionsUrl ? "_blank" : undefined} rel="noreferrer">
-              <span>📍 {address}</span>
+              <span className="bag-detail-address-line">📍 {address}</span>
               <span className="chevron">›</span>
             </a>
           </>
@@ -68,7 +68,10 @@ export default function MerchantProfile({ merchant, bags, rating, distanceKm, on
           <div className="merchant-bag-list">
             {bags.map((bag) => (
               <button key={bag.id} className="merchant-bag-row" onClick={() => onOpenBag(bag)}>
-                <div>
+                <div className="merchant-bag-row-thumb" style={bag.image_url ? { backgroundImage: `url('${bag.image_url}')` } : undefined}>
+                  {!bag.image_url && "🥡"}
+                </div>
+                <div style={{ flex: 1 }}>
                   <b>{bag.title}</b>
                   <span className="page-sub">{formatPickupWindow(bag.pickup_start, bag.pickup_end, lang)}</span>
                 </div>

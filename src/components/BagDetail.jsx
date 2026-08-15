@@ -130,7 +130,7 @@ export default function BagDetail({ bag, rating, isFavorite, onToggleFavorite, o
             <div className="divider" />
             <button className="bag-detail-address" onClick={() => onOpenMerchant({ ...merchant, id: bag.merchant_id })}>
               <span>
-                📍 {address}
+                <span className="bag-detail-address-line">📍 {address}</span>
                 <span className="bag-detail-address-sub">{t("bagDetail.seeMerchant")}</span>
               </span>
               <span className="chevron">›</span>
