@@ -93,8 +93,12 @@ export default function MerchantDashboard({ user, merchant, onMerchantChanged })
         original_price_cents: form.originalPrice ? Math.round(parseFloat(form.originalPrice) * 100) : null,
         quantity_total: parseInt(form.qty || "1", 10),
         quantity_left: parseInt(form.qty || "1", 10),
-        pickup_start: form.start,
-        pickup_end: form.end,
+        // datetime-local ne porte aucune info de fuseau — new Date(...) l'interprète
+        // dans le fuseau du navigateur (donc celui du commerçant), puis toISOString()
+        // produit un horaire UTC correct. Envoyer form.start/form.end tels quels
+        // faisait perdre le fuseau et stockait l'heure locale comme si elle était UTC.
+        pickup_start: new Date(form.start).toISOString(),
+        pickup_end: new Date(form.end).toISOString(),
         is_recurring: form.recurring,
         container_provided: form.containerProvided,
         bag_provided: form.bagProvided,
