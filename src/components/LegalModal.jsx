@@ -143,7 +143,7 @@ const CONTENT = {
       paragraphs: [
         "Diese Website verwendet technisch notwendige Cookies und Speicher (Anmeldung aufrechterhalten, Sprache merken, Standort für die Sortierung nach Entfernung) — diese sind immer aktiv und erfordern keine Zustimmung, da sie für den Dienst unerlässlich sind.",
         "Mit Ihrer Zustimmung verwendet diese Website außerdem Cookies zur Reichweitenmessung (Google Analytics) und Werbung (Meta Pixel). Diese werden erst nach ausdrücklicher Zustimmung über das beim ersten Besuch angezeigte Banner gesetzt.",
-        "Sie können Ihre Wahl jederzeit über den Link „Cookies verwalten" am Seitenende ändern.",
+        "Sie können Ihre Wahl jederzeit über den Link „Cookies verwalten” am Seitenende ändern.",
       ],
     },
   },
