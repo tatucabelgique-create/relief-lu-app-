@@ -1,8 +1,9 @@
 // Crée une session Stripe Checkout pour une réservation déjà créée (en
 // payment_status='pending' — voir reserve_bag() dans schema-app.sql/v2).
-// Le stock est déjà décrémenté à ce stade ; si le paiement échoue/expire,
-// c'est le webhook stripe-webhook qui appelle release_reservation() pour
-// le restaurer. Secrets requis (Supabase Dashboard → Edge Functions → Secrets) :
+// Le stock est déjà décrémenté à ce stade ; si le paiement est annulé, le
+// client appelle release_reservation() dès son retour (PaymentResult.jsx),
+// et le webhook stripe-webhook fait de même sur checkout.session.expired en
+// filet de sécurité. Secrets requis (Supabase Dashboard → Edge Functions → Secrets) :
 // STRIPE_SECRET_KEY, SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY (ces deux
 // derniers sont déjà fournis automatiquement par Supabase à chaque fonction).
 import Stripe from "npm:stripe@17";
@@ -70,6 +71,11 @@ Deno.serve(async (req) => {
       metadata: { reservation_id: reservation.id },
       success_url: `${base}/app.html?paid=1&reservation=${reservation.id}`,
       cancel_url: `${base}/app.html?paid=0&reservation=${reservation.id}`,
+      // Minimum autorisé par Stripe — le client libère déjà le stock tout de
+      // suite en revenant sur ?paid=0 (voir PaymentResult.jsx) ; ceci n'est
+      // qu'un filet de sécurité si l'onglet est fermé avant d'y revenir,
+      // pour éviter de bloquer le sachet jusqu'à l'expiration par défaut (24h).
+      expires_at: Math.floor(Date.now() / 1000) + 30 * 60,
     });
 
     await supabase.from("reservations").update({ stripe_session_id: session.id }).eq("id", reservation.id);

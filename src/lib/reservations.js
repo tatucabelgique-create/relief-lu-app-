@@ -9,6 +9,18 @@ export async function reserveBag(bagId, quantity) {
   return Array.isArray(data) ? data[0] : data;
 }
 
+// Appelée quand le client revient de Stripe Checkout sans avoir payé
+// (annulation, retour arrière) — libère le stock tout de suite plutôt que
+// d'attendre l'expiration de la session côté Stripe (jusqu'à 24h par défaut,
+// réduite à 30 min mais ça reste trop long pour un client qui regarde
+// l'appli immédiatement après). Sans effet si déjà payée/traitée (idempotent,
+// voir release_reservation côté SQL) ou si la réservation appartient à
+// quelqu'un d'autre (vérifié via auth.uid() dans la fonction).
+export async function releaseReservation(id) {
+  const { error } = await supabase.rpc("release_reservation", { p_reservation_id: id });
+  if (error) throw error;
+}
+
 export async function getReservation(id) {
   const { data, error } = await supabase.from("reservations").select("*").eq("id", id).single();
   if (error) throw error;

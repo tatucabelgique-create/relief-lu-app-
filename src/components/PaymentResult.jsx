@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useI18n } from "../lib/i18n.jsx";
-import { getReservation } from "../lib/reservations";
+import { getReservation, releaseReservation } from "../lib/reservations";
 
 // Affiché au retour de Stripe Checkout (voir App.jsx, déclenché par
 // ?paid=1|0&reservation=<id> dans l'URL de succès/annulation configurée dans
@@ -12,7 +12,10 @@ export default function PaymentResult({ reservationId, success, onClose }) {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    if (!success) return;
+    if (!success) {
+      releaseReservation(reservationId).catch(() => {});
+      return;
+    }
     getReservation(reservationId)
       .then(setReservation)
       .catch(() => setError(t("payment.error")));
