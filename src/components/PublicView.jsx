@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import { createPortal } from "react-dom";
 import { useI18n } from "../lib/i18n.jsx";
 import { loadActiveBags, loadSoldOutToday } from "../lib/bags";
 import { haversineKm, loadSavedPosition, locate } from "../lib/geolocation";
@@ -160,6 +161,16 @@ export default function PublicView({ user, pendingReserveBagId, onPendingReserve
     </>
   );
 
+  // Portée directement dans document.body : sur l'onglet Parcourir, ces
+  // modales seraient sinon imbriquées dans .browse-map-page (position:
+  // fixed) qui contient la carte Leaflet — les panneaux/contrôles internes
+  // de Leaflet ont des z-index très élevés qui pouvaient malgré tout passer
+  // par-dessus (confirmé sur Chrome et Safari), même avec un contexte
+  // d'empilement local sur le conteneur de la carte. Un portail évite le
+  // problème à la racine : ces éléments ne sont plus du tout descendants de
+  // .browse-map-page dans le DOM.
+  const modalsPortal = createPortal(modals, document.body);
+
   // Onglet "Parcourir" façon TGTG : carte plein écran avec une feuille de
   // résultats en bas, repliable — pas la page Découvrir avec sa carte
   // encastrée au milieu du contenu éditorial (bannière d'impact, carrousels).
@@ -233,7 +244,7 @@ export default function PublicView({ user, pendingReserveBagId, onPendingReserve
           </div>
         </div>
 
-        {modals}
+        {modalsPortal}
       </div>
     );
   }
@@ -334,7 +345,7 @@ export default function PublicView({ user, pendingReserveBagId, onPendingReserve
           ))
         )}
       </div>
-      {modals}
+      {modalsPortal}
     </div>
   );
 }
