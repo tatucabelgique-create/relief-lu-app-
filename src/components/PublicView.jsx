@@ -118,6 +118,110 @@ export default function PublicView({ user, pendingReserveBagId, onPendingReserve
     }));
   }, [soldOutToday, userPos]);
 
+  const [sheetExpanded, setSheetExpanded] = useState(true);
+
+  const modals = (
+    <>
+      {viewingDetail && (
+        <BagDetail
+          bag={viewingDetail}
+          distanceKm={viewingDetail.distanceKm}
+          rating={ratings[viewingDetail.merchant_id]}
+          isFavorite={favoriteIds.has(viewingDetail.merchant_id)}
+          onToggleFavorite={user ? toggleFavorite : undefined}
+          onBack={() => setViewingDetail(null)}
+          onOpenMerchant={setViewingMerchant}
+          onReserve={(bag) => {
+            setViewingDetail(null);
+            setReserving(bag);
+          }}
+        />
+      )}
+      {viewingMerchant && (
+        <MerchantProfile
+          merchant={viewingMerchant}
+          bags={(bags || []).filter((b) => b.merchant_id === viewingMerchant.id)}
+          rating={ratings[viewingMerchant.id]}
+          distanceKm={userPos && viewingMerchant.lat != null ? haversineKm(userPos.lat, userPos.lng, viewingMerchant.lat, viewingMerchant.lng) : null}
+          onBack={() => setViewingMerchant(null)}
+          onOpenBag={(bag) => {
+            setViewingMerchant(null);
+            setViewingDetail(bag);
+          }}
+        />
+      )}
+      <ReserveModal bag={reserving} user={user} onClose={() => setReserving(null)} onReserved={refresh} />
+    </>
+  );
+
+  // Onglet "Parcourir" façon TGTG : carte plein écran avec une feuille de
+  // résultats en bas, repliable — pas la page Découvrir avec sa carte
+  // encastrée au milieu du contenu éditorial (bannière d'impact, carrousels).
+  if (compact) {
+    return (
+      <div className="browse-map-page">
+        <div className="browse-topbar">
+          <div className="browse-search-row">
+            <input
+              type="text"
+              placeholder={t("filters.search")}
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+            />
+            <button className="browse-locate-btn" onClick={handleLocate} aria-label={t("filters.useLocation")}>
+              {geoStatus === "loading" ? "…" : "📍"}
+            </button>
+          </div>
+          <div className="browse-chip-row">
+            <select value={category} onChange={(e) => setCategory(e.target.value)}>
+              <option value="">{t("filters.allCategories")}</option>
+              {["boulangerie", "restaurant", "epicerie", "supermarche", "traiteur", "autre"].map((c) => (
+                <option key={c} value={c}>
+                  {t(`merchant.category.${c}`)}
+                </option>
+              ))}
+            </select>
+            <select value={sort} onChange={(e) => setSort(e.target.value)}>
+              <option value="recent">{t("filters.sortRecent")}</option>
+              <option value="price">{t("filters.sortPrice")}</option>
+              <option value="distance">{t("filters.sortDistance")}</option>
+            </select>
+          </div>
+        </div>
+
+        <div className="browse-map-area">{bags && <MapView bags={filtered} userPos={userPos} />}</div>
+
+        <div className={`browse-sheet ${sheetExpanded ? "" : "collapsed"}`}>
+          <button className="browse-sheet-handle" onClick={() => setSheetExpanded((v) => !v)} aria-label="toggle">
+            <span />
+          </button>
+          <button className="browse-sheet-header" onClick={() => setSheetExpanded((v) => !v)}>
+            {bags === null
+              ? t("public.loading")
+              : `${filtered.length} ${filtered.length === 1 ? t("browse.result") : t("browse.results")}`}
+          </button>
+          <div className="browse-sheet-body">
+            {bags !== null && !filtered.length && <div className="empty">{t("public.empty")}</div>}
+            {filtered.map((bag) => (
+              <BagCard
+                key={bag.id}
+                bag={bag}
+                onReserve={setReserving}
+                onOpenDetail={setViewingDetail}
+                distanceKm={bag.distanceKm}
+                onToggleFavorite={user ? toggleFavorite : undefined}
+                isFavorite={favoriteIds.has(bag.merchant_id)}
+                rating={ratings[bag.merchant_id]}
+              />
+            ))}
+          </div>
+        </div>
+
+        {modals}
+      </div>
+    );
+  }
+
   return (
     <div>
       <button className="location-picker" onClick={handleLocate}>
@@ -214,35 +318,7 @@ export default function PublicView({ user, pendingReserveBagId, onPendingReserve
           ))
         )}
       </div>
-      {viewingDetail && (
-        <BagDetail
-          bag={viewingDetail}
-          distanceKm={viewingDetail.distanceKm}
-          rating={ratings[viewingDetail.merchant_id]}
-          isFavorite={favoriteIds.has(viewingDetail.merchant_id)}
-          onToggleFavorite={user ? toggleFavorite : undefined}
-          onBack={() => setViewingDetail(null)}
-          onOpenMerchant={setViewingMerchant}
-          onReserve={(bag) => {
-            setViewingDetail(null);
-            setReserving(bag);
-          }}
-        />
-      )}
-      {viewingMerchant && (
-        <MerchantProfile
-          merchant={viewingMerchant}
-          bags={(bags || []).filter((b) => b.merchant_id === viewingMerchant.id)}
-          rating={ratings[viewingMerchant.id]}
-          distanceKm={userPos && viewingMerchant.lat != null ? haversineKm(userPos.lat, userPos.lng, viewingMerchant.lat, viewingMerchant.lng) : null}
-          onBack={() => setViewingMerchant(null)}
-          onOpenBag={(bag) => {
-            setViewingMerchant(null);
-            setViewingDetail(bag);
-          }}
-        />
-      )}
-      <ReserveModal bag={reserving} user={user} onClose={() => setReserving(null)} onReserved={refresh} />
+      {modals}
     </div>
   );
 }

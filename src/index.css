@@ -217,6 +217,53 @@ h1.page-title {
 }
 
 .map-container { height: 320px; border-radius: 16px; overflow: hidden; margin-bottom: 24px; }
+
+/* Onglet "Parcourir" — carte plein écran + feuille de résultats repliable,
+   façon TGTG. Position fixed du haut de l'écran jusqu'au-dessus de la
+   barre du bas (78px, même réserve que "body { padding-bottom }") plutôt
+   que de dépendre de la hauteur variable du header en flux normal. */
+.browse-map-page {
+  position: fixed; top: 0; left: 0; right: 0; bottom: 78px; z-index: 30;
+  background: var(--navy); display: flex; flex-direction: column;
+}
+.browse-topbar {
+  padding: calc(14px + env(safe-area-inset-top)) 16px 10px;
+  display: flex; flex-direction: column; gap: 10px; position: relative; z-index: 2;
+}
+.browse-search-row { display: flex; gap: 10px; align-items: center; }
+.browse-search-row input {
+  flex: 1; background: var(--navy-2); border: none; border-radius: 100px;
+  padding: 12px 16px; color: var(--paper); font-size: 14px;
+}
+.browse-locate-btn {
+  width: 44px; height: 44px; border-radius: 50%; background: var(--navy-2);
+  border: none; display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0; font-size: 17px;
+}
+.browse-chip-row { display: flex; gap: 8px; overflow-x: auto; }
+.browse-chip-row select {
+  background: var(--navy-2); color: var(--paper); border: none; border-radius: 100px;
+  padding: 8px 14px; font-size: 13px; font-weight: 600; white-space: nowrap;
+}
+.browse-map-area { flex: 1; min-height: 0; position: relative; }
+.browse-map-area .map-container { height: 100%; border-radius: 0; margin: 0; }
+.browse-sheet {
+  position: relative; z-index: 1; background: var(--navy-2);
+  border-radius: 20px 20px 0 0; box-shadow: 0 -6px 24px rgba(0,0,0,0.35);
+  max-height: 62%; display: flex; flex-direction: column;
+  transition: max-height 0.25s ease; flex-shrink: 0;
+}
+.browse-sheet.collapsed { max-height: 84px; }
+.browse-sheet-handle {
+  width: 100%; padding: 10px 0 2px; display: flex; justify-content: center;
+  background: none; border: none;
+}
+.browse-sheet-handle span { width: 36px; height: 4px; border-radius: 4px; background: rgba(239,230,211,0.25); }
+.browse-sheet-header {
+  width: 100%; text-align: center; font-weight: 700; background: none; border: none;
+  color: var(--paper); padding: 4px 16px 12px; font-family: 'Fraunces', serif; font-size: 16px;
+}
+.browse-sheet-body { overflow-y: auto; padding: 0 16px 16px; display: flex; flex-direction: column; gap: 12px; }
 .merchant-marker-photo {
   width: 42px; height: 42px; border-radius: 100%; background: var(--honey) center/cover no-repeat;
   border: 3px solid var(--paper); box-shadow: 0 2px 6px rgba(0,0,0,0.4);
