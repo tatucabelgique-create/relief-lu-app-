@@ -259,8 +259,11 @@ h1.page-title {
 .browse-map-area { flex: 1 1 0; min-height: 140px; position: relative; z-index: 1; }
 .browse-map-area.hidden { flex: 0 0 0; min-height: 0; }
 .browse-map-area .map-container { height: 100%; border-radius: 0; margin: 0; }
+/* Fond plus sombre (--navy) que les cartes (--navy-2, même chose que le
+   reste de l'appli, ex. .panel) — sinon feuille et cartes ont exactement
+   la même couleur et se fondent en un seul bloc plat, sans séparation. */
 .browse-sheet {
-  position: relative; z-index: 1; background: var(--navy-2);
+  position: relative; z-index: 1; background: var(--navy);
   border-radius: 20px 20px 0 0; box-shadow: 0 -6px 24px rgba(0,0,0,0.35);
   max-height: 55%; display: flex; flex-direction: column; flex: 0 1 auto;
 }
@@ -282,7 +285,7 @@ h1.page-title {
   width: 100%; text-align: center; font-weight: 700; background: none; border: none;
   color: var(--paper); padding: 4px 16px 12px; font-family: 'Fraunces', serif; font-size: 16px;
 }
-.browse-sheet-body { overflow-y: auto; padding: 0 16px 16px; display: flex; flex-direction: column; gap: 12px; }
+.browse-sheet-body { overflow-y: auto; padding: 14px 16px 16px; display: flex; flex-direction: column; gap: 18px; }
 .browse-sheet.full .browse-sheet-body { padding-bottom: 76px; }
 .merchant-marker-photo {
   width: 42px; height: 42px; border-radius: 100%; background: var(--honey) center/cover no-repeat;
