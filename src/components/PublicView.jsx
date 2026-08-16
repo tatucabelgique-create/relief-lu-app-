@@ -197,6 +197,7 @@ export default function PublicView({ user, pendingReserveBagId, onPendingReserve
       {viewingDetail && (
         <BagDetail
           bag={viewingDetail}
+          distanceKm={viewingDetail.distanceKm}
           rating={ratings[viewingDetail.merchant_id]}
           isFavorite={favoriteIds.has(viewingDetail.merchant_id)}
           onToggleFavorite={user ? toggleFavorite : undefined}

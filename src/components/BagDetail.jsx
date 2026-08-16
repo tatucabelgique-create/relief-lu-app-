@@ -24,7 +24,7 @@ function ShareIcon() {
 // "Emballages" et "Ingrédients & Allergènes" reprennent le texte générique
 // fixe de la référence — le contenu d'un panier surprise varie chaque jour,
 // donc TGTG ne demande pas au commerçant de le détailler à chaque sachet.
-export default function BagDetail({ bag, rating, isFavorite, onToggleFavorite, onBack, onReserve, onOpenMerchant }) {
+export default function BagDetail({ bag, rating, isFavorite, onToggleFavorite, onBack, onReserve, onOpenMerchant, distanceKm }) {
   const { lang, t } = useI18n();
   const merchant = bag.merchants;
   const hasDiscount = bag.original_price_cents && bag.original_price_cents > bag.price_cents;
@@ -121,7 +121,10 @@ export default function BagDetail({ bag, rating, isFavorite, onToggleFavorite, o
           </div>
         )}
         <div className="bag-detail-row">
-          <span>🕒 {t("pickupWindow")} {formatPickupWindow(bag.pickup_start, bag.pickup_end, lang)}</span>
+          <span>
+            🕒 {t("pickupWindow")} {formatPickupWindow(bag.pickup_start, bag.pickup_end, lang)}
+            {distanceKm != null && <> · {distanceKm.toFixed(1)} km</>}
+          </span>
           {isToday(bag.pickup_start) && <span className="chip-pill-outline">{t("bagDetail.today")}</span>}
           {isTomorrow(bag.pickup_start) && <span className="chip-pill-outline">{t("bagDetail.tomorrow")}</span>}
         </div>
