@@ -249,7 +249,13 @@ h1.page-title {
    la feuille en priorité, sans jamais tomber à 0px — auparavant la feuille
    (flex-shrink:0, max-height en % de la PAGE entière) pouvait à elle seule
    consommer tout l'espace dispo sur un petit écran, écrasant la carte. */
-.browse-map-area { flex: 1 1 0; min-height: 140px; position: relative; }
+/* z-index: 1 (pas juste position:relative) est indispensable ici : Leaflet
+   met ses propres panneaux/contrôles à des z-index internes très élevés
+   (jusqu'à 1000 pour les boutons +/-) qui, sans ça, ne sont pas contenus
+   dans un contexte d'empilement local et "fuient" par-dessus tout ce qui a
+   un z-index plus bas ailleurs sur la page (ex. BagDetail à 60) — la carte
+   restait visible par-dessus la fiche détail du sachet à cause de ça. */
+.browse-map-area { flex: 1 1 0; min-height: 140px; position: relative; z-index: 1; }
 .browse-map-area .map-container { height: 100%; border-radius: 0; margin: 0; }
 .browse-sheet {
   position: relative; z-index: 1; background: var(--navy-2);
