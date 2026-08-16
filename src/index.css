@@ -245,13 +245,17 @@ h1.page-title {
   background: var(--navy-2); color: var(--paper); border: none; border-radius: 100px;
   padding: 8px 14px; font-size: 13px; font-weight: 600; white-space: nowrap;
 }
-.browse-map-area { flex: 1; min-height: 0; position: relative; }
+/* flex-basis:0 + min-height : la carte reçoit tout l'espace restant après
+   la feuille en priorité, sans jamais tomber à 0px — auparavant la feuille
+   (flex-shrink:0, max-height en % de la PAGE entière) pouvait à elle seule
+   consommer tout l'espace dispo sur un petit écran, écrasant la carte. */
+.browse-map-area { flex: 1 1 0; min-height: 140px; position: relative; }
 .browse-map-area .map-container { height: 100%; border-radius: 0; margin: 0; }
 .browse-sheet {
   position: relative; z-index: 1; background: var(--navy-2);
   border-radius: 20px 20px 0 0; box-shadow: 0 -6px 24px rgba(0,0,0,0.35);
-  max-height: 62%; display: flex; flex-direction: column;
-  transition: max-height 0.25s ease; flex-shrink: 0;
+  max-height: 55%; display: flex; flex-direction: column;
+  transition: max-height 0.25s ease; flex: 0 1 auto;
 }
 .browse-sheet.collapsed { max-height: 84px; }
 .browse-sheet-handle {
