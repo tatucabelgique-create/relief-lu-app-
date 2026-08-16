@@ -69,7 +69,16 @@ self.addEventListener("fetch", (event) => {
           caches.open(CACHE).then((cache) => cache.put(req, copy));
           return res;
         })
-        .catch(() => caches.match(req))
+        .catch(() =>
+          // ignoreSearch: la page de retour de Stripe porte des paramètres
+          // uniques (?paid=0&reservation=<id>), donc jamais présente telle
+          // quelle dans le cache — sans ça, caches.match() ne trouvait rien,
+          // event.respondWith(undefined) plantait, et la page restait blanche
+          // juste au moment critique où le code qui libère le stock doit
+          // s'exécuter. Si rien n'est en cache non plus (tout premier
+          // chargement), on retente un fetch normal plutôt que d'abandonner.
+          caches.match(req, { ignoreSearch: true }).then((cached) => cached || fetch(req))
+        )
     );
     return;
   }
