@@ -434,7 +434,7 @@ body { padding-bottom: 78px; }
 /* Large plutôt qu'étroite façon carrousel classique — comme TGTG, une carte
    occupe presque tout l'écran (avec un aperçu de la suivante), ce qui laisse
    la place au texte de tenir sur une ligne au lieu de s'écraser. */
-.carousel-card { flex: 0 0 82%; max-width: 320px; scroll-snap-align: start; }
+.carousel-card { flex: 0 0 92%; max-width: 380px; scroll-snap-align: start; }
 .carousel-track::-webkit-scrollbar { height: 6px; }
 .carousel-track::-webkit-scrollbar-thumb { background: rgba(239,230,211,0.15); border-radius: 6px; }
 
