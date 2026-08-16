@@ -434,14 +434,28 @@ body { padding-bottom: 78px; }
 .toggle-switch {
   width: 42px; height: 24px; border-radius: 100px; background: rgba(239,230,211,0.2);
   position: relative; flex-shrink: 0; transition: background 0.15s ease;
+  border: none; padding: 0; cursor: pointer;
 }
 .toggle-switch.on { background: var(--sage); }
+.toggle-switch.disabled { cursor: default; opacity: 0.7; }
 .toggle-knob {
   position: absolute; top: 3px; left: 3px; width: 18px; height: 18px; border-radius: 50%;
   background: #fff; transition: transform 0.15s ease;
 }
 .toggle-switch.on .toggle-knob { transform: translateX(18px); }
 .divider { border-top: 1px solid rgba(239,230,211,0.12); margin: 18px 0; }
+
+.link-btn { background: none; border: none; color: var(--honey); font-weight: 600; text-decoration: underline; padding: 0; font-size: inherit; }
+
+.cookie-modal { text-align: left; }
+.cookie-modal-logo { display: flex; justify-content: center; margin-bottom: 14px; }
+.cookie-modal-logo img { width: 52px; height: 52px; border-radius: 14px; }
+.cookie-section-title { font-family: 'Fraunces', serif; font-weight: 560; font-size: 16px; margin: 0 0 10px; }
+.cookie-toggle-row { display: flex; align-items: center; justify-content: space-between; font-size: 14px; font-weight: 600; margin-bottom: 8px; }
+.cookie-section-text { font-size: 13px; color: var(--paper-dim); line-height: 1.5; margin: 0; }
+.cookie-modal-footnote { font-size: 12px; color: var(--paper-dim); line-height: 1.5; margin: 18px 0 0; }
+.cookie-modal-actions { display: flex; gap: 10px; margin-top: 18px; }
+.cookie-modal-actions .btn { flex: 1; }
 
 .bag-detail-address {
   display: flex; justify-content: space-between; align-items: center; width: 100%;

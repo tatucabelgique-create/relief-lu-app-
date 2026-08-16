@@ -186,7 +186,7 @@ export default function App() {
         />
       )}
 
-      <CookieConsent />
+      <CookieConsent onOpenLegal={setLegalModal} />
 
       {legalModal && (
         <LegalModal
