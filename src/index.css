@@ -431,7 +431,10 @@ body { padding-bottom: 78px; }
   display: flex; gap: 14px; overflow-x: auto; padding-bottom: 6px;
   scroll-snap-type: x proximity; -webkit-overflow-scrolling: touch;
 }
-.carousel-card { flex: 0 0 220px; scroll-snap-align: start; }
+/* Large plutôt qu'étroite façon carrousel classique — comme TGTG, une carte
+   occupe presque tout l'écran (avec un aperçu de la suivante), ce qui laisse
+   la place au texte de tenir sur une ligne au lieu de s'écraser. */
+.carousel-card { flex: 0 0 82%; max-width: 320px; scroll-snap-align: start; }
 .carousel-track::-webkit-scrollbar { height: 6px; }
 .carousel-track::-webkit-scrollbar-thumb { background: rgba(239,230,211,0.15); border-radius: 6px; }
 
