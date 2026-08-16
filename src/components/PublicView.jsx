@@ -38,6 +38,14 @@ export default function PublicView({ user, pendingReserveBagId, onPendingReserve
     refresh();
     getMerchantRatings().then(setRatings);
 
+    // Demande la position automatiquement à l'ouverture plutôt que d'attendre
+    // un tap sur "Utiliser ma position" — si elle a déjà été refusée, le
+    // navigateur ne réaffiche pas de popup (comportement natif), donc pas de
+    // risque de solliciter l'utilisateur en boucle. Si elle avait déjà été
+    // accordée, ce useEffect ne fait rien puisque userPos est déjà rempli
+    // depuis le localStorage (voir useState plus haut).
+    if (!userPos) handleLocate();
+
     // Recharge la liste à chaque retour au premier plan — sans ça, un sachet
     // publié pendant que l'app était en arrière-plan (ou ouverte depuis une
     // notification) restait invisible tant qu'on ne fermait/rouvrait pas
