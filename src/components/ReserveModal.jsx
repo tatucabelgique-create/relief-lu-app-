@@ -14,9 +14,10 @@ export default function ReserveModal({ bag, user, onClose, onReserved }) {
   if (!bag) return null;
 
   const total = ((bag.price_cents * qty) / 100).toFixed(2);
+  const maxQty = Math.max(1, bag.quantity_left ?? 1);
 
   function changeQty(delta) {
-    setQty((q) => Math.max(1, q + delta));
+    setQty((q) => Math.min(maxQty, Math.max(1, q + delta)));
   }
 
   // Le sachet est déjà réservé (stock décrémenté) à ce stade, en
@@ -67,7 +68,7 @@ export default function ReserveModal({ bag, user, onClose, onReserved }) {
                   −
                 </button>
                 <span className="figures">{qty}</span>
-                <button type="button" onClick={() => changeQty(1)} disabled={redirecting} aria-label="+">
+                <button type="button" onClick={() => changeQty(1)} disabled={redirecting || qty >= maxQty} aria-label="+">
                   +
                 </button>
               </div>
