@@ -114,6 +114,7 @@ h1.page-title {
 }
 .badge-availability { left: 10px; background: var(--honey); color: var(--navy); }
 .badge-availability.badge-sold-out { background: rgba(22,35,44,0.75); color: var(--paper-dim); }
+.badge-availability.badge-selling-fast { background: var(--navy); color: var(--paper); }
 .badge-rating { right: 10px; background: rgba(22,35,44,0.85); color: var(--honey); }
 
 .card-sold-out .thumb { filter: grayscale(0.85); opacity: 0.55; }
@@ -256,14 +257,22 @@ h1.page-title {
    un z-index plus bas ailleurs sur la page (ex. BagDetail à 60) — la carte
    restait visible par-dessus la fiche détail du sachet à cause de ça. */
 .browse-map-area { flex: 1 1 0; min-height: 140px; position: relative; z-index: 1; }
+.browse-map-area.hidden { flex: 0 0 0; min-height: 0; }
 .browse-map-area .map-container { height: 100%; border-radius: 0; margin: 0; }
 .browse-sheet {
   position: relative; z-index: 1; background: var(--navy-2);
   border-radius: 20px 20px 0 0; box-shadow: 0 -6px 24px rgba(0,0,0,0.35);
-  max-height: 55%; display: flex; flex-direction: column;
-  transition: max-height 0.25s ease; flex: 0 1 auto;
+  max-height: 55%; display: flex; flex-direction: column; flex: 0 1 auto;
 }
-.browse-sheet.collapsed { max-height: 84px; }
+/* Liste plein écran (bouton "Carte" flottant pour revenir à la carte) —
+   façon TGTG, plutôt qu'une simple feuille repliable au-dessus de la carte. */
+.browse-sheet.full { max-height: none; flex: 1 1 auto; min-height: 0; border-radius: 0; }
+.browse-map-fab {
+  position: absolute; left: 50%; bottom: 24px; transform: translateX(-50%);
+  background: var(--navy-2); color: var(--paper); border: 1px solid rgba(239,230,211,0.2);
+  border-radius: 100px; padding: 12px 22px; font-weight: 700; font-size: 14px;
+  display: flex; align-items: center; gap: 8px; box-shadow: 0 6px 20px rgba(0,0,0,0.4); z-index: 5;
+}
 .browse-sheet-handle {
   width: 100%; padding: 10px 0 2px; display: flex; justify-content: center;
   background: none; border: none;
@@ -274,6 +283,7 @@ h1.page-title {
   color: var(--paper); padding: 4px 16px 12px; font-family: 'Fraunces', serif; font-size: 16px;
 }
 .browse-sheet-body { overflow-y: auto; padding: 0 16px 16px; display: flex; flex-direction: column; gap: 12px; }
+.browse-sheet.full .browse-sheet-body { padding-bottom: 76px; }
 .merchant-marker-photo {
   width: 42px; height: 42px; border-radius: 100%; background: var(--honey) center/cover no-repeat;
   border: 3px solid var(--paper); box-shadow: 0 2px 6px rgba(0,0,0,0.4);

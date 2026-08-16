@@ -1,10 +1,24 @@
-import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
+import { useEffect } from "react";
+import { MapContainer, TileLayer, Marker, Popup, useMap } from "react-leaflet";
 import { useI18n } from "../lib/i18n.jsx";
 import { merchantMarkerIcon, userLocationIcon } from "../lib/leafletIcon";
 
 const LUXEMBOURG_CENTER = [49.75, 6.15];
 
-export default function MapView({ bags, userPos }) {
+// Leaflet ne détecte pas tout seul qu'un conteneur masqué (display:none /
+// hauteur 0, ex. l'onglet Parcourir qui bascule carte/liste) reprend une
+// taille normale — sans ce recalcul explicite, la carte réapparaît coupée/
+// mal centrée tant qu'on n'interagit pas avec elle.
+function InvalidateOnShow({ trigger }) {
+  const map = useMap();
+  useEffect(() => {
+    const id = setTimeout(() => map.invalidateSize(), 50);
+    return () => clearTimeout(id);
+  }, [trigger]);
+  return null;
+}
+
+export default function MapView({ bags, userPos, invalidateKey }) {
   const { t } = useI18n();
 
   const merchants = {};
@@ -22,6 +36,7 @@ export default function MapView({ bags, userPos }) {
   return (
     <div className="map-container">
       <MapContainer center={center} zoom={12} scrollWheelZoom={false} style={{ width: "100%", height: "100%" }}>
+        {invalidateKey !== undefined && <InvalidateOnShow trigger={invalidateKey} />}
         <TileLayer
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"

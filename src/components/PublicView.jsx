@@ -125,7 +125,9 @@ export default function PublicView({ user, pendingReserveBagId, onPendingReserve
     }));
   }, [soldOutToday, userPos]);
 
-  const [sheetExpanded, setSheetExpanded] = useState(true);
+  // false = carte + feuille en aperçu (façon TGTG par défaut) ; true = liste
+  // plein écran, carte masquée, bouton flottant "Carte" pour y revenir.
+  const [showList, setShowList] = useState(false);
 
   const modals = (
     <>
@@ -216,13 +218,15 @@ export default function PublicView({ user, pendingReserveBagId, onPendingReserve
           </div>
         </div>
 
-        <div className="browse-map-area">{bags && <MapView bags={filtered} userPos={userPos} />}</div>
+        <div className={`browse-map-area ${showList ? "hidden" : ""}`}>
+          {bags && <MapView bags={filtered} userPos={userPos} invalidateKey={showList} />}
+        </div>
 
-        <div className={`browse-sheet ${sheetExpanded ? "" : "collapsed"}`}>
-          <button className="browse-sheet-handle" onClick={() => setSheetExpanded((v) => !v)} aria-label="toggle">
+        <div className={`browse-sheet ${showList ? "full" : ""}`}>
+          <button className="browse-sheet-handle" onClick={() => setShowList((v) => !v)} aria-label="toggle">
             <span />
           </button>
-          <button className="browse-sheet-header" onClick={() => setSheetExpanded((v) => !v)}>
+          <button className="browse-sheet-header" onClick={() => setShowList((v) => !v)}>
             {bags === null
               ? t("public.loading")
               : `${filtered.length} ${filtered.length === 1 ? t("browse.result") : t("browse.results")}`}
@@ -243,6 +247,12 @@ export default function PublicView({ user, pendingReserveBagId, onPendingReserve
             ))}
           </div>
         </div>
+
+        {showList && (
+          <button className="browse-map-fab" onClick={() => setShowList(false)}>
+            🗺️ {t("browse.showMap")}
+          </button>
+        )}
 
         {modalsPortal}
       </div>
