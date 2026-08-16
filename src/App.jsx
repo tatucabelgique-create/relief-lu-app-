@@ -165,11 +165,8 @@ export default function App() {
             <button className="btn secondary small" onClick={() => setLegalModal("confidentialite")}>
               Confidentialité
             </button>
-            <button className="btn secondary small" onClick={() => setLegalModal("cookies")}>
-              Cookies
-            </button>
             <button className="btn secondary small" onClick={reopenCookieConsent}>
-              Gérer les cookies
+              Cookies
             </button>
           </div>
           <SocialLinks />
