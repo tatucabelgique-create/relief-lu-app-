@@ -7,14 +7,13 @@
 // déclenchait rien côté service worker, et Safari/iOS pouvait resservir
 // une page en cache disque avant même que le SW n'intercepte la requête.
 const CACHE = "relief-lu-__BUILD_ID__";
-const ASSETS = [
-  "./",
-  "./index.html",
-  "./app.html",
-  "./manifest.json",
-  "./icon-192.png",
-  "./icon-512.png"
-];
+// index.html/app.html ne sont volontairement PAS préchargées ici : elles
+// doivent toujours passer par le réseau-prioritaire du fetch handler
+// ci-dessous, jamais servies depuis une version figée au moment de
+// l'installation du service worker (voir isHTML plus bas — la détection
+// se fait sur le chemin de l'URL, pas sur req.mode/Accept qui peuvent ne
+// pas être fiables selon le navigateur, ex. Safari/iOS).
+const ASSETS = ["./manifest.json", "./icon-192.png", "./icon-512.png"];
 
 self.addEventListener("install", (event) => {
   event.waitUntil(
@@ -47,7 +46,13 @@ self.addEventListener("fetch", (event) => {
   // toute la requête côté Safari ("FetchEvent.respondWith received an error").
   if (req.method !== "GET") return;
 
-  const isHTML = req.mode === "navigate" || req.headers.get("accept")?.includes("text/html");
+  // Basé sur le chemin de l'URL plutôt que req.mode/Accept : ces derniers ne
+  // sont pas toujours fiables selon le navigateur (Safari/iOS notamment),
+  // et une détection ratée faisait retomber app.html sur la branche
+  // cache-first plus bas — la version figée à l'installation du SW, jamais
+  // rafraîchie, quel que soit le nombre de mises à jour déployées depuis.
+  const url = new URL(req.url);
+  const isHTML = url.pathname.endsWith(".html") || url.pathname.endsWith("/");
 
   if (isHTML) {
     // Réseau en priorité pour les pages HTML : index.html/app.html ne sont pas
