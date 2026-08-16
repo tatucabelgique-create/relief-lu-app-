@@ -103,6 +103,13 @@ export default function PublicView({ user, pendingReserveBagId, onPendingReserve
   }, [filtered]);
   const showCarousel = !search.trim() && !category && closingSoon.length > 1 && filtered.length > closingSoon.length;
 
+  const soldOutTodayWithDistance = useMemo(() => {
+    return soldOutToday.map((b) => ({
+      ...b,
+      distanceKm: userPos && b.merchants?.lat != null ? haversineKm(userPos.lat, userPos.lng, b.merchants.lat, b.merchants.lng) : null,
+    }));
+  }, [soldOutToday, userPos]);
+
   return (
     <div>
       <button className="location-picker" onClick={handleLocate}>
@@ -139,12 +146,13 @@ export default function PublicView({ user, pendingReserveBagId, onPendingReserve
         <div className="carousel-section">
           <h2>{t("public.soldOutToday")}</h2>
           <div className="carousel-track">
-            {soldOutToday.map((bag) => (
+            {soldOutTodayWithDistance.map((bag) => (
               <div className="carousel-card" key={bag.id}>
                 <BagCard
                   bag={bag}
                   onReserve={setReserving}
                   onOpenDetail={setViewingDetail}
+                  distanceKm={bag.distanceKm}
                   onToggleFavorite={user ? toggleFavorite : undefined}
                   isFavorite={favoriteIds.has(bag.merchant_id)}
                   rating={ratings[bag.merchant_id]}
