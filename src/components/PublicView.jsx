@@ -13,7 +13,7 @@ import MapView from "./MapView.jsx";
 import ImpactBanner from "./ImpactBanner.jsx";
 import MissionIntro from "./MissionIntro.jsx";
 
-export default function PublicView({ user, pendingReserveBagId, onPendingReserveHandled, initialViewMode = "grid" }) {
+export default function PublicView({ user, pendingReserveBagId, onPendingReserveHandled, initialViewMode = "grid", compact = false }) {
   const { t } = useI18n();
   const [bags, setBags] = useState(null); // null = loading
   const [reserving, setReserving] = useState(null);
@@ -124,12 +124,16 @@ export default function PublicView({ user, pendingReserveBagId, onPendingReserve
         📍 {geoStatus === "loading" ? t("filters.locating") : userPos ? t("filters.currentPosition") : t("filters.useLocation")}
         <span className="chevron">›</span>
       </button>
-      <h1 className="page-title">{t("public.title")}</h1>
-      <p className="page-sub">{t("public.sub")}</p>
+      {!compact && (
+        <>
+          <h1 className="page-title">{t("public.title")}</h1>
+          <p className="page-sub">{t("public.sub")}</p>
 
-      <ImpactBanner />
+          <ImpactBanner />
+        </>
+      )}
 
-      {showCarousel && (
+      {!compact && showCarousel && (
         <div className="carousel-section">
           <h2>{t("public.closingSoon")}</h2>
           <div className="carousel-track">
@@ -150,7 +154,7 @@ export default function PublicView({ user, pendingReserveBagId, onPendingReserve
         </div>
       )}
 
-      {soldOutToday.length > 0 && (
+      {!compact && soldOutToday.length > 0 && (
         <div className="carousel-section">
           <h2>{t("public.soldOutToday")}</h2>
           <div className="carousel-track">
@@ -171,7 +175,7 @@ export default function PublicView({ user, pendingReserveBagId, onPendingReserve
         </div>
       )}
 
-      {bags !== null && bags.length === 0 && <MissionIntro />}
+      {!compact && bags !== null && bags.length === 0 && <MissionIntro />}
 
       {bags !== null && bags.length > 0 && (
         <FiltersBar

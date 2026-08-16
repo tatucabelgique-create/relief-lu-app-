@@ -145,6 +145,7 @@ export default function App() {
             pendingReserveBagId={pendingReserveBagId}
             onPendingReserveHandled={() => setPendingReserveBagId(null)}
             initialViewMode="map"
+            compact
           />
         )}
         {view === "merchant" && (
