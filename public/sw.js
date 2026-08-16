@@ -1,6 +1,12 @@
-// v2 : force l'invalidation du cache "cache-first" de v1, qui servait une
-// version figée de l'app indéfiniment (voir le fetch handler ci-dessous).
-const CACHE = "relief-lu-v2";
+// __BUILD_ID__ est remplacé par le SHA du commit à chaque build (voir
+// .github/workflows/deploy.yml) — ce fichier change donc toujours d'un
+// déploiement à l'autre, ce qui déclenche systématiquement la détection de
+// mise à jour et la bannière "Mettre à jour" (voir UpdatePrompt, main.jsx).
+// Avant ce changement, la bannière ne s'affichait que si sw.js changeait
+// "à la main" ; sans ça, une mise à jour du bundle React seul ne
+// déclenchait rien côté service worker, et Safari/iOS pouvait resservir
+// une page en cache disque avant même que le SW n'intercepte la requête.
+const CACHE = "relief-lu-__BUILD_ID__";
 const ASSETS = [
   "./",
   "./index.html",
