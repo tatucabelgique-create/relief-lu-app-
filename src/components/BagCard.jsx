@@ -88,10 +88,9 @@ export default function BagCard({ bag, onReserve, onToggleFavorite, isFavorite, 
         </div>
         <h3>{bag.title}</h3>
         <div className="meta">
-          {t("pickupWindow")} {formatPickupWindow(bag.pickup_start, bag.pickup_end, lang)}
+          {isToday(bag.pickup_start) ? t("pickupWindow.today") : isTomorrow(bag.pickup_start) ? t("pickupWindow.tomorrow") : t("pickupWindow")}{" "}
+          {formatPickupWindow(bag.pickup_start, bag.pickup_end, lang)}
           {distanceKm != null && <> · {distanceKm.toFixed(1)} km</>}
-          {isToday(bag.pickup_start) && <span className="chip-pill-outline" style={{ marginLeft: 6 }}>{t("pickupWindow.today")}</span>}
-          {isTomorrow(bag.pickup_start) && <span className="chip-pill-outline" style={{ marginLeft: 6 }}>{t("pickupWindow.tomorrow")}</span>}
         </div>
         <div className="countdown">{countdown}</div>
         <div className="row" style={{ marginTop: 10 }}>
