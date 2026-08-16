@@ -280,11 +280,14 @@ h1.page-title {
 /* Liste plein écran (bouton "Carte" flottant pour revenir à la carte) —
    façon TGTG, plutôt qu'une simple feuille repliable au-dessus de la carte. */
 .browse-sheet.full { max-height: none; flex: 1 1 auto; min-height: 0; border-radius: 0; }
+/* Miel plutôt que navy — même logique que le bouton "Réserver" (couleur
+   d'action principale), pour que ce bouton flottant se voie clairement
+   par-dessus la liste au lieu de se fondre dedans. */
 .browse-map-fab {
   position: absolute; left: 50%; bottom: 24px; transform: translateX(-50%);
-  background: var(--navy-2); color: var(--paper); border: 1px solid rgba(239,230,211,0.2);
-  border-radius: 100px; padding: 12px 22px; font-weight: 700; font-size: 14px;
-  display: flex; align-items: center; gap: 8px; box-shadow: 0 6px 20px rgba(0,0,0,0.4); z-index: 5;
+  background: var(--honey); color: var(--navy); border: none;
+  border-radius: 100px; padding: 13px 24px; font-weight: 700; font-size: 15px;
+  display: flex; align-items: center; gap: 8px; box-shadow: 0 6px 20px rgba(0,0,0,0.45); z-index: 5;
 }
 .browse-sheet-handle {
   width: 100%; padding: 10px 0 2px; display: flex; justify-content: center;
