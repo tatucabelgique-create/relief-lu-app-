@@ -48,7 +48,10 @@ export default function BagCard({ bag, onReserve, onToggleFavorite, isFavorite, 
   const countdown = useCountdown(bag.pickup_start, bag.pickup_end, t);
   const hasDiscount = bag.original_price_cents && bag.original_price_cents > bag.price_cents;
   const soldOut = bag.status === "sold_out";
-  const sellingFast = !soldOut && bag.quantity_left === 1;
+  // Basé sur le taux de vente (proportion déjà réservée), pas juste "il en
+  // reste 1" — sinon un sachet publié à l'unité déclenchait le badge sans
+  // jamais avoir été réservé, ce qui n'a rien de "part vite".
+  const sellingFast = !soldOut && bag.quantity_total > 1 && (bag.quantity_total - bag.quantity_left) / bag.quantity_total >= 0.66;
 
   return (
     <div
