@@ -4,6 +4,7 @@ const DICT = {
   fr: {
     "nav.merchant": "Inscrivez votre commerce",
     "nav.bottom.discover": "Découvrir",
+    "nav.bottom.browse": "Parcourir",
     "nav.bottom.merchant": "Commerçant",
     "nav.bottom.account": "Profil",
     "bagDetail.about": "À propos de ce sachet",
@@ -208,6 +209,7 @@ const DICT = {
   de: {
     "nav.merchant": "Registrieren Sie Ihr Geschäft",
     "nav.bottom.discover": "Entdecken",
+    "nav.bottom.browse": "Suchen",
     "nav.bottom.merchant": "Geschäft",
     "nav.bottom.account": "Profil",
     "bagDetail.about": "Über dieses Tütchen",
@@ -412,6 +414,7 @@ const DICT = {
   en: {
     "nav.merchant": "Register your business",
     "nav.bottom.discover": "Discover",
+    "nav.bottom.browse": "Browse",
     "nav.bottom.merchant": "Merchant",
     "nav.bottom.account": "Profile",
     "bagDetail.about": "About this bag",

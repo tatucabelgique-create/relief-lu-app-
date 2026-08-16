@@ -139,6 +139,14 @@ export default function App() {
         {view === "public" && (
           <PublicView user={user} pendingReserveBagId={pendingReserveBagId} onPendingReserveHandled={() => setPendingReserveBagId(null)} />
         )}
+        {view === "browse" && (
+          <PublicView
+            user={user}
+            pendingReserveBagId={pendingReserveBagId}
+            onPendingReserveHandled={() => setPendingReserveBagId(null)}
+            initialViewMode="map"
+          />
+        )}
         {view === "merchant" && (
           <MerchantView user={user} merchant={merchant} onMerchantChanged={() => refreshMerchant(user.id)} onOpenLegal={setLegalModal} />
         )}

@@ -9,6 +9,12 @@ const icons = {
       <path d="M15 9l-2 5-5 2 2-5 5-2z" strokeLinejoin="round" />
     </svg>
   ),
+  search: (
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
+      <circle cx="11" cy="11" r="7" />
+      <path d="M21 21l-4.3-4.3" strokeLinecap="round" />
+    </svg>
+  ),
   heart: (
     <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
       <path d="M12 20s-7-4.35-9.5-8.5C.7 8 2.4 4.5 6 4.5c2 0 3.3 1 4 2.2.7-1.2 2-2.2 4-2.2 3.6 0 5.3 3.5 3.5 7C19 15.65 12 20 12 20z" strokeLinejoin="round" />
@@ -35,6 +41,7 @@ export default function BottomNav({ view, onNavigate }) {
 
   const items = [
     { key: "public", icon: "discover", label: t("nav.bottom.discover") },
+    { key: "browse", icon: "search", label: t("nav.bottom.browse") },
     { key: "favorites", icon: "heart", label: t("nav.favorites") },
     { key: "merchant", icon: "store", label: t("nav.bottom.merchant") },
     { key: "account", icon: "profile", label: t("nav.bottom.account") },

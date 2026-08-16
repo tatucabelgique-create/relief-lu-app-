@@ -13,7 +13,7 @@ import MapView from "./MapView.jsx";
 import ImpactBanner from "./ImpactBanner.jsx";
 import MissionIntro from "./MissionIntro.jsx";
 
-export default function PublicView({ user, pendingReserveBagId, onPendingReserveHandled }) {
+export default function PublicView({ user, pendingReserveBagId, onPendingReserveHandled, initialViewMode = "grid" }) {
   const { t } = useI18n();
   const [bags, setBags] = useState(null); // null = loading
   const [reserving, setReserving] = useState(null);
@@ -22,7 +22,7 @@ export default function PublicView({ user, pendingReserveBagId, onPendingReserve
   const [category, setCategory] = useState("");
   const [sort, setSort] = useState("recent");
   const [search, setSearch] = useState("");
-  const [viewMode, setViewMode] = useState("grid");
+  const [viewMode, setViewMode] = useState(initialViewMode);
   const [userPos, setUserPos] = useState(() => loadSavedPosition());
   const [geoStatus, setGeoStatus] = useState("idle");
   const { favoriteIds, toggleFavorite } = useFavorites(user);
