@@ -4,7 +4,7 @@ import { loadActiveBags, loadSoldOutToday } from "../lib/bags";
 import { haversineKm, loadSavedPosition, locate } from "../lib/geolocation";
 import { useFavorites } from "../lib/favorites";
 import { getMerchantRatings } from "../lib/reviews";
-import BagCard from "./BagCard.jsx";
+import BagCard, { isToday, isTomorrow } from "./BagCard.jsx";
 import BagDetail from "./BagDetail.jsx";
 import MerchantProfile from "./MerchantProfile.jsx";
 import ReserveModal from "./ReserveModal.jsx";
@@ -22,6 +22,8 @@ export default function PublicView({ user, pendingReserveBagId, onPendingReserve
   const [category, setCategory] = useState("");
   const [sort, setSort] = useState("recent");
   const [search, setSearch] = useState("");
+  const [diet, setDiet] = useState("");
+  const [pickupTime, setPickupTime] = useState("");
   const [viewMode, setViewMode] = useState(initialViewMode);
   const [userPos, setUserPos] = useState(() => loadSavedPosition());
   const [geoStatus, setGeoStatus] = useState("idle");
@@ -84,6 +86,10 @@ export default function PublicView({ user, pendingReserveBagId, onPendingReserve
     }));
 
     if (category) list = list.filter((b) => b.category === category);
+    if (diet === "vegetarian") list = list.filter((b) => b.vegetarian);
+    else if (diet === "vegan") list = list.filter((b) => b.vegan);
+    if (pickupTime === "today") list = list.filter((b) => isToday(b.pickup_start));
+    else if (pickupTime === "tomorrow") list = list.filter((b) => isTomorrow(b.pickup_start));
     if (search.trim()) {
       const q = search.trim().toLowerCase();
       list = list.filter((b) => b.title.toLowerCase().includes(q) || b.merchants?.business_name?.toLowerCase().includes(q));
@@ -99,7 +105,7 @@ export default function PublicView({ user, pendingReserveBagId, onPendingReserve
     else list = [...list].sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
 
     return list;
-  }, [bags, category, search, sort, userPos]);
+  }, [bags, category, diet, pickupTime, search, sort, userPos]);
 
   // Sous-ensemble trié par urgence de retrait — reprend le pattern "À sauver
   // avant qu'il ne soit trop tard" façon TGTG. Affiché seulement s'il reste
@@ -185,6 +191,16 @@ export default function PublicView({ user, pendingReserveBagId, onPendingReserve
               <option value="recent">{t("filters.sortRecent")}</option>
               <option value="price">{t("filters.sortPrice")}</option>
               <option value="distance">{t("filters.sortDistance")}</option>
+            </select>
+            <select value={pickupTime} onChange={(e) => setPickupTime(e.target.value)}>
+              <option value="">{t("filters.pickupTime")}</option>
+              <option value="today">{t("filters.pickupToday")}</option>
+              <option value="tomorrow">{t("filters.pickupTomorrow")}</option>
+            </select>
+            <select value={diet} onChange={(e) => setDiet(e.target.value)}>
+              <option value="">{t("filters.allDiets")}</option>
+              <option value="vegetarian">{t("diet.vegetarian")}</option>
+              <option value="vegan">{t("diet.vegan")}</option>
             </select>
           </div>
         </div>

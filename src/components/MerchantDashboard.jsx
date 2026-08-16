@@ -20,6 +20,8 @@ const emptyForm = {
   recurring: false,
   containerProvided: false,
   bagProvided: false,
+  vegetarian: false,
+  vegan: false,
 };
 
 export default function MerchantDashboard({ user, merchant, onMerchantChanged }) {
@@ -61,6 +63,13 @@ export default function MerchantDashboard({ user, merchant, onMerchantChanged })
   function setPrice(value) {
     setPriceTouched(true);
     set("price", value);
+  }
+
+  // Végan implique végétarien — coché automatiquement pour éviter d'avoir à
+  // cocher les deux cases séparément (l'inverse n'est pas vrai, décocher
+  // végan ne touche pas à végétarien).
+  function setVegan(checked) {
+    setForm((f) => ({ ...f, vegan: checked, vegetarian: checked ? true : f.vegetarian }));
   }
 
   async function handlePublish() {
@@ -105,6 +114,8 @@ export default function MerchantDashboard({ user, merchant, onMerchantChanged })
         is_recurring: form.recurring,
         container_provided: form.containerProvided,
         bag_provided: form.bagProvided,
+        vegetarian: form.vegetarian,
+        vegan: form.vegan,
         image_url,
       });
       notifyNewBag(newBag);
@@ -226,6 +237,16 @@ export default function MerchantDashboard({ user, merchant, onMerchantChanged })
         <label className="checkbox-field">
           <input type="checkbox" checked={form.bagProvided} onChange={(e) => set("bagProvided", e.target.checked)} />
           <span>{t("merchant.f.bagProvided")}</span>
+        </label>
+
+        <label className="checkbox-field">
+          <input type="checkbox" checked={form.vegetarian} onChange={(e) => set("vegetarian", e.target.checked)} />
+          <span>{t("merchant.f.vegetarian")}</span>
+        </label>
+
+        <label className="checkbox-field">
+          <input type="checkbox" checked={form.vegan} onChange={(e) => setVegan(e.target.checked)} />
+          <span>{t("merchant.f.vegan")}</span>
         </label>
 
         <div className="field">

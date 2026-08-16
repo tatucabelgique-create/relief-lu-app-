@@ -127,6 +127,8 @@ export default function BagDetail({ bag, rating, isFavorite, onToggleFavorite, o
           </span>
           {isToday(bag.pickup_start) && <span className="chip-pill-outline">{t("bagDetail.today")}</span>}
           {isTomorrow(bag.pickup_start) && <span className="chip-pill-outline">{t("bagDetail.tomorrow")}</span>}
+          {bag.vegan && <span className="chip-pill-outline">🌿 {t("diet.vegan")}</span>}
+          {!bag.vegan && bag.vegetarian && <span className="chip-pill-outline">🌱 {t("diet.vegetarian")}</span>}
         </div>
 
         {address && onOpenMerchant && (

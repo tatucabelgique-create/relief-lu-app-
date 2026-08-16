@@ -91,6 +91,8 @@ export default function BagCard({ bag, onReserve, onToggleFavorite, isFavorite, 
           {isToday(bag.pickup_start) ? t("pickupWindow.today") : isTomorrow(bag.pickup_start) ? t("pickupWindow.tomorrow") : t("pickupWindow")}{" "}
           {formatPickupWindow(bag.pickup_start, bag.pickup_end, lang)}
           {distanceKm != null && <> · {distanceKm.toFixed(1)} km</>}
+          {bag.vegan && <> · 🌿 {t("diet.vegan")}</>}
+          {!bag.vegan && bag.vegetarian && <> · 🌱 {t("diet.vegetarian")}</>}
         </div>
         <div className="countdown">{countdown}</div>
         <div className="row" style={{ marginTop: 10 }}>
