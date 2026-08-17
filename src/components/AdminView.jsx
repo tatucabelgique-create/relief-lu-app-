@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import AuthPrompt from "./AuthPrompt.jsx";
 import MarketingPush from "./MarketingPush.jsx";
 import { supabase } from "../lib/supabase";
+import { ADMIN_EMAIL } from "../lib/admin";
 
 // Seul ce compte peut voir/utiliser les outils admin (notifications
 // marketing, et toute future opération admin) — pas de rôle admin en base,
@@ -9,7 +10,6 @@ import { supabase } from "../lib/supabase";
 // n'importe qui la devinant. Protégé en plus par la 2FA TOTP native de
 // Supabase (Google Authenticator/Authy) : lien magique = 1er facteur
 // (possession de l'email), code à 6 chiffres = 2e facteur.
-const ADMIN_EMAIL = "giovanni.ehp@gmail.com";
 
 export default function AdminView({ user }) {
   const [aal, setAal] = useState(null); // { currentLevel, nextLevel }

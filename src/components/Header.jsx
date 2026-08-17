@@ -1,6 +1,7 @@
 import { useI18n } from "../lib/i18n.jsx";
 import { logout } from "../lib/auth";
 import { isRegistrationComplete } from "../lib/merchants";
+import { ADMIN_EMAIL } from "../lib/admin";
 
 export default function Header({ view, user, merchant, onNavigate }) {
   const { lang, setLang, t } = useI18n();
@@ -46,6 +47,11 @@ export default function Header({ view, user, merchant, onNavigate }) {
               </button>
             ))}
           </div>
+          {user?.email === ADMIN_EMAIL && (
+            <button className="btn secondary small" onClick={() => onNavigate("admin")}>
+              Admin
+            </button>
+          )}
           {user && (
             <button className="btn secondary small" onClick={logout}>
               {t("account.logout")}
