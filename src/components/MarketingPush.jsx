@@ -27,9 +27,8 @@ export default function MarketingPush() {
         headers: {
           "content-type": "application/json",
           authorization: `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
-          "x-admin-secret": secret,
         },
-        body: JSON.stringify({ title, body, url: "./app.html" }),
+        body: JSON.stringify({ title, body, url: "./app.html", admin_secret: secret }),
       });
       const data = await res.json();
       if (!res.ok) {

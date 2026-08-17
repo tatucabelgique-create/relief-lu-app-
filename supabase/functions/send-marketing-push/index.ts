@@ -72,19 +72,27 @@ const appServer = await webpush.ApplicationServer.new({
   vapidKeys,
 });
 
+// En-têtes standards uniquement (authorization, apikey, content-type...) —
+// Supabase impose une liste fixe d'en-têtes autorisés en amont de la
+// fonction pour la réponse au préflight CORS, qui ignore ce que le code
+// demande en plus ; un en-tête personnalisé comme x-admin-secret est donc
+// toujours rejeté au préflight, quel que soit le code déployé. Le secret
+// passe donc dans le corps de la requête (JSON), jamais soumis à cette
+// restriction.
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-admin-secret",
+  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
 
-  if (req.headers.get("x-admin-secret") !== ADMIN_SECRET) {
+  const { title, body, url, admin_secret } = await req.json();
+
+  if (admin_secret !== ADMIN_SECRET) {
     return new Response("unauthorized", { status: 401, headers: corsHeaders });
   }
 
-  const { title, body, url } = await req.json();
   if (!title || !body) {
     return new Response(JSON.stringify({ error: "title et body requis" }), { status: 400, headers: corsHeaders });
   }
