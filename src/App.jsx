@@ -12,7 +12,7 @@ import LegalModal from "./components/LegalModal.jsx";
 import PaymentResult from "./components/PaymentResult.jsx";
 import CookieConsent, { reopenCookieConsent } from "./components/CookieConsent.jsx";
 import SocialLinks from "./components/SocialLinks.jsx";
-import MarketingPush from "./components/MarketingPush.jsx";
+import AdminView from "./components/AdminView.jsx";
 
 export default function App() {
   const [view, setView] = useState("public");
@@ -154,7 +154,7 @@ export default function App() {
         )}
         {view === "account" && <AccountView user={user} />}
         {view === "favorites" && <FavoritesView user={user} />}
-        {view === "marketing" && <MarketingPush />}
+        {view === "admin" && <AdminView user={user} />}
 
         <footer style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 16, padding: "30px 0" }}>
           <div style={{ display: "flex", gap: 16, flexWrap: "wrap", fontSize: 13, opacity: 0.7 }}>
