@@ -214,6 +214,39 @@
   .btn-cta.secondary{background:transparent; border:1px solid rgba(239,230,211,0.3); color:var(--paper);}
   .btn-cta.secondary:hover{border-color:var(--honey); color:var(--honey);}
 
+  /* bandeau cookies — même structure/contenu que la modale de l'app
+     (CookieConsent.jsx), réécrite en vanilla JS puisque cette page n'est
+     pas React. Même clé localStorage ("relief_cookie_consent") pour que
+     le choix reste cohérent entre la landing et l'app. */
+  .cookie-overlay{
+    position:fixed; inset:0; z-index:80; background:rgba(10,16,20,0.72);
+    display:none; align-items:center; justify-content:center; padding:20px;
+  }
+  .cookie-overlay.open{display:flex;}
+  .cookie-modal{
+    background:var(--navy-2); border-radius:18px; padding:30px; max-width:420px; width:100%;
+    max-height:85vh; overflow-y:auto; text-align:left;
+  }
+  .cookie-modal-logo{display:flex; justify-content:center; margin-bottom:14px;}
+  .cookie-modal-logo img{width:52px; height:52px; border-radius:14px;}
+  .cookie-modal p.intro{color:var(--paper-dim); font-size:14px; line-height:1.6; text-align:center; margin:0 0 20px;}
+  .cookie-divider{border-top:1px solid rgba(239,230,211,0.12); margin:18px 0;}
+  .cookie-section-title{font-family:'Fraunces', serif; font-weight:560; font-size:16px; margin:0 0 10px;}
+  .cookie-toggle-row{display:flex; align-items:center; justify-content:space-between; font-size:14px; font-weight:600; margin-bottom:8px;}
+  .cookie-toggle{
+    width:42px; height:24px; border-radius:100px; background:rgba(239,230,211,0.2);
+    position:relative; flex-shrink:0; border:none; padding:0; cursor:pointer;
+  }
+  .cookie-toggle.on{background:var(--honey);}
+  .cookie-toggle.disabled{cursor:default; opacity:0.7;}
+  .cookie-toggle-knob{position:absolute; top:3px; left:3px; width:18px; height:18px; border-radius:50%; background:#fff; transition:transform 0.15s ease;}
+  .cookie-toggle.on .cookie-toggle-knob{transform:translateX(18px);}
+  .cookie-section-text{font-size:13px; color:var(--paper-dim); line-height:1.5; margin:0;}
+  .cookie-modal-footnote{font-size:12px; color:var(--paper-dim); line-height:1.5; margin:18px 0 0;}
+  .cookie-modal-footnote a{color:var(--honey); text-decoration:underline;}
+  .cookie-modal-actions{display:flex; gap:10px; margin-top:18px;}
+  .cookie-modal-actions .btn-cta{flex:1; padding:12px 18px; font-size:14px; text-align:center;}
+
   /* mission */
   .mission{
     padding:64px 0; border-top:1px solid rgba(239,230,211,0.12);
@@ -323,6 +356,11 @@
     border-bottom:1px solid transparent;
   }
   .foot-links a:hover{color:var(--honey); border-color:var(--honey);}
+  .foot-links button{
+    background:none; border:none; border-bottom:1px solid transparent; cursor:pointer;
+    color:var(--paper-dim); text-decoration:none; font-size:14px; font-family:'Work Sans', sans-serif; padding:0;
+  }
+  .foot-links button:hover{color:var(--honey); border-color:var(--honey);}
   .social-icon{display:flex; line-height:0; border-bottom:none !important; opacity:0.9; transition:opacity .15s ease, transform .15s ease;}
   .social-icon:hover{opacity:1; transform:translateY(-1px);}
 
@@ -530,6 +568,7 @@
         <a href="app.html?legal=mentions" data-i18n="footer.mentions">Mentions légales</a>
         <a href="app.html?legal=cgu" data-i18n="footer.cgu">CGU</a>
         <a href="app.html?legal=confidentialite" data-i18n="footer.confidentialite">Confidentialité</a>
+        <button type="button" id="cookie-manage-link" data-i18n="footer.cookies">Cookies</button>
         <a href="#" id="link-ig" class="social-icon" aria-label="Instagram">
           <svg viewBox="0 0 48 48" width="26" height="26"><defs><radialGradient id="ig-grad" cx="30%" cy="107%" r="150%"><stop offset="0" stop-color="#fdf497"/><stop offset="0.05" stop-color="#fdf497"/><stop offset="0.45" stop-color="#fd5949"/><stop offset="0.6" stop-color="#d6249f"/><stop offset="0.9" stop-color="#285AEB"/></radialGradient></defs><rect width="48" height="48" rx="12" fill="url(#ig-grad)"/><rect x="12" y="12" width="24" height="24" rx="7" fill="none" stroke="#fff" stroke-width="2.4"/><circle cx="24" cy="24" r="6.2" fill="none" stroke="#fff" stroke-width="2.4"/><circle cx="31.6" cy="16.4" r="1.6" fill="#fff"/></svg>
         </a>
@@ -538,6 +577,41 @@
         </a>
       </div>
     </footer>
+  </div>
+
+  <div class="cookie-overlay" id="cookie-overlay">
+    <div class="cookie-modal">
+      <div class="cookie-modal-logo"><img src="icon-192.png" alt="relief.lu"></div>
+      <p class="intro" data-i18n="cookies.intro">Nous utilisons des cookies afin de vous offrir la meilleure expérience possible sur relief.lu. Certains sont indispensables au fonctionnement de l'app, d'autres nous aident à mesurer son audience — vous choisissez lesquels activer.</p>
+
+      <div class="cookie-divider"></div>
+      <h3 class="cookie-section-title" data-i18n="cookies.requiredTitle">Cookies obligatoires</h3>
+      <div class="cookie-toggle-row">
+        <span data-i18n="cookies.requiredLabel">Techniquement nécessaire</span>
+        <span class="cookie-toggle on disabled" aria-hidden="true"><span class="cookie-toggle-knob"></span></span>
+      </div>
+      <p class="cookie-section-text" data-i18n="cookies.requiredText">Ces cookies sont indispensables pour naviguer sur relief.lu et utiliser ses fonctions de base : rester connecté, mémoriser votre langue et votre position pour trier par distance. L'app ne fonctionne pas correctement sans eux.</p>
+
+      <div class="cookie-divider"></div>
+      <h3 class="cookie-section-title" data-i18n="cookies.optionalTitle">Cookies optionnels</h3>
+      <div class="cookie-toggle-row">
+        <span data-i18n="cookies.marketingLabel">Marketing</span>
+        <button type="button" class="cookie-toggle" id="cookie-marketing-toggle" aria-label="marketing"><span class="cookie-toggle-knob"></span></button>
+      </div>
+      <p class="cookie-section-text" data-i18n="cookies.marketingText">Si vous acceptez ces cookies, nous mesurons l'audience du site (Google Analytics) et partageons des données avec Meta (Meta Pixel) à des fins publicitaires. Ce choix n'affecte en rien le fonctionnement de l'app.</p>
+
+      <p class="cookie-modal-footnote">
+        <span data-i18n="cookies.footnote">Pour en savoir plus sur les cookies que nous utilisons, consultez notre</span>
+        <a href="app.html?legal=cookies" data-i18n="cookies.linkCookies">Politique relative aux cookies</a>
+        <span data-i18n="cookies.and">et notre</span>
+        <a href="app.html?legal=confidentialite" data-i18n="cookies.linkPrivacy">Politique de confidentialité</a>.
+      </p>
+
+      <div class="cookie-modal-actions">
+        <button type="button" class="btn-cta secondary" id="cookie-selection-btn" data-i18n="cookies.selectionBtn">Autoriser la sélection</button>
+        <button type="button" class="btn-cta" id="cookie-acceptall-btn" data-i18n="cookies.acceptAllBtn">Tout autoriser</button>
+      </div>
+    </div>
   </div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
@@ -604,6 +678,20 @@
       "footer.mentions": "Mentions légales",
       "footer.cgu": "CGU",
       "footer.confidentialite": "Confidentialité",
+      "footer.cookies": "Cookies",
+      "cookies.intro": "Nous utilisons des cookies afin de vous offrir la meilleure expérience possible sur relief.lu. Certains sont indispensables au fonctionnement de l'app, d'autres nous aident à mesurer son audience — vous choisissez lesquels activer.",
+      "cookies.requiredTitle": "Cookies obligatoires",
+      "cookies.requiredLabel": "Techniquement nécessaire",
+      "cookies.requiredText": "Ces cookies sont indispensables pour naviguer sur relief.lu et utiliser ses fonctions de base : rester connecté, mémoriser votre langue et votre position pour trier par distance. L'app ne fonctionne pas correctement sans eux.",
+      "cookies.optionalTitle": "Cookies optionnels",
+      "cookies.marketingLabel": "Marketing",
+      "cookies.marketingText": "Si vous acceptez ces cookies, nous mesurons l'audience du site (Google Analytics) et partageons des données avec Meta (Meta Pixel) à des fins publicitaires. Ce choix n'affecte en rien le fonctionnement de l'app.",
+      "cookies.footnote": "Pour en savoir plus sur les cookies que nous utilisons, consultez notre",
+      "cookies.linkCookies": "Politique relative aux cookies",
+      "cookies.and": "et notre",
+      "cookies.linkPrivacy": "Politique de confidentialité",
+      "cookies.selectionBtn": "Autoriser la sélection",
+      "cookies.acceptAllBtn": "Tout autoriser",
       "nav.openApp": "Voir l'app",
       "nav.merchant": "Inscrivez votre commerce",
       "nav.about": "À propos",
@@ -669,6 +757,20 @@
       "footer.mentions": "Impressum",
       "footer.cgu": "AGB",
       "footer.confidentialite": "Datenschutz",
+      "footer.cookies": "Cookies",
+      "cookies.intro": "Wir verwenden Cookies, um Ihnen die bestmögliche Erfahrung auf relief.lu zu bieten. Manche sind für den Betrieb der App unerlässlich, andere helfen uns bei der Reichweitenmessung — Sie entscheiden, welche Sie aktivieren.",
+      "cookies.requiredTitle": "Erforderliche Cookies",
+      "cookies.requiredLabel": "Technisch notwendig",
+      "cookies.requiredText": "Diese Cookies sind unerlässlich, um relief.lu zu nutzen und die Grundfunktionen zu verwenden: angemeldet bleiben, Ihre Sprache und Position für die Sortierung nach Entfernung merken. Die App funktioniert ohne sie nicht richtig.",
+      "cookies.optionalTitle": "Optionale Cookies",
+      "cookies.marketingLabel": "Marketing",
+      "cookies.marketingText": "Wenn Sie diese Cookies akzeptieren, messen wir die Reichweite der Website (Google Analytics) und teilen Daten mit Meta (Meta Pixel) zu Werbezwecken. Diese Wahl hat keinen Einfluss auf die Funktion der App.",
+      "cookies.footnote": "Weitere Informationen zu den von uns verwendeten Cookies finden Sie in unserer",
+      "cookies.linkCookies": "Cookie-Richtlinie",
+      "cookies.and": "und unserer",
+      "cookies.linkPrivacy": "Datenschutzerklärung",
+      "cookies.selectionBtn": "Auswahl erlauben",
+      "cookies.acceptAllBtn": "Alle erlauben",
       "nav.openApp": "App öffnen",
       "nav.merchant": "Registrieren Sie Ihr Geschäft",
       "nav.about": "Über uns",
@@ -734,6 +836,20 @@
       "footer.mentions": "Legal notice",
       "footer.cgu": "Terms",
       "footer.confidentialite": "Privacy",
+      "footer.cookies": "Cookies",
+      "cookies.intro": "We use cookies to give you the best possible experience on relief.lu. Some are essential to the app's operation, others help us measure its audience — you choose which to enable.",
+      "cookies.requiredTitle": "Required cookies",
+      "cookies.requiredLabel": "Technically necessary",
+      "cookies.requiredText": "These cookies are essential to browse relief.lu and use its core features: staying signed in, remembering your language and position to sort by distance. The app won't work properly without them.",
+      "cookies.optionalTitle": "Optional cookies",
+      "cookies.marketingLabel": "Marketing",
+      "cookies.marketingText": "If you accept these cookies, we measure site traffic (Google Analytics) and share data with Meta (Meta Pixel) for advertising purposes. This choice has no effect on how the app works.",
+      "cookies.footnote": "To learn more about the cookies we use, see our",
+      "cookies.linkCookies": "Cookie Policy",
+      "cookies.and": "and our",
+      "cookies.linkPrivacy": "Privacy Policy",
+      "cookies.selectionBtn": "Allow selection",
+      "cookies.acceptAllBtn": "Allow all",
       "nav.openApp": "Open the app",
       "nav.merchant": "Register your business",
       "nav.about": "About",
@@ -870,6 +986,67 @@
     window.addEventListener('load', () => {
       navigator.serviceWorker.register('sw.js').catch(()=>{});
     });
+  }
+
+  // Bandeau cookies — même clé localStorage que l'app (CookieConsent.jsx)
+  // pour que le choix reste cohérent entre les deux pages. loadAnalytics()
+  // dupliqué intentionnellement depuis src/lib/analytics.js : cette page
+  // n'est pas un module ES, donc pas d'import possible — à garder en phase
+  // manuellement si les IDs changent là-bas.
+  const COOKIE_KEY = 'relief_cookie_consent';
+  const cookieOverlay = document.getElementById('cookie-overlay');
+  const marketingToggle = document.getElementById('cookie-marketing-toggle');
+  let marketingOn = false;
+
+  function loadAnalytics() {
+    if (window.__analyticsLoaded) return;
+    window.__analyticsLoaded = true;
+    const GA_ID = 'G-XXXXXXXXXX';
+    const FB_PIXEL_ID = '0000000000000000';
+
+    const gaScript = document.createElement('script');
+    gaScript.async = true;
+    gaScript.src = 'https://www.googletagmanager.com/gtag/js?id=' + GA_ID;
+    document.head.appendChild(gaScript);
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){ window.dataLayer.push(arguments); }
+    window.gtag = gtag;
+    gtag('js', new Date());
+    gtag('config', GA_ID);
+
+    (function(f,b,e,v,n,t,s){
+      if (f.fbq) return;
+      n = f.fbq = function(){ n.callMethod ? n.callMethod.apply(n, arguments) : n.queue.push(arguments); };
+      if (!f._fbq) f._fbq = n;
+      n.push = n; n.loaded = true; n.version = '2.0'; n.queue = [];
+      t = b.createElement(e); t.async = true; t.src = v;
+      s = b.getElementsByTagName(e)[0]; s.parentNode.insertBefore(t, s);
+    })(window, document, 'script', 'https://connect.facebook.net/en_US/fbevents.js');
+    window.fbq('init', FB_PIXEL_ID);
+    window.fbq('track', 'PageView');
+  }
+
+  function saveCookieChoice(marketingEnabled) {
+    localStorage.setItem(COOKIE_KEY, marketingEnabled ? 'accepted' : 'declined');
+    if (marketingEnabled) loadAnalytics();
+    cookieOverlay.classList.remove('open');
+  }
+
+  document.getElementById('cookie-acceptall-btn').addEventListener('click', () => saveCookieChoice(true));
+  document.getElementById('cookie-selection-btn').addEventListener('click', () => saveCookieChoice(marketingOn));
+  marketingToggle.addEventListener('click', () => {
+    marketingOn = !marketingOn;
+    marketingToggle.classList.toggle('on', marketingOn);
+  });
+  document.getElementById('cookie-manage-link').addEventListener('click', () => {
+    cookieOverlay.classList.add('open');
+  });
+
+  const savedCookieChoice = localStorage.getItem(COOKIE_KEY);
+  if (savedCookieChoice === 'accepted') {
+    loadAnalytics();
+  } else if (savedCookieChoice !== 'declined') {
+    cookieOverlay.classList.add('open');
   }
 </script>
 </body>
