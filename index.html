@@ -15,6 +15,7 @@
   :root{
     --navy:#16232C;
     --navy-2:#1E313D;
+    --navy-3:#28404F;
     --paper:#EFE6D3;
     --paper-dim:#D9CDB2;
     --honey:#E8A33D;
@@ -239,20 +240,76 @@
   .how-sub{
     color:var(--paper-dim); font-size:16px; line-height:1.6; max-width:56ch; margin:0 0 32px;
   }
-  .steps{display:grid; grid-template-columns:1fr 1fr; gap:22px;}
-  .step{
-    background:var(--navy-2); border-radius:16px; padding:26px;
-    border-left:3px solid var(--honey);
+  /* mockups téléphone — mêmes écrans que l'app réelle, en miniature */
+  .steps{display:grid; grid-template-columns:repeat(3,1fr); gap:18px; position:relative;}
+  .steps-connector{
+    position:absolute; top:150px; left:calc(100%/6); right:calc(100%/6); height:1px;
+    background-image:linear-gradient(to right,var(--honey-dim) 0 5px,transparent 5px 11px);
+    background-size:11px 1px; background-repeat:repeat-x; z-index:0;
   }
-  .step .tag{
-    font-family:'IBM Plex Mono', monospace; font-size:12px;
-    color:var(--honey); text-transform:uppercase; letter-spacing:1px;
+  .step{display:flex; flex-direction:column; align-items:center; position:relative;}
+  .phone{
+    width:172px; height:352px; border-radius:30px;
+    background:linear-gradient(155deg,#2b2b2b,#131313); padding:8px;
+    box-shadow:0 20px 40px -16px rgba(0,0,0,0.5); position:relative; z-index:1;
   }
-  .step h3{
-    font-family:'Fraunces', serif; font-weight:560; font-size:22px;
-    margin:10px 0 10px;
+  .phone::before{
+    content:""; position:absolute; top:17px; left:50%; transform:translateX(-50%);
+    width:54px; height:15px; background:#131313; border-radius:10px; z-index:3;
   }
-  .step p{color:var(--paper-dim); font-size:15px; line-height:1.6; margin:0;}
+  .screen{
+    width:100%; height:100%; border-radius:23px; overflow:hidden;
+    background:var(--navy); position:relative; display:flex; flex-direction:column;
+  }
+  .s-body{padding:6px 10px 0; flex:1;}
+  .s-search-row{display:flex; gap:6px; margin-bottom:7px;}
+  .s-search-pill{flex:1; background:var(--navy-3); border-radius:100px; padding:6px 10px; font-size:7.5px; color:var(--paper-dim);}
+  .s-locate{width:24px; height:24px; border-radius:50%; background:var(--navy-3); display:flex; align-items:center; justify-content:center; font-size:9px; flex-shrink:0;}
+  .s-chip-row{display:flex; gap:4px; margin-bottom:9px;}
+  .s-chip{background:var(--navy-3); border-radius:100px; padding:4px 8px; font-size:7px; font-weight:600; color:var(--paper-dim);}
+  .s-card{background:var(--navy-2); border-radius:11px; overflow:hidden; border:1px solid rgba(239,230,211,0.14);}
+  .s-thumb{height:64px; position:relative; background:url('/img/panier-du-soir.jpg') center 65%/cover no-repeat;}
+  .s-thumb::before{content:""; position:absolute; inset:0; background:linear-gradient(180deg,rgba(22,35,44,0.05),rgba(22,35,44,0.35));}
+  .s-badge-avail{position:absolute; top:6px; left:6px; background:var(--honey); color:var(--navy); font-family:'IBM Plex Mono',monospace; font-size:6.5px; font-weight:700; padding:2px 6px; border-radius:100px; z-index:2;}
+  .s-badge-rating{position:absolute; top:6px; right:6px; background:rgba(22,35,44,0.85); color:var(--honey); font-family:'IBM Plex Mono',monospace; font-size:6.5px; font-weight:700; padding:2px 6px; border-radius:100px; z-index:2;}
+  .s-card-body{padding:12px 8px 8px;}
+  .s-merchant{font-size:8px; font-weight:700; color:var(--paper); margin-bottom:1px;}
+  .s-title{font-family:'Work Sans',sans-serif; font-weight:600; font-size:6.8px; color:var(--honey); text-transform:uppercase; letter-spacing:0.03em; margin-bottom:4px;}
+  .s-meta{font-size:6.8px; color:var(--paper-dim); margin-bottom:7px;}
+  .s-row{display:flex; align-items:center; justify-content:space-between;}
+  .s-price-old{font-size:7px; color:var(--paper-dim); text-decoration:line-through; margin-right:3px;}
+  .s-price{font-family:'IBM Plex Mono',monospace; font-weight:700; font-size:10px; color:var(--honey);}
+  .s-btn{background:var(--honey); color:var(--navy); font-size:7px; font-weight:700; padding:4px 9px; border-radius:100px;}
+
+  .s-hero{height:106px; position:relative; background:url('/img/panier-du-soir.jpg') center 60%/cover no-repeat;}
+  .s-hero::after{content:""; position:absolute; inset:0; background:linear-gradient(180deg,rgba(22,35,44,0.05) 40%,rgba(22,35,44,0.55));}
+  .s-hero-top{position:absolute; top:8px; left:8px; right:8px; display:flex; justify-content:space-between; z-index:2;}
+  .s-icircle{width:18px; height:18px; border-radius:50%; background:rgba(22,35,44,0.55); color:var(--paper); font-size:8px; display:flex; align-items:center; justify-content:center;}
+  .s-rbody{padding:10px 11px 0; flex:1;}
+  .s-rtitle{font-family:'Fraunces', serif; font-weight:560; font-size:13px; color:var(--paper); margin:0 0 7px;}
+  .s-time{background:rgba(232,163,61,0.16); color:var(--honey); font-weight:700; font-size:7.5px; padding:3px 8px; border-radius:100px; font-family:'IBM Plex Mono',monospace;}
+  .s-rdiv{border-top:1px solid rgba(239,230,211,0.12); margin:8px 0 9px;}
+  .s-total-row{display:flex; align-items:center; justify-content:space-between; font-size:8.5px; color:var(--paper); font-weight:600; padding-top:7px; border-top:1px solid rgba(239,230,211,0.12);}
+  .s-total-num{font-family:'IBM Plex Mono',monospace; font-weight:700; color:var(--honey); font-size:12px;}
+  .s-rcta{margin:auto 11px 12px; background:var(--honey); color:var(--navy); text-align:center; font-weight:700; font-size:8.5px; padding:9px; border-radius:100px;}
+
+  .s-collect-body{flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:16px 14px; text-align:center;}
+  .s-check{width:30px; height:30px; border-radius:50%; background:rgba(232,163,61,0.16); display:flex; align-items:center; justify-content:center; font-size:13px; color:var(--honey); margin-bottom:11px;}
+  .s-ctitle{font-family:'Fraunces', serif; font-weight:560; font-size:13.5px; color:var(--paper); margin:0 0 5px;}
+  .s-cdesc{font-size:7.5px; color:var(--paper-dim); line-height:1.4; max-width:22ch; margin:0 0 14px;}
+  .s-code-box{background:var(--navy-3); border:1px dashed rgba(232,163,61,0.5); border-radius:11px; padding:11px 16px; margin-bottom:12px;}
+  .s-code{font-family:'IBM Plex Mono',monospace; font-weight:700; font-size:16px; letter-spacing:0.1em; color:var(--honey);}
+  .s-code-label{font-size:6px; color:var(--paper-dim); text-transform:uppercase; letter-spacing:0.06em; margin-top:4px;}
+
+  .step-label{display:flex; align-items:baseline; gap:8px; margin:20px 0 6px;}
+  .step-num{font-family:'IBM Plex Mono',monospace; font-weight:600; font-size:11px; color:var(--honey-dim); letter-spacing:0.06em;}
+  .step-verb{font-family:'Fraunces', serif; font-weight:560; font-style:italic; font-size:13px; color:var(--paper-dim);}
+  .step h3{font-family:'Fraunces', serif; font-weight:560; font-size:17px; margin:0 0 6px; text-align:center;}
+  .step p{color:var(--paper-dim); font-size:12.5px; line-height:1.5; text-align:center; max-width:24ch; margin:0;}
+  @media (max-width:820px){
+    .steps{grid-template-columns:1fr; gap:44px; justify-items:center;}
+    .steps-connector{display:none;}
+  }
 
   footer{
     padding:34px 0 46px; border-top:1px solid rgba(239,230,211,0.12);
@@ -381,15 +438,80 @@
       <h2 class="how-hook" data-i18n="how.hook">Trois clics vous séparent d'une très bonne affaire.</h2>
       <p class="how-sub" data-i18n="how.sub">Parcourez. Réservez. Récupérez. Jusqu'à -70%, moins de déchets, et le repas réglé en trois clics.</p>
       <div class="steps">
+        <div class="steps-connector"></div>
+
         <div class="step">
-          <div class="tag" data-i18n="step1.tag">Les commerçants</div>
-          <h3 data-i18n="step1.title">Ils publient leurs invendus du jour</h3>
-          <p data-i18n="step1.text">Boulangeries, restaurants, épiceries, traiteurs annoncent leurs surplus à prix réduit en quelques clics, avec un créneau de retrait.</p>
+          <div class="phone">
+            <div class="screen">
+              <div class="s-body">
+                <div class="s-search-row">
+                  <div class="s-search-pill" data-i18n="step1.search">Rechercher…</div>
+                  <div class="s-locate">📍</div>
+                </div>
+                <div class="s-chip-row">
+                  <div class="s-chip" data-i18n="step1.chip1">Toutes catégories</div>
+                  <div class="s-chip" data-i18n="step1.chip2">Plus récent</div>
+                </div>
+                <div class="s-card">
+                  <div class="s-thumb">
+                    <span class="s-badge-avail" data-i18n="step1.avail">3 disponible</span>
+                    <span class="s-badge-rating">★ 4.8</span>
+                  </div>
+                  <div class="s-card-body">
+                    <div class="s-merchant">foodday.tech</div>
+                    <div class="s-title" data-i18n="step1.bagtitle">Panier du soir</div>
+                    <div class="s-meta" data-i18n="step1.meta">Aujourd'hui 18:00 – 18:30 · 0,8 km</div>
+                    <div class="s-row">
+                      <span><span class="s-price-old">9,00&nbsp;€</span><span class="s-price">4,50&nbsp;€</span></span>
+                      <span class="s-btn" data-i18n="reserve">Réserver</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="step-label"><span class="step-num">01</span><span class="step-verb" data-i18n="step1.verb">Parcourez</span></div>
+          <h3 data-i18n="step1.title">Les invendus près de chez toi</h3>
+          <p data-i18n="step1.text">Boulangeries, restaurants, épiceries — les sachets surprise disponibles aujourd'hui, triés par distance.</p>
         </div>
+
         <div class="step">
-          <div class="tag" data-i18n="step2.tag">Toi</div>
-          <h3 data-i18n="step2.title">Tu réserves, tu récupères</h3>
-          <p data-i18n="step2.text">Réservation en 2 minutes sur l'app, retrait sur place au créneau fixé.</p>
+          <div class="phone">
+            <div class="screen">
+              <div class="s-hero">
+                <div class="s-hero-top"><div class="s-icircle">←</div><div class="s-icircle">♡</div></div>
+              </div>
+              <div class="s-rbody">
+                <h4 class="s-rtitle" data-i18n="step1.bagtitle">Panier du soir</h4>
+                <span class="s-time">18:00 – 18:30</span>
+                <div class="s-rdiv"></div>
+                <div class="s-total-row"><span data-i18n="step2.total">Total</span><span class="s-total-num">4,50&nbsp;€</span></div>
+              </div>
+              <div class="s-rcta" data-i18n="reserve">Réserver</div>
+            </div>
+          </div>
+          <div class="step-label"><span class="step-num">02</span><span class="step-verb" data-i18n="step2.verb">Réservez</span></div>
+          <h3 data-i18n="step2.title">En moins de deux minutes</h3>
+          <p data-i18n="step2.text">Choisis ta quantité, paie en ligne en toute sécurité. Ton panier est à toi, personne d'autre ne peut le prendre.</p>
+        </div>
+
+        <div class="step">
+          <div class="phone">
+            <div class="screen">
+              <div class="s-collect-body">
+                <div class="s-check">✓</div>
+                <h4 class="s-ctitle" data-i18n="step3.confirm">C'est réservé !</h4>
+                <p class="s-cdesc" data-i18n="step3.desc">Montre ce code sur place pour récupérer ton sachet.</p>
+                <div class="s-code-box">
+                  <div class="s-code">7X4K9P</div>
+                  <div class="s-code-label" data-i18n="reserve.codeLabel">Code de retrait</div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="step-label"><span class="step-num">03</span><span class="step-verb" data-i18n="step3.verb">Récupérez</span></div>
+          <h3 data-i18n="step3.title">Avec un simple code</h3>
+          <p data-i18n="step3.text">Montre ton code au commerçant pendant le créneau indiqué. Repars avec ton panier, l'esprit léger.</p>
         </div>
       </div>
     </section>
@@ -459,12 +581,26 @@
       "how.eyebrow": "Comment ça marche",
       "how.hook": "Trois clics vous séparent d'une très bonne affaire.",
       "how.sub": "Parcourez. Réservez. Récupérez. Jusqu'à -70%, moins de déchets, et le repas réglé en trois clics.",
-      "step1.tag": "Les commerçants",
-      "step1.title": "Ils publient leurs invendus du jour",
-      "step1.text": "Boulangeries, restaurants, épiceries, traiteurs annoncent leurs surplus à prix réduit en quelques clics, avec un créneau de retrait.",
-      "step2.tag": "Toi",
-      "step2.title": "Tu réserves, tu récupères",
-      "step2.text": "Réservation en 2 minutes sur l'app, retrait sur place au créneau fixé.",
+      "step1.search": "Rechercher…",
+      "step1.chip1": "Toutes catégories",
+      "step1.chip2": "Plus récent",
+      "step1.avail": "3 disponible",
+      "step1.bagtitle": "Panier du soir",
+      "step1.meta": "Aujourd'hui 18:00 – 18:30 · 0,8 km",
+      "step1.verb": "Parcourez",
+      "step1.title": "Les invendus près de chez toi",
+      "step1.text": "Boulangeries, restaurants, épiceries — les sachets surprise disponibles aujourd'hui, triés par distance.",
+      "step2.verb": "Réservez",
+      "step2.total": "Total",
+      "step2.title": "En moins de deux minutes",
+      "step2.text": "Choisis ta quantité, paie en ligne en toute sécurité. Ton panier est à toi, personne d'autre ne peut le prendre.",
+      "step3.verb": "Récupérez",
+      "step3.confirm": "C'est réservé !",
+      "step3.desc": "Montre ce code sur place pour récupérer ton sachet.",
+      "step3.title": "Avec un simple code",
+      "step3.text": "Montre ton code au commerçant pendant le créneau indiqué. Repars avec ton panier, l'esprit léger.",
+      "reserve": "Réserver",
+      "reserve.codeLabel": "Code de retrait",
       "footer.mentions": "Mentions légales",
       "footer.cgu": "CGU",
       "footer.confidentialite": "Confidentialité",
@@ -510,12 +646,26 @@
       "how.eyebrow": "So funktioniert's",
       "how.hook": "Drei Klicks trennen dich von einem richtig guten Deal.",
       "how.sub": "Durchstöbern. Reservieren. Abholen. Bis zu -70%, weniger Verschwendung, und das Essen ist in drei Klicks gesichert.",
-      "step1.tag": "Die Geschäfte",
-      "step1.title": "Sie veröffentlichen ihre Reste des Tages",
-      "step1.text": "Bäckereien, Restaurants, Lebensmittelgeschäfte und Caterer melden ihre Überschüsse zu reduzierten Preisen in wenigen Klicks, mit einem Abholzeitraum.",
-      "step2.tag": "Du",
-      "step2.title": "Du reservierst, du holst ab",
-      "step2.text": "Reservierung in 2 Minuten über die App, Abholung vor Ort im festgelegten Zeitfenster.",
+      "step1.search": "Suchen…",
+      "step1.chip1": "Alle Kategorien",
+      "step1.chip2": "Neueste",
+      "step1.avail": "3 verfügbar",
+      "step1.bagtitle": "Abendtüte",
+      "step1.meta": "Heute 18:00 – 18:30 · 0,8 km",
+      "step1.verb": "Durchstöbern",
+      "step1.title": "Reste in deiner Nähe",
+      "step1.text": "Bäckereien, Restaurants, Lebensmittelgeschäfte — die heute verfügbaren Überraschungstüten, sortiert nach Entfernung.",
+      "step2.verb": "Reservieren",
+      "step2.total": "Gesamt",
+      "step2.title": "In weniger als zwei Minuten",
+      "step2.text": "Wähle deine Menge, bezahle sicher online. Die Tüte gehört dir, niemand sonst kann sie nehmen.",
+      "step3.verb": "Abholen",
+      "step3.confirm": "Reserviert!",
+      "step3.desc": "Zeig diesen Code vor Ort, um deine Tüte abzuholen.",
+      "step3.title": "Mit einem einfachen Code",
+      "step3.text": "Zeig deinen Code dem Geschäft im angegebenen Zeitfenster. Geh mit deiner Tüte, ganz entspannt.",
+      "reserve": "Reservieren",
+      "reserve.codeLabel": "Abholcode",
       "footer.mentions": "Impressum",
       "footer.cgu": "AGB",
       "footer.confidentialite": "Datenschutz",
@@ -561,12 +711,26 @@
       "how.eyebrow": "How it works",
       "how.hook": "Three taps between you and a really good deal.",
       "how.sub": "Browse. Reserve. Collect. Up to 70% off, less landfill, and dinner sorted in three taps.",
-      "step1.tag": "Merchants",
-      "step1.title": "They publish today's surplus",
-      "step1.text": "Bakeries, restaurants, grocery stores and caterers announce their surplus at a reduced price in a few clicks, with a pickup window.",
-      "step2.tag": "You",
-      "step2.title": "You reserve, you pick up",
-      "step2.text": "Reservation in 2 minutes on the app, pickup on site within the set window.",
+      "step1.search": "Search…",
+      "step1.chip1": "All categories",
+      "step1.chip2": "Newest",
+      "step1.avail": "3 available",
+      "step1.bagtitle": "Evening bag",
+      "step1.meta": "Today 18:00 – 18:30 · 0.8 km",
+      "step1.verb": "Browse",
+      "step1.title": "Surplus food near you",
+      "step1.text": "Bakeries, restaurants, grocery stores — today's surprise bags, sorted by distance.",
+      "step2.verb": "Reserve",
+      "step2.total": "Total",
+      "step2.title": "In under two minutes",
+      "step2.text": "Pick your quantity, pay securely online. The bag is yours, no one else can take it.",
+      "step3.verb": "Collect",
+      "step3.confirm": "Reserved!",
+      "step3.desc": "Show this code on site to collect your bag.",
+      "step3.title": "With a simple code",
+      "step3.text": "Show your code to the merchant within the pickup window. Walk away with your bag, worry-free.",
+      "reserve": "Reserve",
+      "reserve.codeLabel": "Pickup code",
       "footer.mentions": "Legal notice",
       "footer.cgu": "Terms",
       "footer.confidentialite": "Privacy",
