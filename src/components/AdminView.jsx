@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import AuthPrompt from "./AuthPrompt.jsx";
 import MarketingPush from "./MarketingPush.jsx";
+import MerchantVerification from "./MerchantVerification.jsx";
 import { supabase } from "../lib/supabase";
 import { ADMIN_EMAIL } from "../lib/admin";
 
@@ -151,6 +152,7 @@ export default function AdminView({ user }) {
   return (
     <div>
       <h1 className="page-title">Admin</h1>
+      <MerchantVerification />
       <MarketingPush />
     </div>
   );

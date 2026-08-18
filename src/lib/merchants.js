@@ -39,6 +39,24 @@ export async function updateMerchantProfile(userId, profile) {
   if (error) throw error;
 }
 
+// Admin uniquement (voir db/schema-v14-merchant-verification.sql : policy +
+// trigger empêchant un commerçant de se vérifier lui-même).
+export async function listPendingMerchants() {
+  const { data, error } = await supabase
+    .from("merchants")
+    .select("*")
+    .eq("verified", false)
+    .not("address", "is", null)
+    .order("created_at", { ascending: true });
+  if (error) throw error;
+  return data;
+}
+
+export async function verifyMerchant(merchantId) {
+  const { error } = await supabase.from("merchants").update({ verified: true }).eq("id", merchantId);
+  if (error) throw error;
+}
+
 // Réutilise le bucket "bag-photos" (déjà public, déjà autorisé en écriture
 // pour les commerçants connectés) plutôt que d'en créer un dédié.
 export async function uploadMerchantLogo(userId, file) {

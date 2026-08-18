@@ -163,6 +163,14 @@ export default function MerchantDashboard({ user, merchant, onMerchantChanged })
         />
       )}
 
+      {merchant && !merchant.verified && (
+        <div className="panel">
+          <h2>{t("merchant.verification.pendingTitle")}</h2>
+          <p className="page-sub">{t("merchant.verification.pendingDesc")}</p>
+        </div>
+      )}
+
+      {merchant?.verified && (
       <div className="panel">
         <h2>{t("merchant.newBag")}</h2>
         <div className="two-col">
@@ -258,6 +266,7 @@ export default function MerchantDashboard({ user, merchant, onMerchantChanged })
         </button>
         {msg && <p className={msg.type === "error" ? "error-msg" : "success-msg"}>{msg.text}</p>}
       </div>
+      )}
 
       <div className="panel">
         <h2>{t("merchant.mine")}</h2>
