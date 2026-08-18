@@ -40,20 +40,23 @@ export async function updateMerchantProfile(userId, profile) {
 }
 
 // Admin uniquement (voir db/schema-v14-merchant-verification.sql : policy +
-// trigger empêchant un commerçant de se vérifier lui-même).
-export async function listPendingMerchants() {
+// trigger empêchant un commerçant de se vérifier lui-même). Renvoie tous
+// les commerçants ayant terminé leur inscription (verified true ou false)
+// pour permettre à l'admin d'approuver ou de suspendre — pas seulement
+// les nouveaux, au cas où un commerçant déjà approuvé doive être refermé.
+export async function listMerchants() {
   const { data, error } = await supabase
     .from("merchants")
     .select("*")
-    .eq("verified", false)
     .not("address", "is", null)
+    .order("verified", { ascending: true })
     .order("created_at", { ascending: true });
   if (error) throw error;
   return data;
 }
 
-export async function verifyMerchant(merchantId) {
-  const { error } = await supabase.from("merchants").update({ verified: true }).eq("id", merchantId);
+export async function setMerchantVerified(merchantId, verified) {
+  const { error } = await supabase.from("merchants").update({ verified }).eq("id", merchantId);
   if (error) throw error;
 }
 
