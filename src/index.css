@@ -135,6 +135,7 @@ h1.page-title {
 .modal { background: var(--navy-2); border-radius: 18px; padding: 30px; max-width: 420px; width: 100%; position: relative; }
 .modal h2 { font-family: 'Fraunces', serif; font-weight: 560; font-size: 24px; margin: 0 0 8px; }
 .modal p.desc { color: var(--paper-dim); font-size: 14px; margin: 0 0 20px; }
+.auth-link-accent { color: var(--honey); text-decoration: underline; text-underline-offset: 2px; }
 .modal .close {
   position: absolute; top: 18px; right: 18px; background: none; border: none;
   color: var(--paper-dim); font-size: 20px;

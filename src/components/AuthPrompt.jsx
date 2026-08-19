@@ -35,7 +35,13 @@ export default function AuthPrompt({ title, description, view }) {
   return (
     <div>
       <h2>{title || t("account.loginTitle")}</h2>
-      <p className="desc">{description || t("account.loginDesc")}</p>
+      <p className="desc">
+        {description || (
+          <>
+            {t("account.loginDescPre")} <span className="auth-link-accent">{t("account.loginDescLink")}</span>
+          </>
+        )}
+      </p>
       <div className="field">
         <label>{t("account.emailLabel")}</label>
         <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="toi@exemple.lu" />
@@ -47,7 +53,7 @@ export default function AuthPrompt({ title, description, view }) {
       {sent && (
         <div className="field" style={{ marginTop: 18 }}>
           <label>{t("account.codeLabel")}</label>
-          <input value={code} onChange={(e) => setCode(e.target.value)} placeholder="123456" inputMode="numeric" />
+          <input value={code} onChange={(e) => setCode(e.target.value)} placeholder="12345678" inputMode="numeric" />
           <button className="btn secondary small" style={{ marginTop: 8 }} onClick={handleVerifyCode}>
             {t("account.verifyCode")}
           </button>
