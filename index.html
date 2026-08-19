@@ -1021,9 +1021,15 @@
 
   document.getElementById('footer-year').textContent = new Date().getFullYear();
 
+  // Centre la carte sur la ville ET filtre la liste sur les commerçants qui
+  // y sont réellement enregistrés (voir PublicView.jsx, qui lit ?city= et
+  // matche merchants.city — plus juste que le simple recentrage précédent,
+  // qui ne faisait qu'afficher les sachets les plus proches sans vraiment
+  // rattacher les commerces à leur ville).
   document.querySelectorAll('.footer-city').forEach(function(btn){
     btn.addEventListener('click', function(){
-      goToApp({ lat: parseFloat(btn.dataset.lat), lng: parseFloat(btn.dataset.lng) });
+      localStorage.setItem(POSITION_KEY, JSON.stringify({ lat: parseFloat(btn.dataset.lat), lng: parseFloat(btn.dataset.lng) }));
+      window.location.href = 'app.html?city=' + encodeURIComponent(btn.textContent.trim());
     });
   });
 

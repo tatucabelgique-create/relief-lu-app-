@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useI18n } from "../lib/i18n.jsx";
 import { updateMerchantProfile } from "../lib/merchants";
 import { geocodeAddress } from "../lib/geolocation";
+import { LUXEMBOURG_CITIES } from "../lib/cities";
 
 export default function MerchantRegistrationForm({ user, merchant, onDone }) {
   const { t } = useI18n();
@@ -55,7 +56,14 @@ export default function MerchantRegistrationForm({ user, merchant, onDone }) {
         </div>
         <div className="field">
           <label>{t("merchant.reg.city")}</label>
-          <input value={form.city} onChange={(e) => set("city", e.target.value)} placeholder="Luxembourg-Ville" />
+          <select value={form.city} onChange={(e) => set("city", e.target.value)}>
+            <option value="">{t("merchant.reg.cityPlaceholder")}</option>
+            {LUXEMBOURG_CITIES.map((c) => (
+              <option key={c} value={c}>
+                {c}
+              </option>
+            ))}
+          </select>
         </div>
       </div>
       <div className="two-col">

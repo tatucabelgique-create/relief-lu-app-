@@ -22,7 +22,11 @@ export default function PublicView({ user, pendingReserveBagId, onPendingReserve
   const [viewingMerchant, setViewingMerchant] = useState(null);
   const [category, setCategory] = useState("");
   const [sort, setSort] = useState("recent");
-  const [search, setSearch] = useState("");
+  // Préremplie depuis ?city=... (liens "Villes" du footer de la landing) —
+  // réutilise la recherche texte existante plutôt qu'un filtre à part,
+  // puisqu'elle matche déjà le nom du commerçant en plus du titre (voir
+  // plus bas, étendu pour matcher aussi la ville du commerçant).
+  const [search, setSearch] = useState(() => new URLSearchParams(window.location.search).get("city") || "");
   const [diet, setDiet] = useState("");
   const [pickupTime, setPickupTime] = useState("");
   const [viewMode, setViewMode] = useState(initialViewMode);
@@ -93,7 +97,12 @@ export default function PublicView({ user, pendingReserveBagId, onPendingReserve
     else if (pickupTime === "tomorrow") list = list.filter((b) => isTomorrow(b.pickup_start));
     if (search.trim()) {
       const q = search.trim().toLowerCase();
-      list = list.filter((b) => b.title.toLowerCase().includes(q) || b.merchants?.business_name?.toLowerCase().includes(q));
+      list = list.filter(
+        (b) =>
+          b.title.toLowerCase().includes(q) ||
+          b.merchants?.business_name?.toLowerCase().includes(q) ||
+          b.merchants?.city?.toLowerCase().includes(q)
+      );
     }
 
     if (sort === "price") list = [...list].sort((a, b) => a.price_cents - b.price_cents);
