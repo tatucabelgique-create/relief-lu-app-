@@ -97,12 +97,19 @@ export default function PublicView({ user, pendingReserveBagId, onPendingReserve
     else if (pickupTime === "tomorrow") list = list.filter((b) => isTomorrow(b.pickup_start));
     if (search.trim()) {
       const q = search.trim().toLowerCase();
-      list = list.filter(
-        (b) =>
+      list = list.filter((b) => {
+        const city = b.merchants?.city?.toLowerCase();
+        return (
           b.title.toLowerCase().includes(q) ||
           b.merchants?.business_name?.toLowerCase().includes(q) ||
-          b.merchants?.city?.toLowerCase().includes(q)
-      );
+          // Bidirectionnel côté ville : les commerçants inscrits avant le
+          // passage en liste fermée (voir lib/cities.js) ont parfois une
+          // variante plus courte ("Luxembourg" au lieu de
+          // "Luxembourg-Ville") — sans ça, un clic sur le footer ne les
+          // retrouve jamais alors qu'ils sont clairement dans cette ville.
+          (city && (city.includes(q) || q.includes(city)))
+        );
+      });
     }
 
     if (sort === "price") list = [...list].sort((a, b) => a.price_cents - b.price_cents);
