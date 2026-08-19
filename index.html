@@ -344,25 +344,47 @@
     .steps-connector{display:none;}
   }
 
-  footer{
-    padding:34px 0 46px; border-top:1px solid rgba(239,230,211,0.12);
-    display:flex; align-items:center; justify-content:space-between;
-    flex-wrap:wrap; gap:14px;
+  /* Footer pleine largeur (façon Too Good To Go) : sort du conteneur
+     .wrap via le classique truc left:50%/margin:-50vw, indépendamment
+     du fait qu'il soit imbriqué dedans dans le HTML. */
+  footer.footer-mega{
+    background:var(--navy-2); margin-top:60px;
+    width:100vw; position:relative; left:50%; right:50%; margin-left:-50vw; margin-right:-50vw;
+    padding-top:56px;
   }
-  .foot-logo{font-family:'Fraunces', serif; font-weight:680; font-size:17px; text-decoration:none; color:var(--paper);}
-  .foot-links{display:flex; gap:14px; align-items:center;}
-  .foot-links a{
-    color:var(--paper-dim); text-decoration:none; font-size:14px;
-    border-bottom:1px solid transparent;
+  .footer-inner{max-width:980px; margin:0 auto; padding:0 28px;}
+  .footer-wordmark{
+    font-family:'Fraunces', serif; font-weight:680; letter-spacing:-0.02em;
+    font-size:clamp(52px, 11vw, 128px); line-height:0.9; color:var(--paper); margin:0 0 44px;
   }
-  .foot-links a:hover{color:var(--honey); border-color:var(--honey);}
-  .foot-links button{
-    background:none; border:none; border-bottom:1px solid transparent; cursor:pointer;
-    color:var(--paper-dim); text-decoration:none; font-size:14px; font-family:'Work Sans', sans-serif; padding:0;
+  .footer-wordmark span{color:var(--honey);}
+  .footer-grid{
+    display:grid; grid-template-columns:repeat(3, 1fr); gap:32px;
+    padding-bottom:36px; border-bottom:1px solid rgba(239,230,211,0.12);
   }
-  .foot-links button:hover{color:var(--honey); border-color:var(--honey);}
+  .footer-col h4{
+    font-family:'Work Sans', sans-serif; font-size:12px; font-weight:700; letter-spacing:0.06em;
+    text-transform:uppercase; color:var(--honey); margin:0 0 14px;
+  }
+  .footer-col{display:flex; flex-direction:column; gap:10px;}
+  .footer-col a, .footer-col button{
+    background:none; border:none; padding:0; text-align:left; cursor:pointer;
+    color:var(--paper-dim); text-decoration:none; font-size:14.5px; font-family:'Work Sans', sans-serif;
+    border-bottom:1px solid transparent; width:fit-content;
+  }
+  .footer-col a:hover, .footer-col button:hover{color:var(--honey); border-color:var(--honey);}
+  .footer-bottom{
+    display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:14px;
+    padding:22px 0 30px;
+  }
+  .footer-bottom-logo{display:flex; align-items:center; gap:8px; color:var(--paper-dim); font-size:13px;}
+  .footer-bottom-logo img{width:22px; height:22px; border-radius:6px;}
+  .footer-social{display:flex; gap:12px; align-items:center;}
   .social-icon{display:flex; line-height:0; border-bottom:none !important; opacity:0.9; transition:opacity .15s ease, transform .15s ease;}
   .social-icon:hover{opacity:1; transform:translateY(-1px);}
+  @media (max-width:640px){
+    .footer-grid{grid-template-columns:1fr 1fr; row-gap:32px;}
+  }
 
   @media (max-width:760px){
     .tickets{grid-template-columns:1fr;}
@@ -564,19 +586,52 @@
       </div>
     </section>
 
-    <footer>
-      <a href="index.html" class="foot-logo">relief<span style="color:var(--honey)">.lu</span></a>
-      <div class="foot-links">
-        <a href="app.html?legal=mentions" data-i18n="footer.mentions">Mentions légales</a>
-        <a href="app.html?legal=cgu" data-i18n="footer.cgu">CGU</a>
-        <a href="app.html?legal=confidentialite" data-i18n="footer.confidentialite">Confidentialité</a>
-        <button type="button" id="cookie-manage-link" data-i18n="footer.cookies">Cookies</button>
-        <a href="https://www.instagram.com/relief.lu" target="_blank" rel="noreferrer" id="link-ig" class="social-icon" aria-label="Instagram">
-          <svg viewBox="0 0 48 48" width="26" height="26"><defs><radialGradient id="ig-grad" cx="30%" cy="107%" r="150%"><stop offset="0" stop-color="#fdf497"/><stop offset="0.05" stop-color="#fdf497"/><stop offset="0.45" stop-color="#fd5949"/><stop offset="0.6" stop-color="#d6249f"/><stop offset="0.9" stop-color="#285AEB"/></radialGradient></defs><rect width="48" height="48" rx="12" fill="url(#ig-grad)"/><rect x="12" y="12" width="24" height="24" rx="7" fill="none" stroke="#fff" stroke-width="2.4"/><circle cx="24" cy="24" r="6.2" fill="none" stroke="#fff" stroke-width="2.4"/><circle cx="31.6" cy="16.4" r="1.6" fill="#fff"/></svg>
-        </a>
-        <a href="https://www.facebook.com/profile.php?id=61593060962783" target="_blank" rel="noreferrer" id="link-fb" class="social-icon" aria-label="Facebook">
-          <svg viewBox="0 0 48 48" width="26" height="26"><rect width="48" height="48" rx="12" fill="#1877F2"/><path d="M27.5 42V25.9h5.4l0.8-6.3h-6.2v-4c0-1.8 0.5-3.1 3.1-3.1h3.3V6.9c-0.6-0.1-2.5-0.3-4.8-0.3-4.8 0-8 2.9-8 8.2v4.6h-5.4v6.3h5.4V42h6.4z" fill="#fff"/></svg>
-        </a>
+    <footer class="footer-mega">
+      <div class="footer-inner">
+        <div class="footer-wordmark">relief<span>.lu</span></div>
+
+        <div class="footer-grid">
+          <div class="footer-col">
+            <h4 data-i18n="footer.legalHeading">Légal</h4>
+            <a href="app.html?legal=mentions" data-i18n="footer.mentions">Mentions légales</a>
+            <a href="app.html?legal=cgu" data-i18n="footer.cgu">CGU</a>
+            <a href="app.html?legal=confidentialite" data-i18n="footer.confidentialite">Confidentialité</a>
+            <button type="button" id="cookie-manage-link" data-i18n="footer.cookies">Cookies</button>
+          </div>
+
+          <div class="footer-col">
+            <h4 data-i18n="footer.villesHeading">Villes</h4>
+            <button type="button" class="footer-city" data-lat="49.6116" data-lng="6.1319">Luxembourg-Ville</button>
+            <button type="button" class="footer-city" data-lat="49.4958" data-lng="5.9805">Esch-sur-Alzette</button>
+            <button type="button" class="footer-city" data-lat="49.5239" data-lng="5.8916">Differdange</button>
+            <button type="button" class="footer-city" data-lat="49.4797" data-lng="6.0868">Dudelange</button>
+            <button type="button" class="footer-city" data-lat="49.8479" data-lng="6.1044">Ettelbruck</button>
+            <button type="button" class="footer-city" data-lat="49.8679" data-lng="6.1594">Diekirch</button>
+            <button type="button" class="footer-city" data-lat="49.8114" data-lng="6.4222">Echternach</button>
+            <button type="button" class="footer-city" data-lat="49.6797" data-lng="6.4408">Grevenmacher</button>
+          </div>
+
+          <div class="footer-col">
+            <h4 data-i18n="footer.contactHeading">Contact</h4>
+            <a href="mailto:relief-lu@outlook.com">relief-lu@outlook.com</a>
+            <a href="app.html?view=merchant" data-i18n="nav.merchant">Inscrivez votre commerce</a>
+          </div>
+        </div>
+
+        <div class="footer-bottom">
+          <div class="footer-bottom-logo">
+            <img src="icon-192.png" alt="">
+            <span>&copy; <span id="footer-year">2026</span> RELIEF.LU SARL-S — <span data-i18n="footer.rights">Tous droits réservés.</span></span>
+          </div>
+          <div class="footer-social">
+            <a href="https://www.instagram.com/relief.lu" target="_blank" rel="noreferrer" id="link-ig" class="social-icon" aria-label="Instagram">
+              <svg viewBox="0 0 48 48" width="26" height="26"><defs><radialGradient id="ig-grad" cx="30%" cy="107%" r="150%"><stop offset="0" stop-color="#fdf497"/><stop offset="0.05" stop-color="#fdf497"/><stop offset="0.45" stop-color="#fd5949"/><stop offset="0.6" stop-color="#d6249f"/><stop offset="0.9" stop-color="#285AEB"/></radialGradient></defs><rect width="48" height="48" rx="12" fill="url(#ig-grad)"/><rect x="12" y="12" width="24" height="24" rx="7" fill="none" stroke="#fff" stroke-width="2.4"/><circle cx="24" cy="24" r="6.2" fill="none" stroke="#fff" stroke-width="2.4"/><circle cx="31.6" cy="16.4" r="1.6" fill="#fff"/></svg>
+            </a>
+            <a href="https://www.facebook.com/profile.php?id=61593060962783" target="_blank" rel="noreferrer" id="link-fb" class="social-icon" aria-label="Facebook">
+              <svg viewBox="0 0 48 48" width="26" height="26"><rect width="48" height="48" rx="12" fill="#1877F2"/><path d="M27.5 42V25.9h5.4l0.8-6.3h-6.2v-4c0-1.8 0.5-3.1 3.1-3.1h3.3V6.9c-0.6-0.1-2.5-0.3-4.8-0.3-4.8 0-8 2.9-8 8.2v4.6h-5.4v6.3h5.4V42h6.4z" fill="#fff"/></svg>
+            </a>
+          </div>
+        </div>
       </div>
     </footer>
   </div>
@@ -681,6 +736,10 @@
       "footer.cgu": "CGU",
       "footer.confidentialite": "Confidentialité",
       "footer.cookies": "Cookies",
+      "footer.legalHeading": "Légal",
+      "footer.villesHeading": "Villes",
+      "footer.contactHeading": "Contact",
+      "footer.rights": "Tous droits réservés.",
       "cookies.intro": "Nous utilisons des cookies afin de vous offrir la meilleure expérience possible sur relief.lu. Certains sont indispensables au fonctionnement de l'app, d'autres nous aident à mesurer son audience — vous choisissez lesquels activer.",
       "cookies.requiredTitle": "Cookies obligatoires",
       "cookies.requiredLabel": "Techniquement nécessaire",
@@ -760,6 +819,10 @@
       "footer.cgu": "AGB",
       "footer.confidentialite": "Datenschutz",
       "footer.cookies": "Cookies",
+      "footer.legalHeading": "Rechtliches",
+      "footer.villesHeading": "Städte",
+      "footer.contactHeading": "Kontakt",
+      "footer.rights": "Alle Rechte vorbehalten.",
       "cookies.intro": "Wir verwenden Cookies, um Ihnen die bestmögliche Erfahrung auf relief.lu zu bieten. Manche sind für den Betrieb der App unerlässlich, andere helfen uns bei der Reichweitenmessung — Sie entscheiden, welche Sie aktivieren.",
       "cookies.requiredTitle": "Erforderliche Cookies",
       "cookies.requiredLabel": "Technisch notwendig",
@@ -839,6 +902,10 @@
       "footer.cgu": "Terms",
       "footer.confidentialite": "Privacy",
       "footer.cookies": "Cookies",
+      "footer.legalHeading": "Legal",
+      "footer.villesHeading": "Cities",
+      "footer.contactHeading": "Contact",
+      "footer.rights": "All rights reserved.",
       "cookies.intro": "We use cookies to give you the best possible experience on relief.lu. Some are essential to the app's operation, others help us measure its audience — you choose which to enable.",
       "cookies.requiredTitle": "Required cookies",
       "cookies.requiredLabel": "Technically necessary",
@@ -946,6 +1013,14 @@
     } catch {
       showSearchError(t('citySearch.notFound'));
     }
+  });
+
+  document.getElementById('footer-year').textContent = new Date().getFullYear();
+
+  document.querySelectorAll('.footer-city').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      goToApp({ lat: parseFloat(btn.dataset.lat), lng: parseFloat(btn.dataset.lng) });
+    });
   });
 
   document.getElementById('closing-cta-waitlist').addEventListener('click', function(){
