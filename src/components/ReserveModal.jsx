@@ -45,7 +45,7 @@ export default function ReserveModal({ bag, user, onClose, onReserved }) {
           ✕
         </button>
         {!user ? (
-          <AuthPrompt title={t("reserve.loginRequired")} description={t("reserve.loginDesc")} view={`reserve:${bag.id}`} />
+          <AuthPrompt title={t("reserve.loginRequired")} view={`reserve:${bag.id}`} />
         ) : (
           <div>
             <h2>{bag.title}</h2>
