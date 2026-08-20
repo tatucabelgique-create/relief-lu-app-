@@ -9,7 +9,7 @@ const CONTENT = {
     mentions: {
       title: "Mentions légales",
       paragraphs: [
-        `Éditeur : ${COMPANY}, société à responsabilité limitée simplifiée (SARL-S) de droit luxembourgeois, en cours d'établissement.`,
+        `Éditeur : ${COMPANY}, société à responsabilité limitée simplifiée (SARL-S) de droit luxembourgeois, en cours de constitution et d'établissement.`,
         `Siège social : ${ADDRESS}`,
         `Contact : ${CONTACT}`,
         "Numéro RCS / matricule : en cours d'immatriculation — ces mentions seront complétées dès leur obtention.",
@@ -22,7 +22,7 @@ const CONTENT = {
       title: "Politique de confidentialité",
       paragraphs: [
         "Cette politique explique quelles données Relief.lu collecte, pourquoi, et comment les faire corriger ou supprimer.",
-        { heading: "1. Responsable du traitement", text: `${COMPANY} (SARL-S en cours d'établissement), ${ADDRESS}, contact : ${CONTACT}.` },
+        { heading: "1. Responsable du traitement", text: `${COMPANY} (SARL-S en cours de constitution et d'établissement), ${ADDRESS}, contact : ${CONTACT}.` },
         {
           heading: "2. Données collectées",
           text: "Email (liste d'attente, compte utilisateur), contenu de vos réservations (sachet, quantité, statut de paiement, code de retrait), vos favoris, les avis que vous laissez. Pour les commerçants : nom du commerce, adresse et position sur la carte, photos des sachets publiés, données de facturation liées aux ventes réalisées. Si vous activez les notifications, un identifiant technique d'abonnement push est stocké (aucune information personnelle supplémentaire). Les données de paiement (numéro de carte, etc.) ne transitent jamais par nos serveurs : elles sont saisies et traitées directement par Stripe.",
@@ -46,7 +46,7 @@ const CONTENT = {
     cgu: {
       title: "Conditions Générales d'Utilisation",
       paragraphs: [
-        `Les présentes Conditions Générales d'Utilisation ("CGU") régissent l'accès et l'utilisation de la plateforme relief.lu, éditée par ${COMPANY} (SARL-S en cours d'établissement), dont le siège social est situé ${ADDRESS}. Ce texte, rédigé pour ce type de plateforme, sera revu par un professionnel du droit avant une exploitation à grande échelle.`,
+        `Les présentes Conditions Générales d'Utilisation ("CGU") régissent l'accès et l'utilisation de la plateforme relief.lu, éditée par ${COMPANY} (SARL-S en cours de constitution et d'établissement), dont le siège social est situé ${ADDRESS}. Ce texte, rédigé pour ce type de plateforme, sera revu par un professionnel du droit avant une exploitation à grande échelle.`,
         {
           heading: "1. Objet et rôle de relief.lu",
           text: "relief.lu est une plateforme de mise en relation entre des commerçants (boulangeries, restaurants, épiceries, traiteurs, supermarchés...) disposant d'invendus alimentaires et des utilisateurs souhaitant les acquérir à prix réduit sous forme de \"sachets surprise\". relief.lu agit exclusivement en tant qu'intermédiaire technique : elle n'est ni producteur, ni vendeur, ni propriétaire des denrées proposées, et n'est partie à aucun moment au contrat de vente conclu directement entre le commerçant et l'utilisateur.",
@@ -105,7 +105,7 @@ const CONTENT = {
     mentions: {
       title: "Impressum",
       paragraphs: [
-        `Herausgeber: ${COMPANY}, vereinfachte Gesellschaft mit beschränkter Haftung (SARL-S) luxemburgischen Rechts, in Gründung.`,
+        `Herausgeber: ${COMPANY}, vereinfachte Gesellschaft mit beschränkter Haftung (SARL-S) luxemburgischen Rechts, in Gründung und Niederlassung.`,
         `Gesellschaftssitz: ${ADDRESS}`,
         `Kontakt: ${CONTACT}`,
         "Handelsregisternummer: wird derzeit beantragt — diese Angaben werden nach Erhalt ergänzt.",
@@ -118,7 +118,7 @@ const CONTENT = {
       title: "Datenschutzerklärung",
       paragraphs: [
         "Diese Erklärung beschreibt, welche Daten Relief.lu erhebt, warum, und wie Sie diese berichtigen oder löschen lassen können.",
-        { heading: "1. Verantwortlicher", text: `${COMPANY} (SARL-S in Gründung), ${ADDRESS}, Kontakt: ${CONTACT}.` },
+        { heading: "1. Verantwortlicher", text: `${COMPANY} (SARL-S in Gründung und Niederlassung), ${ADDRESS}, Kontakt: ${CONTACT}.` },
         {
           heading: "2. Erhobene Daten",
           text: "E-Mail (Warteliste, Nutzerkonto), Inhalt Ihrer Reservierungen (Tüte, Menge, Zahlungsstatus, Abholcode), Ihre Favoriten, von Ihnen abgegebene Bewertungen. Für Geschäfte: Name und Adresse des Geschäfts, Position auf der Karte, Fotos der veröffentlichten Tüten, Abrechnungsdaten zu den getätigten Verkäufen. Bei aktivierten Benachrichtigungen wird eine technische Push-Abonnement-Kennung gespeichert (keine weiteren personenbezogenen Daten). Zahlungsdaten (Kartennummer usw.) laufen niemals über unsere Server: sie werden ausschließlich von Stripe erfasst und verarbeitet.",
@@ -142,7 +142,7 @@ const CONTENT = {
     cgu: {
       title: "Allgemeine Nutzungsbedingungen",
       paragraphs: [
-        `Diese Allgemeinen Nutzungsbedingungen ("AGB") regeln den Zugang zur und die Nutzung der Plattform relief.lu, herausgegeben von ${COMPANY} (SARL-S in Gründung) mit Sitz ${ADDRESS}. Dieser Text wird vor einem umfangreichen Betrieb von einem Rechtsexperten geprüft.`,
+        `Diese Allgemeinen Nutzungsbedingungen ("AGB") regeln den Zugang zur und die Nutzung der Plattform relief.lu, herausgegeben von ${COMPANY} (SARL-S in Gründung und Niederlassung) mit Sitz ${ADDRESS}. Dieser Text wird vor einem umfangreichen Betrieb von einem Rechtsexperten geprüft.`,
         {
           heading: "1. Gegenstand und Rolle von relief.lu",
           text: "relief.lu ist eine Vermittlungsplattform zwischen Geschäften (Bäckereien, Restaurants, Lebensmittelgeschäfte, Caterer, Supermärkte usw.) mit überschüssigen Lebensmitteln und Nutzer:innen, die diese zu reduzierten Preisen als \"Überraschungstüte\" erwerben möchten. relief.lu handelt ausschließlich als technischer Vermittler: sie ist weder Hersteller noch Verkäufer noch Eigentümer der angebotenen Waren und zu keinem Zeitpunkt Vertragspartei des Kaufvertrags zwischen Geschäft und Nutzer.",
@@ -198,7 +198,7 @@ const CONTENT = {
     mentions: {
       title: "Legal notice",
       paragraphs: [
-        `Publisher: ${COMPANY}, a simplified private limited company (SARL-S) under Luxembourg law, currently being established.`,
+        `Publisher: ${COMPANY}, a simplified private limited company (SARL-S) under Luxembourg law, currently being incorporated and established.`,
         `Registered office: ${ADDRESS}`,
         `Contact: ${CONTACT}`,
         "Company registration number: pending — these details will be completed once obtained.",
@@ -211,7 +211,7 @@ const CONTENT = {
       title: "Privacy policy",
       paragraphs: [
         "This policy explains what data Relief.lu collects, why, and how to have it corrected or deleted.",
-        { heading: "1. Data controller", text: `${COMPANY} (SARL-S being established), ${ADDRESS}, contact: ${CONTACT}.` },
+        { heading: "1. Data controller", text: `${COMPANY} (SARL-S being incorporated and established), ${ADDRESS}, contact: ${CONTACT}.` },
         {
           heading: "2. Data collected",
           text: "Email (waitlist, user account), the content of your reservations (bag, quantity, payment status, pickup code), your favorites, the reviews you leave. For merchants: business name and address, map position, photos of published bags, billing data related to completed sales. If you enable notifications, a technical push-subscription identifier is stored (no further personal information). Payment data (card number, etc.) never passes through our servers: it is captured and processed exclusively by Stripe.",
@@ -235,7 +235,7 @@ const CONTENT = {
     cgu: {
       title: "Terms of Service",
       paragraphs: [
-        `These Terms of Service ("Terms") govern access to and use of the relief.lu platform, published by ${COMPANY} (SARL-S being established), with registered office at ${ADDRESS}. This text, written for this type of platform, will be reviewed by a legal professional before large-scale operation.`,
+        `These Terms of Service ("Terms") govern access to and use of the relief.lu platform, published by ${COMPANY} (SARL-S being incorporated and established), with registered office at ${ADDRESS}. This text, written for this type of platform, will be reviewed by a legal professional before large-scale operation.`,
         {
           heading: "1. Purpose and role of relief.lu",
           text: "relief.lu is a matchmaking platform between merchants (bakeries, restaurants, grocery stores, caterers, supermarkets...) with surplus food and users wishing to buy it at a reduced price as a \"surprise bag\". relief.lu acts exclusively as a technical intermediary: it is neither the producer, seller, nor owner of the food offered, and is never a party to the sale contract concluded directly between the merchant and the user.",
