@@ -7,6 +7,7 @@ import MerchantLogoUpload from "./MerchantLogoUpload.jsx";
 import MerchantStats from "./MerchantStats.jsx";
 import MerchantBagRow from "./MerchantBagRow.jsx";
 import MerchantRegistrationForm from "./MerchantRegistrationForm.jsx";
+import NotificationToggle from "./NotificationToggle.jsx";
 
 const emptyForm = {
   title: "",
@@ -161,6 +162,16 @@ export default function MerchantDashboard({ user, merchant, onMerchantChanged })
             onMerchantChanged();
           }}
         />
+      )}
+
+      {merchant?.verified && (
+        <div className="panel">
+          <h2>{t("merchant.notifTitle")}</h2>
+          <p className="page-sub" style={{ marginBottom: 12 }}>
+            {t("merchant.notifDesc")}
+          </p>
+          <NotificationToggle user={user} />
+        </div>
       )}
 
       {merchant && !merchant.verified && (
