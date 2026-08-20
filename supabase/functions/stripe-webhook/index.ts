@@ -60,16 +60,26 @@ async function loadVapidKeys(): Promise<CryptoKeyPair> {
   return { publicKey, privateKey };
 }
 
-const vapidKeys = await loadVapidKeys();
-const appServer = await webpush.ApplicationServer.new({
-  contactInformation: VAPID_SUBJECT,
-  vapidKeys,
-});
+// Chargé à la demande (pas au démarrage du module) : si la génération des
+// clés VAPID échouait au niveau module, ça ferait planter TOUTE la fonction
+// avant même qu'elle puisse traiter le moindre webhook Stripe — y compris la
+// mise à jour du paiement, qui elle est critique. Isolé ici + mis en cache
+// après le premier succès, pour que seul le push (best-effort) soit affecté.
+let appServerPromise: ReturnType<typeof webpush.ApplicationServer.new> | null = null;
+function getAppServer() {
+  if (!appServerPromise) {
+    appServerPromise = loadVapidKeys().then((vapidKeys) =>
+      webpush.ApplicationServer.new({ contactInformation: VAPID_SUBJECT, vapidKeys })
+    );
+  }
+  return appServerPromise;
+}
 
 // Best-effort : une notification ratée ne doit jamais faire échouer le
 // traitement du webhook Stripe (le paiement est déjà confirmé à ce stade).
 async function notifyMerchantOfPaidReservation(reservationId: string) {
   try {
+    const appServer = await getAppServer();
     const { data: reservation } = await supabase
       .from("reservations")
       .select("quantity, bags(title, merchant_id)")
