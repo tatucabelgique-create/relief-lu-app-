@@ -181,11 +181,25 @@ const CONTENT = {
       ],
     },
     cookies: {
-      title: "Cookies",
+      title: "Politique de cookies",
       paragraphs: [
-        "Ce site utilise des cookies et espaces de stockage techniques, nécessaires à son fonctionnement (garder votre connexion, mémoriser votre langue, votre position pour trier par distance) — ceux-ci sont toujours actifs, sans demande de consentement puisqu'ils sont indispensables au service.",
-        "Ce site utilise également, avec votre consentement, des cookies de mesure d'audience (Google Analytics) et de publicité (Meta Pixel). Ils ne sont déposés qu'après acceptation explicite via le bandeau affiché lors de votre première visite.",
-        "Vous pouvez à tout moment modifier votre choix via le lien « Gérer les cookies » en bas de page.",
+        "Un cookie (ou une technologie de stockage similaire, comme le stockage local de votre navigateur) est un petit fichier déposé sur votre appareil lors de votre visite. Cette politique détaille ceux que relief.lu utilise, leur finalité et leur durée.",
+        {
+          heading: "1. Cookies et stockages strictement nécessaires",
+          text: "Toujours actifs, sans demande de consentement, car indispensables au fonctionnement du service : relief_cookie_consent (mémorise votre choix en matière de cookies, 12 mois), relief-user-position (votre position pour trier les sachets par distance, jusqu'à suppression), relief-pending-view (retrouver la bonne page après un clic sur un lien de connexion par email, quelques minutes), ainsi que le jeton de session déposé par notre prestataire d'authentification Supabase (garder votre connexion active).",
+        },
+        {
+          heading: "2. Cookies de mesure d'audience",
+          text: "Déposés uniquement après votre consentement explicite via le bandeau : les cookies Google Analytics (notamment _ga, _ga_*, _gid), qui nous permettent de mesurer la fréquentation du site de façon agrégée, jusqu'à 13 mois.",
+        },
+        {
+          heading: "3. Cookies publicitaires",
+          text: "Déposés uniquement après votre consentement explicite via le bandeau : le cookie Meta Pixel (_fbp), qui nous permet de mesurer l'efficacité de nos campagnes publicitaires sur Facebook/Instagram, jusqu'à 3 mois.",
+        },
+        {
+          heading: "4. Gérer vos choix",
+          text: "Vous pouvez à tout moment modifier votre choix via le lien « Gérer les cookies » en bas de page, ou en supprimant les cookies directement dans les réglages de votre navigateur. Le refus des cookies non essentiels n'affecte pas votre accès au service — seule la mesure d'audience et la publicité en sont affectées.",
+        },
       ],
     },
   },
@@ -362,11 +376,25 @@ const CONTENT = {
       ],
     },
     cookies: {
-      title: "Cookies",
+      title: "Cookie-Richtlinie",
       paragraphs: [
-        "Diese Website verwendet technisch notwendige Cookies und Speicher (Anmeldung aufrechterhalten, Sprache merken, Standort für die Sortierung nach Entfernung) — diese sind immer aktiv und erfordern keine Zustimmung, da sie für den Dienst unerlässlich sind.",
-        "Mit Ihrer Zustimmung verwendet diese Website außerdem Cookies zur Reichweitenmessung (Google Analytics) und Werbung (Meta Pixel). Diese werden erst nach ausdrücklicher Zustimmung über das beim ersten Besuch angezeigte Banner gesetzt.",
-        "Sie können Ihre Wahl jederzeit über den Link „Cookies verwalten” am Seitenende ändern.",
+        "Ein Cookie (oder eine ähnliche Speichertechnologie, z. B. der lokale Speicher Ihres Browsers) ist eine kleine Datei, die bei Ihrem Besuch auf Ihrem Gerät abgelegt wird. Diese Richtlinie beschreibt, welche relief.lu verwendet, zu welchem Zweck und für wie lange.",
+        {
+          heading: "1. Technisch notwendige Cookies und Speicher",
+          text: "Immer aktiv, ohne Zustimmungspflicht, da für den Betrieb unerlässlich: relief_cookie_consent (speichert Ihre Cookie-Wahl, 12 Monate), relief-user-position (Ihr Standort zur Sortierung der Tüten nach Entfernung, bis zur Löschung), relief-pending-view (Rückkehr zur richtigen Seite nach Klick auf einen Login-Link per E-Mail, einige Minuten), sowie das von unserem Authentifizierungsdienstleister Supabase gesetzte Sitzungstoken (Anmeldung aufrechterhalten).",
+        },
+        {
+          heading: "2. Reichweitenmessungs-Cookies",
+          text: "Nur nach ausdrücklicher Zustimmung über das Banner gesetzt: die Google-Analytics-Cookies (u. a. _ga, _ga_*, _gid), die uns eine aggregierte Besuchermessung ermöglichen, bis zu 13 Monate.",
+        },
+        {
+          heading: "3. Werbe-Cookies",
+          text: "Nur nach ausdrücklicher Zustimmung über das Banner gesetzt: das Meta-Pixel-Cookie (_fbp), das uns die Erfolgsmessung unserer Werbekampagnen auf Facebook/Instagram ermöglicht, bis zu 3 Monate.",
+        },
+        {
+          heading: "4. Ihre Wahl verwalten",
+          text: "Sie können Ihre Wahl jederzeit über den Link „Cookies verwalten“ am Seitenende ändern oder Cookies direkt in Ihren Browser-Einstellungen löschen. Die Ablehnung nicht notwendiger Cookies beeinträchtigt Ihren Zugang zum Dienst nicht — nur die Reichweitenmessung und Werbung sind betroffen.",
+        },
       ],
     },
   },
@@ -543,11 +571,25 @@ const CONTENT = {
       ],
     },
     cookies: {
-      title: "Cookies",
+      title: "Cookie policy",
       paragraphs: [
-        "This site uses technical cookies and storage necessary for it to function (keeping you signed in, remembering your language, your position to sort by distance) — these are always active and require no consent, as they're essential to the service.",
-        "With your consent, this site also uses audience-measurement (Google Analytics) and advertising (Meta Pixel) cookies. These are only set after explicit acceptance via the banner shown on your first visit.",
-        "You can change your choice at any time via the \"Manage cookies\" link at the bottom of the page.",
+        "A cookie (or a similar storage technology, such as your browser's local storage) is a small file placed on your device when you visit. This policy details which ones relief.lu uses, for what purpose, and for how long.",
+        {
+          heading: "1. Strictly necessary cookies and storage",
+          text: "Always active, with no consent required, as they are essential to the service: relief_cookie_consent (remembers your cookie choice, 12 months), relief-user-position (your location to sort bags by distance, until deleted), relief-pending-view (returning to the right page after clicking an email sign-in link, a few minutes), and the session token set by our authentication provider Supabase (keeping you signed in).",
+        },
+        {
+          heading: "2. Audience-measurement cookies",
+          text: "Only set after your explicit consent via the banner: the Google Analytics cookies (notably _ga, _ga_*, _gid), which let us measure site traffic in aggregate, for up to 13 months.",
+        },
+        {
+          heading: "3. Advertising cookies",
+          text: "Only set after your explicit consent via the banner: the Meta Pixel cookie (_fbp), which lets us measure the effectiveness of our Facebook/Instagram ad campaigns, for up to 3 months.",
+        },
+        {
+          heading: "4. Managing your choices",
+          text: "You can change your choice at any time via the \"Manage cookies\" link at the bottom of the page, or by deleting cookies directly in your browser settings. Declining non-essential cookies does not affect your access to the service — only audience measurement and advertising are affected.",
+        },
       ],
     },
   },
