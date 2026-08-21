@@ -21,26 +21,45 @@ const CONTENT = {
     confidentialite: {
       title: "Politique de confidentialité",
       paragraphs: [
-        "Cette politique explique quelles données Relief.lu collecte, pourquoi, et comment les faire corriger ou supprimer.",
-        { heading: "1. Responsable du traitement", text: `${COMPANY} (SARL-S en cours de constitution), ${ADDRESS}, contact : ${CONTACT}.` },
+        `Cette politique explique quelles données personnelles relief.lu traite, pourquoi, sur quelle base légale, avec qui elles sont partagées et comment les faire corriger, exporter ou supprimer. Le responsable du traitement est ${COMPANY} (SARL-S en cours de constitution), ${ADDRESS}, contact : ${CONTACT}.`,
         {
-          heading: "2. Données collectées",
-          text: "Email (liste d'attente, compte utilisateur), contenu de vos réservations (sachet, quantité, statut de paiement, code de retrait), vos favoris, les avis que vous laissez. Pour les commerçants : nom du commerce, adresse et position sur la carte, photos des sachets publiés, données de facturation liées aux ventes réalisées. Si vous activez les notifications, un identifiant technique d'abonnement push est stocké (aucune information personnelle supplémentaire). Les données de paiement (numéro de carte, etc.) ne transitent jamais par nos serveurs : elles sont saisies et traitées directement par Stripe.",
+          heading: "1. Données que nous collectons",
+          text: "Pour tous les utilisateurs : votre email (inscription, compte), le contenu de vos réservations (sachet, quantité, statut de paiement, code de retrait), vos favoris, les avis que vous laissez, et — si vous l'activez — votre position approximative (pour trier par distance) ainsi qu'un identifiant technique d'abonnement aux notifications push. Pour les commerçants, en plus : nom du commerce, adresse et position sur la carte, numéro de téléphone, numéro d'immatriculation le cas échéant, photos et logo publiés, données liées aux ventes réalisées sur la plateforme. Les données de paiement (numéro de carte, etc.) ne transitent jamais par nos serveurs : elles sont saisies et traitées directement par Stripe.",
         },
         {
-          heading: "3. Pourquoi ces données",
-          text: "Uniquement pour faire fonctionner relief.lu : créer votre compte, traiter vos réservations et paiements, afficher et gérer vos favoris et avis, vous notifier des nouveaux sachets chez les commerçants suivis, et permettre aux commerçants de suivre leurs ventes et leur facturation.",
+          heading: "2. Base légale et finalités du traitement",
+          text: "Nous traitons ces données parce qu'elles sont nécessaires à l'exécution du contrat qui nous lie à vous (créer et gérer votre compte, traiter vos réservations et paiements, permettre aux commerçants de publier et suivre leurs ventes), sur la base de notre intérêt légitime à faire fonctionner et améliorer relief.lu (affichage des favoris et avis, notifications de nouveaux sachets, sécurité et prévention de la fraude), ou, lorsque la loi l'exige, sur la base de votre consentement (notamment pour la géolocalisation et les cookies non essentiels, voir notre politique de cookies).",
         },
         {
-          heading: "4. Avec qui elles sont partagées",
-          text: "Avec les prestataires techniques nécessaires au fonctionnement du service : Supabase (base de données, authentification, stockage des photos), Stripe (traitement des paiements en ligne), et les services de notification push de votre navigateur (Google, Mozilla ou Apple selon le cas) pour l'acheminement technique des notifications. Aucune donnée n'est vendue ni utilisée à des fins publicitaires en dehors du consentement donné via le bandeau cookies.",
+          heading: "3. Avec qui ces données sont partagées",
+          text: "Avec les prestataires techniques nécessaires au fonctionnement du service, agissant comme sous-traitants : Supabase (base de données, authentification, stockage des photos), Stripe (traitement des paiements en ligne), et les services de notification push de votre navigateur (Google, Mozilla ou Apple selon le cas) pour l'acheminement technique des notifications. Nous pouvons également divulguer des données aux autorités compétentes si la loi nous y oblige. Aucune donnée n'est vendue, et aucune n'est utilisée à des fins publicitaires en dehors du consentement donné via le bandeau cookies.",
         },
-        { heading: "5. Durée de conservation", text: "Vos données sont conservées tant que votre compte est actif. Vous pouvez en demander la suppression à tout moment." },
-        { heading: "6. Vos droits", text: `Vous pouvez demander l'accès, la correction, la suppression ou l'export de vos données à tout moment en écrivant à ${CONTACT}.` },
         {
-          heading: "7. Sécurité",
-          text: "L'accès aux données est protégé par des règles techniques (chaque utilisateur ne peut voir/modifier que ses propres réservations, favoris et sachets) et le site est servi en HTTPS.",
+          heading: "4. Transferts hors Union européenne",
+          text: "Certains de nos prestataires (notamment Stripe et GitHub, sociétés basées aux États-Unis) peuvent traiter des données en dehors de l'Union européenne. Dans ce cas, nous nous assurons que ce transfert repose sur un mécanisme reconnu par le RGPD (clauses contractuelles types de la Commission européenne ou équivalent).",
         },
+        {
+          heading: "5. Durée de conservation",
+          text: "Vos données sont conservées tant que votre compte est actif. Elles peuvent être conservées plus longtemps lorsqu'une obligation légale nous y contraint (notamment en matière comptable et fiscale pour les données de facturation des commerçants) ou en cas de litige en cours. Vous pouvez demander la suppression de votre compte à tout moment.",
+        },
+        {
+          heading: "6. Sécurité",
+          text: "L'accès aux données est protégé par des règles techniques (chaque utilisateur ne peut voir/modifier que ses propres réservations, favoris et sachets) et le site est servi en HTTPS. Nous ne faisons appel qu'à des prestataires appliquant des mesures de sécurité appropriées.",
+        },
+        {
+          heading: "7. Vos droits",
+          text: `Vous disposez d'un droit d'accès, de rectification, d'effacement, de limitation et d'opposition au traitement, ainsi que d'un droit à la portabilité de vos données personnelles, et d'un droit de retirer votre consentement à tout moment lorsque le traitement en repose. Pour les exercer, écrivez-nous à ${CONTACT}.`,
+        },
+        {
+          heading: "8. Réclamation auprès de l'autorité de contrôle",
+          text: "Si vous estimez que vos droits ne sont pas respectés, vous pouvez introduire une réclamation auprès de la Commission Nationale pour la Protection des Données (CNPD), l'autorité de contrôle luxembourgeoise : 15, Boulevard du Jazz, L-4370 Belvaux, Luxembourg — cnpd.public.lu. Nous vous encourageons à nous contacter d'abord afin que nous puissions tenter de résoudre votre demande directement.",
+        },
+        {
+          heading: "9. Protection des mineurs",
+          text: "relief.lu s'adresse à des utilisateurs majeurs ou légalement en capacité de conclure un contrat. Nous ne collectons pas sciemment de données concernant des mineurs n'ayant pas cette capacité.",
+        },
+        { heading: "10. Modification de cette politique", text: "Nous pouvons modifier cette politique à tout moment ; vous serez informé des changements significatifs via l'application ou par email." },
+        { heading: "11. Contact", text: `Pour toute question relative à cette politique : ${CONTACT} — ${COMPANY}, ${ADDRESS}.` },
       ],
     },
     cguClients: {
@@ -182,26 +201,45 @@ const CONTENT = {
     confidentialite: {
       title: "Datenschutzerklärung",
       paragraphs: [
-        "Diese Erklärung beschreibt, welche Daten Relief.lu erhebt, warum, und wie Sie diese berichtigen oder löschen lassen können.",
-        { heading: "1. Verantwortlicher", text: `${COMPANY} (SARL-S in Gründung), ${ADDRESS}, Kontakt: ${CONTACT}.` },
+        `Diese Erklärung beschreibt, welche personenbezogenen Daten relief.lu verarbeitet, warum, auf welcher Rechtsgrundlage, mit wem sie geteilt werden und wie Sie diese berichtigen, exportieren oder löschen lassen können. Verantwortlicher ist ${COMPANY} (SARL-S in Gründung), ${ADDRESS}, Kontakt: ${CONTACT}.`,
         {
-          heading: "2. Erhobene Daten",
-          text: "E-Mail (Warteliste, Nutzerkonto), Inhalt Ihrer Reservierungen (Tüte, Menge, Zahlungsstatus, Abholcode), Ihre Favoriten, von Ihnen abgegebene Bewertungen. Für Geschäfte: Name und Adresse des Geschäfts, Position auf der Karte, Fotos der veröffentlichten Tüten, Abrechnungsdaten zu den getätigten Verkäufen. Bei aktivierten Benachrichtigungen wird eine technische Push-Abonnement-Kennung gespeichert (keine weiteren personenbezogenen Daten). Zahlungsdaten (Kartennummer usw.) laufen niemals über unsere Server: sie werden ausschließlich von Stripe erfasst und verarbeitet.",
+          heading: "1. Erhobene Daten",
+          text: "Für alle Nutzer:innen: Ihre E-Mail (Registrierung, Konto), der Inhalt Ihrer Reservierungen (Tüte, Menge, Zahlungsstatus, Abholcode), Ihre Favoriten, von Ihnen abgegebene Bewertungen sowie — bei Aktivierung — Ihr ungefährer Standort (zur Sortierung nach Entfernung) und eine technische Push-Abonnement-Kennung. Für Geschäfte zusätzlich: Name und Adresse des Geschäfts, Position auf der Karte, Telefonnummer, Handelsregisternummer sofern vorhanden, veröffentlichte Fotos und Logo, Daten zu den auf der Plattform getätigten Verkäufen. Zahlungsdaten (Kartennummer usw.) laufen niemals über unsere Server: sie werden ausschließlich von Stripe erfasst und verarbeitet.",
         },
         {
-          heading: "3. Zweck der Datenverarbeitung",
-          text: "Ausschließlich zum Betrieb von relief.lu: Konto erstellen, Reservierungen und Zahlungen abwickeln, Ihre Favoriten und Bewertungen anzeigen und verwalten, Sie über neue Tüten bei favorisierten Geschäften benachrichtigen, und Geschäften die Nachverfolgung ihrer Verkäufe und Abrechnungen ermöglichen.",
+          heading: "2. Rechtsgrundlage und Zwecke der Verarbeitung",
+          text: "Wir verarbeiten diese Daten, weil sie zur Erfüllung des mit Ihnen bestehenden Vertrags erforderlich sind (Konto erstellen und verwalten, Reservierungen und Zahlungen abwickeln, Geschäften die Veröffentlichung und Nachverfolgung ihrer Verkäufe ermöglichen), aufgrund unseres berechtigten Interesses am Betrieb und an der Verbesserung von relief.lu (Anzeige von Favoriten und Bewertungen, Benachrichtigungen über neue Tüten, Sicherheit und Betrugsprävention), oder, wo gesetzlich vorgeschrieben, auf Grundlage Ihrer Einwilligung (insbesondere für Standortdaten und nicht notwendige Cookies, siehe unsere Cookie-Richtlinie).",
         },
         {
-          heading: "4. Weitergabe an Dritte",
-          text: "An die für den Betrieb notwendigen technischen Dienstleister: Supabase (Datenbank, Authentifizierung, Foto-Speicherung), Stripe (Abwicklung von Online-Zahlungen) sowie die Push-Benachrichtigungsdienste Ihres Browsers (je nach Fall Google, Mozilla oder Apple) für die technische Zustellung. Keine Daten werden verkauft oder außerhalb der über das Cookie-Banner erteilten Einwilligung zu Werbezwecken genutzt.",
+          heading: "3. Weitergabe an Dritte",
+          text: "An die für den Betrieb notwendigen technischen Dienstleister als Auftragsverarbeiter: Supabase (Datenbank, Authentifizierung, Foto-Speicherung), Stripe (Abwicklung von Online-Zahlungen) sowie die Push-Benachrichtigungsdienste Ihres Browsers (je nach Fall Google, Mozilla oder Apple) für die technische Zustellung. Wir können Daten zudem an zuständige Behörden weitergeben, wenn wir gesetzlich dazu verpflichtet sind. Keine Daten werden verkauft oder außerhalb der über das Cookie-Banner erteilten Einwilligung zu Werbezwecken genutzt.",
         },
-        { heading: "5. Speicherdauer", text: "Ihre Daten werden gespeichert, solange Ihr Konto aktiv ist. Sie können jederzeit deren Löschung beantragen." },
-        { heading: "6. Ihre Rechte", text: `Sie können jederzeit Auskunft, Berichtigung, Löschung oder Export Ihrer Daten verlangen, per E-Mail an ${CONTACT}.` },
         {
-          heading: "7. Sicherheit",
-          text: "Der Zugriff auf die Daten ist durch technische Regeln geschützt (jeder Nutzer sieht/ändert nur seine eigenen Reservierungen, Favoriten und Tüten); die Website wird über HTTPS ausgeliefert.",
+          heading: "4. Übermittlung außerhalb der EU",
+          text: "Einige unserer Dienstleister (insbesondere Stripe und GitHub, beide mit Sitz in den USA) können Daten außerhalb der Europäischen Union verarbeiten. In diesem Fall stellen wir sicher, dass die Übermittlung auf einem von der DSGVO anerkannten Mechanismus beruht (Standardvertragsklauseln der Europäischen Kommission oder gleichwertig).",
         },
+        {
+          heading: "5. Speicherdauer",
+          text: "Ihre Daten werden gespeichert, solange Ihr Konto aktiv ist. Eine längere Speicherung ist möglich, wenn eine gesetzliche Verpflichtung dazu besteht (insbesondere buchhalterische und steuerliche Pflichten bei Abrechnungsdaten von Geschäften) oder ein laufender Rechtsstreit dies erfordert. Sie können die Löschung Ihres Kontos jederzeit beantragen.",
+        },
+        {
+          heading: "6. Sicherheit",
+          text: "Der Zugriff auf die Daten ist durch technische Regeln geschützt (jeder Nutzer sieht/ändert nur seine eigenen Reservierungen, Favoriten und Tüten); die Website wird über HTTPS ausgeliefert. Wir beauftragen ausschließlich Dienstleister mit angemessenen Sicherheitsmaßnahmen.",
+        },
+        {
+          heading: "7. Ihre Rechte",
+          text: `Sie haben ein Recht auf Auskunft, Berichtigung, Löschung, Einschränkung und Widerspruch gegen die Verarbeitung sowie ein Recht auf Datenübertragbarkeit und, soweit die Verarbeitung darauf beruht, ein Recht auf jederzeitigen Widerruf Ihrer Einwilligung. Zur Ausübung schreiben Sie uns an ${CONTACT}.`,
+        },
+        {
+          heading: "8. Beschwerde bei der Aufsichtsbehörde",
+          text: "Wenn Sie der Ansicht sind, dass Ihre Rechte nicht gewahrt werden, können Sie eine Beschwerde bei der Commission Nationale pour la Protection des Données (CNPD), der luxemburgischen Aufsichtsbehörde, einreichen: 15, Boulevard du Jazz, L-4370 Belvaux, Luxemburg — cnpd.public.lu. Wir empfehlen, uns zuerst zu kontaktieren, damit wir versuchen können, Ihr Anliegen direkt zu klären.",
+        },
+        {
+          heading: "9. Schutz Minderjähriger",
+          text: "relief.lu richtet sich an volljährige oder rechtlich vertragsfähige Nutzer:innen. Wir erheben wissentlich keine Daten von Minderjährigen ohne diese Fähigkeit.",
+        },
+        { heading: "10. Änderung dieser Erklärung", text: "Wir können diese Erklärung jederzeit ändern; Sie werden über wesentliche Änderungen über die App oder per E-Mail informiert." },
+        { heading: "11. Kontakt", text: `Bei Fragen zu dieser Erklärung: ${CONTACT} — ${COMPANY}, ${ADDRESS}.` },
       ],
     },
     cguClients: {
@@ -340,26 +378,45 @@ const CONTENT = {
     confidentialite: {
       title: "Privacy policy",
       paragraphs: [
-        "This policy explains what data Relief.lu collects, why, and how to have it corrected or deleted.",
-        { heading: "1. Data controller", text: `${COMPANY} (SARL-S being incorporated), ${ADDRESS}, contact: ${CONTACT}.` },
+        `This policy explains what personal data relief.lu processes, why, on what legal basis, who it is shared with, and how to have it corrected, exported or deleted. The data controller is ${COMPANY} (SARL-S being incorporated), ${ADDRESS}, contact: ${CONTACT}.`,
         {
-          heading: "2. Data collected",
-          text: "Email (waitlist, user account), the content of your reservations (bag, quantity, payment status, pickup code), your favorites, the reviews you leave. For merchants: business name and address, map position, photos of published bags, billing data related to completed sales. If you enable notifications, a technical push-subscription identifier is stored (no further personal information). Payment data (card number, etc.) never passes through our servers: it is captured and processed exclusively by Stripe.",
+          heading: "1. Data we collect",
+          text: "For all users: your email (registration, account), the content of your reservations (bag, quantity, payment status, pickup code), your favorites, the reviews you leave, and — if enabled — your approximate location (to sort by distance) and a technical push-subscription identifier. For merchants, in addition: business name and address, map position, phone number, registration number where applicable, published photos and logo, data related to sales made on the platform. Payment data (card number, etc.) never passes through our servers: it is captured and processed exclusively by Stripe.",
         },
         {
-          heading: "3. Why this data is collected",
-          text: "Solely to operate relief.lu: create your account, process reservations and payments, display and manage your favorites and reviews, notify you of new bags from merchants you follow, and let merchants track their sales and billing.",
+          heading: "2. Legal basis and purposes of processing",
+          text: "We process this data because it is necessary for the performance of our contract with you (creating and managing your account, processing reservations and payments, letting merchants publish and track their sales), on the basis of our legitimate interest in operating and improving relief.lu (displaying favorites and reviews, notifying new bags, security and fraud prevention), or, where required by law, on the basis of your consent (notably for location data and non-essential cookies, see our cookie policy).",
         },
         {
-          heading: "4. Who it is shared with",
-          text: "With the technical providers necessary to operate the service: Supabase (database, authentication, photo storage), Stripe (online payment processing), and your browser's push notification services (Google, Mozilla or Apple depending on the case) for technical delivery. No data is sold or used for advertising purposes beyond the consent given via the cookie banner.",
+          heading: "3. Who it is shared with",
+          text: "With the technical providers necessary to operate the service, acting as processors: Supabase (database, authentication, photo storage), Stripe (online payment processing), and your browser's push notification services (Google, Mozilla or Apple depending on the case) for technical delivery. We may also disclose data to competent authorities where legally required. No data is sold or used for advertising purposes beyond the consent given via the cookie banner.",
         },
-        { heading: "5. Retention period", text: "Your data is kept as long as your account is active. You can request its deletion at any time." },
-        { heading: "6. Your rights", text: `You can request access, correction, deletion or export of your data at any time by writing to ${CONTACT}.` },
         {
-          heading: "7. Security",
-          text: "Access to data is protected by technical rules (each user can only see/edit their own reservations, favorites and bags) and the site is served over HTTPS.",
+          heading: "4. Transfers outside the EU",
+          text: "Some of our providers (notably Stripe and GitHub, both US-based companies) may process data outside the European Union. Where this occurs, we ensure the transfer relies on a mechanism recognized under the GDPR (European Commission standard contractual clauses or equivalent).",
         },
+        {
+          heading: "5. Retention period",
+          text: "Your data is kept as long as your account is active. It may be kept longer where a legal obligation requires it (notably accounting and tax obligations for merchant billing data) or in case of an ongoing dispute. You can request deletion of your account at any time.",
+        },
+        {
+          heading: "6. Security",
+          text: "Access to data is protected by technical rules (each user can only see/edit their own reservations, favorites and bags) and the site is served over HTTPS. We only work with providers implementing appropriate security measures.",
+        },
+        {
+          heading: "7. Your rights",
+          text: `You have a right of access, rectification, erasure, restriction and objection to processing, a right to data portability, and, where processing relies on it, a right to withdraw your consent at any time. To exercise these rights, write to us at ${CONTACT}.`,
+        },
+        {
+          heading: "8. Complaint to the supervisory authority",
+          text: "If you believe your rights are not being respected, you may lodge a complaint with the Commission Nationale pour la Protection des Données (CNPD), Luxembourg's supervisory authority: 15, Boulevard du Jazz, L-4370 Belvaux, Luxembourg — cnpd.public.lu. We encourage you to contact us first so we can try to resolve your request directly.",
+        },
+        {
+          heading: "9. Protection of minors",
+          text: "relief.lu is intended for users of legal age or otherwise legally able to enter into a contract. We do not knowingly collect data from minors lacking this capacity.",
+        },
+        { heading: "10. Changes to this policy", text: "We may modify this policy at any time; you will be informed of significant changes via the app or by email." },
+        { heading: "11. Contact", text: `For any question regarding this policy: ${CONTACT} — ${COMPANY}, ${ADDRESS}.` },
       ],
     },
     cguClients: {
