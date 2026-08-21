@@ -41,8 +41,8 @@ export default function MerchantAuth({ onOpenLegal }) {
         </div>
         <p className="legal-consent">
           {t("merchant.consentPrefix")}{" "}
-          <button type="button" className="link-btn" onClick={() => onOpenLegal?.("cgu")}>
-            {t("legal.cgu")}
+          <button type="button" className="link-btn" onClick={() => onOpenLegal?.("cguCommercants")}>
+            {t("legal.cguCommercants")}
           </button>{" "}
           {t("merchant.consentAnd")}{" "}
           <button type="button" className="link-btn" onClick={() => onOpenLegal?.("confidentialite")}>

@@ -161,8 +161,11 @@ export default function App() {
             <button className="btn secondary small" onClick={() => setLegalModal("mentions")}>
               Mentions légales
             </button>
-            <button className="btn secondary small" onClick={() => setLegalModal("cgu")}>
-              CGU
+            <button className="btn secondary small" onClick={() => setLegalModal("cguClients")}>
+              CGU Clients
+            </button>
+            <button className="btn secondary small" onClick={() => setLegalModal("cguCommercants")}>
+              CGU Commerçants
             </button>
             <button className="btn secondary small" onClick={() => setLegalModal("confidentialite")}>
               Confidentialité
