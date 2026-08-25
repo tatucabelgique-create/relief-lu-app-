@@ -1,6 +1,6 @@
 import { useI18n } from "../lib/i18n.jsx";
 
-const CONTACT = "relief-lu@outlook.com";
+const CONTACT = "contact@relief.lu";
 const COMPANY = "RELIEF.LU SARL-S";
 const ADDRESS = "11, rue de l'Industrie, L-8399 Windhof, Luxembourg";
 
