@@ -50,7 +50,7 @@ Deno.serve(async (req) => {
     // return_base inclut déjà le sous-dossier (ex. /relief-lu-app-/) — envoyé
     // par le client (voir payments.js), plus fiable que de le déduire du seul
     // header Origin côté serveur (qui ne contient jamais de chemin).
-    const base = (return_base || "https://relief-lu.online/").replace(/\/+$/, "");
+    const base = (return_base || "https://relief.lu/").replace(/\/+$/, "");
 
     const session = await stripe.checkout.sessions.create({
       mode: "payment",

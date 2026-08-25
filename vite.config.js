@@ -3,8 +3,8 @@ import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 
 export default defineConfig({
-  // Servi depuis relief-lu.online (domaine personnalisé, voir public/CNAME) —
-  // donc racine "/" et non plus le sous-dossier /relief-lu-app-/ de github.io.
+  // Servi depuis un domaine personnalisé (voir public/CNAME) — donc racine
+  // "/" et non plus le sous-dossier /relief-lu-app-/ de github.io.
   base: process.env.VITE_BASE_PATH || "/",
   plugins: [react()],
   build: {
