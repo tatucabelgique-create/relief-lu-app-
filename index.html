@@ -253,6 +253,40 @@
      (CookieConsent.jsx), réécrite en vanilla JS puisque cette page n'est
      pas React. Même clé localStorage ("relief_cookie_consent") pour que
      le choix reste cohérent entre la landing et l'app. */
+  /* Écran d'intro : une seule fois par session (sessionStorage, pas
+     localStorage — sinon un visiteur qui revient le lendemain ne le
+     reverrait plus jamais). Recouvre tout, y compris le futur bandeau
+     cookies (z-index supérieur), le temps que l'animation se joue. */
+  .intro-splash{
+    position:fixed; inset:0; z-index:200; background:var(--navy);
+    display:flex; align-items:center; justify-content:center; text-align:center;
+    transition:opacity 0.6s ease;
+  }
+  .intro-splash.hide{opacity:0; pointer-events:none;}
+  .intro-eyebrow{
+    font-family:'IBM Plex Mono', monospace; font-size:14px; letter-spacing:4px;
+    color:var(--honey); text-transform:uppercase; margin-bottom:12px;
+    opacity:0; transform:translateY(30px); animation:introFadeUp 0.8s ease-out 0.3s forwards;
+  }
+  .intro-wordmark{
+    font-family:'Fraunces', serif; font-weight:680; font-size:clamp(48px,10vw,110px);
+    color:var(--paper); line-height:1; letter-spacing:-0.02em;
+    opacity:0; transform:translateY(30px); animation:introFadeUp 0.8s ease-out 0.6s forwards;
+  }
+  .intro-wordmark span{color:var(--honey);}
+  .intro-tagline{
+    font-family:'IBM Plex Mono', monospace; font-size:14px; color:var(--paper-dim);
+    margin-top:18px; letter-spacing:0.4px;
+    opacity:0; transform:translateY(30px); animation:introFadeUp 0.8s ease-out 0.9s forwards;
+  }
+  @keyframes introFadeUp{
+    0%{opacity:0; transform:translateY(30px);}
+    100%{opacity:1; transform:translateY(0);}
+  }
+  @media (prefers-reduced-motion:reduce){
+    .intro-splash{display:none;}
+  }
+
   .cookie-overlay{
     position:fixed; inset:0; z-index:80; background:rgba(10,16,20,0.72);
     display:none; align-items:center; justify-content:center; padding:20px;
@@ -441,6 +475,28 @@
 </style>
 </head>
 <body>
+  <div class="intro-splash" id="intro-splash" style="display:none;">
+    <div>
+      <div class="intro-eyebrow">Luxembourg</div>
+      <div class="intro-wordmark">relief<span>.lu</span></div>
+      <div class="intro-tagline" data-i18n="intro.tagline">Anti-gaspillage alimentaire</div>
+    </div>
+  </div>
+  <script>
+    (function(){
+      var seen = sessionStorage.getItem('relief_intro_shown');
+      if (seen) return;
+      sessionStorage.setItem('relief_intro_shown', '1');
+      var el = document.getElementById('intro-splash');
+      el.style.display = 'flex';
+      document.documentElement.style.overflow = 'hidden';
+      setTimeout(function(){
+        el.classList.add('hide');
+        document.documentElement.style.overflow = '';
+      }, 2600);
+      setTimeout(function(){ el.remove(); }, 3200);
+    })();
+  </script>
   <div class="wrap">
     <header>
       <a href="index.html" class="logo">relief<span class="dot">.lu</span></a>
@@ -743,6 +799,7 @@
 <script>
   const I18N = {
     fr: {
+      "intro.tagline": "Anti-gaspillage alimentaire",
       "eyebrow": "Arrive à la rentrée",
       "h1.part1": "Le Luxembourg est l'un des pays les plus riches du monde.",
       "h1.part2": "Ce n'est pas le cas pour tout le monde.",
@@ -830,6 +887,7 @@
       "nav.about": "À propos",
     },
     de: {
+      "intro.tagline": "Gegen Lebensmittelverschwendung",
       "eyebrow": "Startet zum Schulanfang",
       "h1.part1": "Luxemburg ist eines der reichsten Länder der Welt.",
       "h1.part2": "Das gilt nicht für alle.",
@@ -917,6 +975,7 @@
       "nav.about": "Über uns",
     },
     en: {
+      "intro.tagline": "Fighting food waste",
       "eyebrow": "Launching this fall",
       "h1.part1": "Luxembourg is one of the richest countries in the world.",
       "h1.part2": "That's not true for everyone.",
