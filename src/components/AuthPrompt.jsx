@@ -35,13 +35,7 @@ export default function AuthPrompt({ title, description, view }) {
   return (
     <div>
       <h2>{title || t("account.loginTitle")}</h2>
-      <p className="desc">
-        {description || (
-          <>
-            {t("account.loginDescPre")} <span className="auth-link-accent">{t("account.loginDescLink")}</span>
-          </>
-        )}
-      </p>
+      {description && <p className="desc">{description}</p>}
       <div className="field">
         <label>{t("account.emailLabel")}</label>
         <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="toi@exemple.lu" />
@@ -59,6 +53,9 @@ export default function AuthPrompt({ title, description, view }) {
           </button>
         </div>
       )}
+      <p className="auth-footnote">
+        {t("account.loginDescPre")} <span className="auth-link-accent">{t("account.loginDescLink")}</span>
+      </p>
     </div>
   );
 }
