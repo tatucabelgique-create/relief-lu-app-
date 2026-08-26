@@ -2,7 +2,7 @@ import { useI18n } from "../lib/i18n.jsx";
 
 const CONTACT = "contact@relief.lu";
 const COMPANY = "RELIEF.LU SARL-S";
-const ADDRESS = "11, rue de l'Industrie, L-8399 Windhof, Luxembourg";
+const ADDRESS = "2, rue Dr. Elvire Engel, L-8346 Grass, Luxembourg";
 
 const CONTENT = {
   fr: {
