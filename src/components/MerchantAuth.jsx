@@ -29,9 +29,7 @@ export default function MerchantAuth({ onOpenLegal }) {
 
   return (
     <div className="merchant-hero">
-      <div className="merchant-visual">
-        <div className="merchant-visual-icon">🥡</div>
-      </div>
+      <div className="merchant-visual" />
       <div className="merchant-form-panel">
         <h2>{t("merchant.registerTitle")}</h2>
         <p className="page-sub">{t("merchant.registerDesc")}</p>
