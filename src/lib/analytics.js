@@ -1,8 +1,8 @@
 // Google Analytics + Meta Pixel — chargés uniquement après consentement
 // explicite (voir CookieConsent.jsx), jamais avant. Remplace ces deux IDs
 // par les vrais avant mise en production.
-const GA_MEASUREMENT_ID = "G-XXXXXXXXXX";
-const FB_PIXEL_ID = "0000000000000000";
+const GA_MEASUREMENT_ID = "G-3XMT3ZQVZS";
+const FB_PIXEL_ID = "2807394679624372";
 
 export function loadAnalytics() {
   if (window.__analyticsLoaded) return;
