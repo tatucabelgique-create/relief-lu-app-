@@ -34,7 +34,19 @@ const icons = {
       <path d="M4.5 20c1.4-3.6 4.3-5.5 7.5-5.5s6.1 1.9 7.5 5.5" strokeLinecap="round" />
     </svg>
   ),
+  chat: (
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
+      <path d="M4 5h16v11H8l-4 4V5z" strokeLinejoin="round" />
+    </svg>
+  ),
 };
+
+// Ouvre le widget Tawk.to (bulle flottante masquée, voir app.html) —
+// window.Tawk_API peut ne pas encore exister au tout premier rendu, le
+// script se charge de façon asynchrone.
+function openChat() {
+  window.Tawk_API?.toggle?.();
+}
 
 export default function BottomNav({ view, onNavigate }) {
   const { t } = useI18n();
@@ -44,6 +56,7 @@ export default function BottomNav({ view, onNavigate }) {
     { key: "browse", icon: "search", label: t("nav.bottom.browse") },
     { key: "favorites", icon: "heart", label: t("nav.favorites") },
     { key: "merchant", icon: "store", label: t("nav.bottom.merchant") },
+    { key: "help", icon: "chat", label: t("nav.bottom.help"), action: openChat },
     { key: "account", icon: "profile", label: t("nav.bottom.account") },
   ];
 
@@ -53,7 +66,7 @@ export default function BottomNav({ view, onNavigate }) {
         <button
           key={item.key}
           className={`bottom-nav-item ${view === item.key ? "active" : ""}`}
-          onClick={() => onNavigate(item.key)}
+          onClick={() => (item.action ? item.action() : onNavigate(item.key))}
         >
           {icons[item.icon]}
           <span>{item.label}</span>

@@ -15,15 +15,12 @@
   <!--Start of Tawk.to Script-->
   <script type="text/javascript">
   var Tawk_API=Tawk_API||{}, Tawk_LoadStart=new Date();
-  // Décale la bulle vers le haut sur mobile pour qu'elle ne recouvre pas la
-  // barre de navigation du bas (.bottom-nav, ~78px de haut avec l'encoche
-  // iOS incluse — voir src/index.css). Aucun souci en desktop, pas de
-  // barre fixe en bas.
-  Tawk_API.customStyle = {
-    visibility: {
-      desktop: { position: 'br', xOffset: 20, yOffset: 20 },
-      mobile: { position: 'br', xOffset: 10, yOffset: 90 }
-    }
+  // Bulle flottante masquée : elle recouvrait la barre de navigation du bas
+  // (.bottom-nav) et sa taille n'est pas réglable. L'onglet "Aide" de
+  // BottomNav.jsx ouvre le chat via Tawk_API.toggle() à la place — un seul
+  // point d'entrée, cohérent avec le reste de la navigation.
+  Tawk_API.onLoad = function () {
+    Tawk_API.hideWidget();
   };
   (function(){
   var s1=document.createElement("script"),s0=document.getElementsByTagName("script")[0];
