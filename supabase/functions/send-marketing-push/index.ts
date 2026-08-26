@@ -90,7 +90,10 @@ Deno.serve(async (req) => {
   const { title, body, url, admin_secret } = await req.json();
 
   if (admin_secret !== ADMIN_SECRET) {
-    return new Response("unauthorized", { status: 401, headers: corsHeaders });
+    return new Response(JSON.stringify({ error: "Clé secrète incorrecte." }), {
+      status: 401,
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
   }
 
   if (!title || !body) {
