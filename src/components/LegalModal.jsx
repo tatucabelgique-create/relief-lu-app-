@@ -36,7 +36,7 @@ const CONTENT = {
         },
         {
           heading: "3. Avec qui ces données sont partagées",
-          text: "Avec les prestataires techniques nécessaires au fonctionnement du service, agissant comme sous-traitants : Supabase (base de données, authentification, stockage des photos), Stripe (traitement des paiements en ligne), et les services de notification push de votre navigateur (Google, Mozilla ou Apple selon le cas) pour l'acheminement technique des notifications. Nous pouvons également divulguer des données aux autorités compétentes si la loi nous y oblige. Aucune donnée n'est vendue, et aucune n'est utilisée à des fins publicitaires en dehors du consentement donné via le bandeau cookies.",
+          text: "Avec les prestataires techniques nécessaires au fonctionnement du service, agissant comme sous-traitants : Supabase (base de données, authentification, stockage des photos), Stripe (traitement des paiements en ligne), Tawk.to (chat en direct, si vous nous contactez via la bulle de discussion), et les services de notification push de votre navigateur (Google, Mozilla ou Apple selon le cas) pour l'acheminement technique des notifications. Nous pouvons également divulguer des données aux autorités compétentes si la loi nous y oblige. Aucune donnée n'est vendue, et aucune n'est utilisée à des fins publicitaires en dehors du consentement donné via le bandeau cookies.",
         },
         {
           heading: "4. Transferts hors Union européenne",
@@ -186,7 +186,7 @@ const CONTENT = {
         "Un cookie (ou une technologie de stockage similaire, comme le stockage local de votre navigateur) est un petit fichier déposé sur votre appareil lors de votre visite. Cette politique détaille ceux que relief.lu utilise, leur finalité et leur durée.",
         {
           heading: "1. Cookies et stockages strictement nécessaires",
-          text: "Toujours actifs, sans demande de consentement, car indispensables au fonctionnement du service : relief_cookie_consent (mémorise votre choix en matière de cookies, 12 mois), relief-user-position (votre position pour trier les sachets par distance, jusqu'à suppression), relief-pending-view (retrouver la bonne page après un clic sur un lien de connexion par email, quelques minutes), ainsi que le jeton de session déposé par notre prestataire d'authentification Supabase (garder votre connexion active).",
+          text: "Toujours actifs, sans demande de consentement, car indispensables au fonctionnement du service : relief_cookie_consent (mémorise votre choix en matière de cookies, 12 mois), relief-user-position (votre position pour trier les sachets par distance, jusqu'à suppression), relief-pending-view (retrouver la bonne page après un clic sur un lien de connexion par email, quelques minutes), le jeton de session déposé par notre prestataire d'authentification Supabase (garder votre connexion active), ainsi que les cookies déposés par Tawk.to, notre prestataire de chat en direct, nécessaires pour maintenir votre conversation active si vous nous contactez via la bulle de discussion.",
         },
         {
           heading: "2. Cookies de mesure d'audience",
@@ -234,7 +234,7 @@ const CONTENT = {
         },
         {
           heading: "3. Weitergabe an Dritte",
-          text: "An die für den Betrieb notwendigen technischen Dienstleister als Auftragsverarbeiter: Supabase (Datenbank, Authentifizierung, Foto-Speicherung), Stripe (Abwicklung von Online-Zahlungen) sowie die Push-Benachrichtigungsdienste Ihres Browsers (je nach Fall Google, Mozilla oder Apple) für die technische Zustellung. Wir können Daten zudem an zuständige Behörden weitergeben, wenn wir gesetzlich dazu verpflichtet sind. Keine Daten werden verkauft oder außerhalb der über das Cookie-Banner erteilten Einwilligung zu Werbezwecken genutzt.",
+          text: "An die für den Betrieb notwendigen technischen Dienstleister als Auftragsverarbeiter: Supabase (Datenbank, Authentifizierung, Foto-Speicherung), Stripe (Abwicklung von Online-Zahlungen), Tawk.to (Live-Chat, falls Sie uns über die Chat-Blase kontaktieren) sowie die Push-Benachrichtigungsdienste Ihres Browsers (je nach Fall Google, Mozilla oder Apple) für die technische Zustellung. Wir können Daten zudem an zuständige Behörden weitergeben, wenn wir gesetzlich dazu verpflichtet sind. Keine Daten werden verkauft oder außerhalb der über das Cookie-Banner erteilten Einwilligung zu Werbezwecken genutzt.",
         },
         {
           heading: "4. Übermittlung außerhalb der EU",
@@ -381,7 +381,7 @@ const CONTENT = {
         "Ein Cookie (oder eine ähnliche Speichertechnologie, z. B. der lokale Speicher Ihres Browsers) ist eine kleine Datei, die bei Ihrem Besuch auf Ihrem Gerät abgelegt wird. Diese Richtlinie beschreibt, welche relief.lu verwendet, zu welchem Zweck und für wie lange.",
         {
           heading: "1. Technisch notwendige Cookies und Speicher",
-          text: "Immer aktiv, ohne Zustimmungspflicht, da für den Betrieb unerlässlich: relief_cookie_consent (speichert Ihre Cookie-Wahl, 12 Monate), relief-user-position (Ihr Standort zur Sortierung der Tüten nach Entfernung, bis zur Löschung), relief-pending-view (Rückkehr zur richtigen Seite nach Klick auf einen Login-Link per E-Mail, einige Minuten), sowie das von unserem Authentifizierungsdienstleister Supabase gesetzte Sitzungstoken (Anmeldung aufrechterhalten).",
+          text: "Immer aktiv, ohne Zustimmungspflicht, da für den Betrieb unerlässlich: relief_cookie_consent (speichert Ihre Cookie-Wahl, 12 Monate), relief-user-position (Ihr Standort zur Sortierung der Tüten nach Entfernung, bis zur Löschung), relief-pending-view (Rückkehr zur richtigen Seite nach Klick auf einen Login-Link per E-Mail, einige Minuten), das von unserem Authentifizierungsdienstleister Supabase gesetzte Sitzungstoken (Anmeldung aufrechterhalten), sowie die von Tawk.to, unserem Live-Chat-Anbieter, gesetzten Cookies, die zur Aufrechterhaltung Ihrer Konversation nötig sind, wenn Sie uns über die Chat-Blase kontaktieren.",
         },
         {
           heading: "2. Reichweitenmessungs-Cookies",
@@ -429,7 +429,7 @@ const CONTENT = {
         },
         {
           heading: "3. Who it is shared with",
-          text: "With the technical providers necessary to operate the service, acting as processors: Supabase (database, authentication, photo storage), Stripe (online payment processing), and your browser's push notification services (Google, Mozilla or Apple depending on the case) for technical delivery. We may also disclose data to competent authorities where legally required. No data is sold or used for advertising purposes beyond the consent given via the cookie banner.",
+          text: "With the technical providers necessary to operate the service, acting as processors: Supabase (database, authentication, photo storage), Stripe (online payment processing), Tawk.to (live chat, if you contact us via the chat bubble), and your browser's push notification services (Google, Mozilla or Apple depending on the case) for technical delivery. We may also disclose data to competent authorities where legally required. No data is sold or used for advertising purposes beyond the consent given via the cookie banner.",
         },
         {
           heading: "4. Transfers outside the EU",
@@ -576,7 +576,7 @@ const CONTENT = {
         "A cookie (or a similar storage technology, such as your browser's local storage) is a small file placed on your device when you visit. This policy details which ones relief.lu uses, for what purpose, and for how long.",
         {
           heading: "1. Strictly necessary cookies and storage",
-          text: "Always active, with no consent required, as they are essential to the service: relief_cookie_consent (remembers your cookie choice, 12 months), relief-user-position (your location to sort bags by distance, until deleted), relief-pending-view (returning to the right page after clicking an email sign-in link, a few minutes), and the session token set by our authentication provider Supabase (keeping you signed in).",
+          text: "Always active, with no consent required, as they are essential to the service: relief_cookie_consent (remembers your cookie choice, 12 months), relief-user-position (your location to sort bags by distance, until deleted), relief-pending-view (returning to the right page after clicking an email sign-in link, a few minutes), the session token set by our authentication provider Supabase (keeping you signed in), and the cookies set by Tawk.to, our live chat provider, needed to keep your conversation active if you contact us via the chat bubble.",
         },
         {
           heading: "2. Audience-measurement cookies",
