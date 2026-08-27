@@ -19,7 +19,16 @@
   // (.bottom-nav) et sa taille n'est pas réglable. L'onglet "Aide" de
   // BottomNav.jsx ouvre le chat via Tawk_API.toggle() à la place — un seul
   // point d'entrée, cohérent avec le reste de la navigation.
+  // toggle() réaffiche tout le widget (bulle comprise), qui reste alors
+  // visible même une fois le chat refermé — on la re-masque donc à chaque
+  // retour à l'état bulle/fermé (minimize = repli en bulle, hidden = fermeture complète).
   Tawk_API.onLoad = function () {
+    Tawk_API.hideWidget();
+  };
+  Tawk_API.onChatMinimized = function () {
+    Tawk_API.hideWidget();
+  };
+  Tawk_API.onChatHidden = function () {
     Tawk_API.hideWidget();
   };
   (function(){
