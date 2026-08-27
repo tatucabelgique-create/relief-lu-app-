@@ -60,6 +60,10 @@ export async function publishBag(payload) {
 }
 
 export async function cancelBag(bagId) {
-  const { error } = await supabase.from("bags").update({ status: "cancelled" }).eq("id", bagId);
+  // is_recurring doit tomber à false ici : sinon refresh_recurring_bags()
+  // (tâche planifiée toutes les 15 min, voir schema-v9) republie quand même
+  // ce sachet le lendemain — annuler ne serait alors jamais définitif pour
+  // un sachet récurrent.
+  const { error } = await supabase.from("bags").update({ status: "cancelled", is_recurring: false }).eq("id", bagId);
   if (error) throw error;
 }
