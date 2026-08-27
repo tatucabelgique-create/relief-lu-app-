@@ -46,12 +46,20 @@ self.addEventListener("fetch", (event) => {
   // toute la requête côté Safari ("FetchEvent.respondWith received an error").
   if (req.method !== "GET") return;
 
+  const url = new URL(req.url);
+
+  // Sans ça, une requête tierce (pixel Facebook, gtag, Tawk.to...) dont le
+  // chemin se termine par "/" — ex: facebook.com/tr/?id=... — matchait
+  // isHTML ci-dessous et se faisait intercepter/mettre en cache par erreur
+  // comme si c'était une page du site, au lieu de partir normalement au
+  // réseau sans passer par le SW.
+  if (url.origin !== self.location.origin) return;
+
   // Basé sur le chemin de l'URL plutôt que req.mode/Accept : ces derniers ne
   // sont pas toujours fiables selon le navigateur (Safari/iOS notamment),
   // et une détection ratée faisait retomber app.html sur la branche
   // cache-first plus bas — la version figée à l'installation du SW, jamais
   // rafraîchie, quel que soit le nombre de mises à jour déployées depuis.
-  const url = new URL(req.url);
   const isHTML = url.pathname.endsWith(".html") || url.pathname.endsWith("/");
 
   if (isHTML) {
