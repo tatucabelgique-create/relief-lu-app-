@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useI18n } from "../lib/i18n.jsx";
-import { cancelBag } from "../lib/bags";
+import { cancelBag, stopRecurring } from "../lib/bags";
 import { getReservationsForBag, updateReservationStatus } from "../lib/reservations";
 
 export default function MerchantBagRow({ bag, onChanged }) {
@@ -24,6 +24,11 @@ export default function MerchantBagRow({ bag, onChanged }) {
     onChanged();
   }
 
+  async function handleStopRecurring() {
+    await stopRecurring(bag.id);
+    onChanged();
+  }
+
   return (
     <div className="my-bag" style={{ flexDirection: "column", alignItems: "stretch" }}>
       <div className="row">
@@ -38,6 +43,11 @@ export default function MerchantBagRow({ bag, onChanged }) {
           <button className="btn secondary small" onClick={toggleOpen}>
             {open ? t("merchant.hideReservations") : t("merchant.showReservations")}
           </button>
+          {bag.status !== "cancelled" && bag.is_recurring && (
+            <button className="btn secondary small" onClick={handleStopRecurring}>
+              {t("merchant.stopRecurring")}
+            </button>
+          )}
           {bag.status !== "cancelled" && (
             <button className="btn secondary small" onClick={handleCancelBag}>
               {t("merchant.cancelBag")}

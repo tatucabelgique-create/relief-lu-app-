@@ -67,3 +67,11 @@ export async function cancelBag(bagId) {
   const { error } = await supabase.from("bags").update({ status: "cancelled", is_recurring: false }).eq("id", bagId);
   if (error) throw error;
 }
+
+// Arrête la répétition sans annuler le sachet du jour — contrairement à
+// cancelBag(), l'instance en cours reste active/réservable jusqu'à son
+// créneau, elle ne sera juste pas reprogrammée par refresh_recurring_bags().
+export async function stopRecurring(bagId) {
+  const { error } = await supabase.from("bags").update({ is_recurring: false }).eq("id", bagId);
+  if (error) throw error;
+}
