@@ -12,6 +12,7 @@ import FavoritesView from "./components/FavoritesView.jsx";
 import LegalModal from "./components/LegalModal.jsx";
 import PaymentResult from "./components/PaymentResult.jsx";
 import CookieConsent, { reopenCookieConsent } from "./components/CookieConsent.jsx";
+import InstallPrompt from "./components/InstallPrompt.jsx";
 import SocialLinks from "./components/SocialLinks.jsx";
 import AdminView from "./components/AdminView.jsx";
 
@@ -205,6 +206,7 @@ export default function App() {
       )}
 
       <CookieConsent onOpenLegal={setLegalModal} />
+      <InstallPrompt />
 
       {legalModal && (
         <LegalModal

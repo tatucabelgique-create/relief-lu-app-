@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useI18n } from "../lib/i18n.jsx";
 import { getReservation, releaseReservation } from "../lib/reservations";
 import { trackEvent } from "../lib/analytics";
+import { notifyEngaged } from "./InstallPrompt.jsx";
 
 // Affiché au retour de Stripe Checkout (voir App.jsx, déclenché par
 // ?paid=1|0&reservation=<id> dans l'URL de succès/annulation configurée dans
@@ -29,6 +30,7 @@ export default function PaymentResult({ reservationId, success, onClose }) {
             value: (r.bags?.price_cents ?? 0) * r.quantity / 100,
             currency: "EUR",
           });
+          notifyEngaged();
         }
       })
       .catch(() => setError(t("payment.error")));

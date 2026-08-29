@@ -371,6 +371,28 @@ h1.page-title {
 .bottom-nav-item.active { color: var(--honey); }
 body { padding-bottom: 78px; }
 
+/* Bandeau discret d'invitation à l'installation PWA — au-dessus de la
+   bottom-nav (z-index 40), jamais dessus, même problème que la bulle
+   Tawk.to si on ne le décale pas explicitement. */
+.install-nudge {
+  position: fixed; left: 16px; right: 16px;
+  bottom: calc(88px + env(safe-area-inset-bottom));
+  background: var(--navy-2); border: 1px solid rgba(232,163,61,0.3);
+  border-radius: 14px; padding: 16px 18px;
+  display: flex; align-items: center; gap: 14px;
+  box-shadow: 0 12px 30px rgba(0,0,0,0.35);
+  z-index: 45;
+}
+.install-nudge .ic {
+  width: 40px; height: 40px; border-radius: 10px; background: var(--honey);
+  display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 20px;
+}
+.install-nudge .txt { flex: 1; font-size: 13px; line-height: 1.4; }
+.install-nudge .txt b { display: block; font-family: 'Fraunces', serif; font-size: 15px; margin-bottom: 2px; }
+.install-nudge .close {
+  background: none; border: none; color: var(--paper-dim); font-size: 18px; padding: 4px 6px; flex-shrink: 0;
+}
+
 /* Page détail d'un sachet, ouverte en plein écran par-dessus le reste. */
 .bag-detail {
   position: fixed; inset: 0; z-index: 60; background: var(--navy);
