@@ -14,6 +14,11 @@ const COOLDOWN_MS = 14 * 24 * 60 * 60 * 1000; // 14 jours
 export default function InstallPrompt() {
   const { t } = useI18n();
   const [show, setShow] = useState(false);
+  // Chrome/Edge/Android exposent un événement natif permettant de déclencher
+  // la vraie boîte de dialogue d'installation au clic — sans lui, on ne peut
+  // que dire "installe" sans dire où ni comment, contrairement à iOS qui a
+  // des étapes manuelles précises (pas d'installation en un clic possible).
+  const [deferredPrompt, setDeferredPrompt] = useState(null);
 
   const isStandalone =
     typeof window !== "undefined" &&
@@ -29,7 +34,27 @@ export default function InstallPrompt() {
       setShow(true);
     }
     window.addEventListener("relief:engaged", handleEngaged);
-    return () => window.removeEventListener("relief:engaged", handleEngaged);
+
+    // preventDefault() empêche la mini-barre native de Chrome de s'afficher
+    // en plus de notre propre bandeau — on garde l'événement pour le
+    // redéclencher nous-mêmes au clic sur "Installer".
+    function handleBeforeInstall(e) {
+      e.preventDefault();
+      setDeferredPrompt(e);
+    }
+    window.addEventListener("beforeinstallprompt", handleBeforeInstall);
+
+    function handleInstalled() {
+      setShow(false);
+      setDeferredPrompt(null);
+    }
+    window.addEventListener("appinstalled", handleInstalled);
+
+    return () => {
+      window.removeEventListener("relief:engaged", handleEngaged);
+      window.removeEventListener("beforeinstallprompt", handleBeforeInstall);
+      window.removeEventListener("appinstalled", handleInstalled);
+    };
   }, [isStandalone]);
 
   if (isStandalone || !show) return null;
@@ -39,13 +64,26 @@ export default function InstallPrompt() {
     localStorage.setItem(DISMISS_KEY, Date.now().toString());
   }
 
+  async function handleInstallClick() {
+    if (!deferredPrompt) return;
+    deferredPrompt.prompt();
+    const choice = await deferredPrompt.userChoice;
+    setDeferredPrompt(null);
+    if (choice.outcome === "accepted") setShow(false);
+  }
+
   return (
-    <div className={`install-nudge ${show ? "show" : ""}`}>
+    <div className="install-nudge">
       <div className="ic">📲</div>
       <div className="txt">
         <b>{t("install.title")}</b>
         {isIOS ? t("install.textIOS") : t("install.textOther")}
       </div>
+      {!isIOS && deferredPrompt && (
+        <button className="btn small" onClick={handleInstallClick}>
+          {t("install.button")}
+        </button>
+      )}
       <button className="close" onClick={dismiss} aria-label="Fermer">
         ✕
       </button>
