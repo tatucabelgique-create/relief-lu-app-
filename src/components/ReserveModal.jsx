@@ -1,15 +1,26 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useI18n } from "../lib/i18n.jsx";
 import { reserveBag } from "../lib/reservations";
 import { createCheckoutSession } from "../lib/payments";
 import { formatPickupWindow, isToday, isTomorrow } from "./BagCard.jsx";
 import AuthPrompt from "./AuthPrompt.jsx";
+import { notifyEngaged } from "./InstallPrompt.jsx";
 
 export default function ReserveModal({ bag, user, onClose, onReserved }) {
   const { lang, t } = useI18n();
   const [qty, setQty] = useState(1);
   const [error, setError] = useState("");
   const [redirecting, setRedirecting] = useState(false);
+
+  // Ce composant reste monté en permanence (bag passe de null à un sachet à
+  // l'ouverture, voir PublicView) — un simple useEffect au montage ne
+  // suffirait pas, il faut suivre les changements de `bag`. Réserver
+  // directement depuis la liste (sans passer par BagDetail) est au moins
+  // aussi fréquent que l'ouverture du détail, donc le même signal
+  // d'engagement doit s'y déclencher.
+  useEffect(() => {
+    if (bag) notifyEngaged();
+  }, [bag]);
 
   if (!bag) return null;
 
