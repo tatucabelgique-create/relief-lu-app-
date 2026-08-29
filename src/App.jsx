@@ -75,15 +75,17 @@ export default function App() {
       setUser(u);
       if (u) {
         // "SIGNED_IN" se déclenche aussi bien pour une toute première
-        // inscription que pour une reconnexion classique — created_at et
-        // last_sign_in_at ne sont proches (quelques secondes) que lors du
-        // tout premier login, jamais lors des suivants. Sans cette
-        // distinction, CompleteRegistration se déclencherait à chaque
-        // connexion, faussant complètement la mesure de conversion Meta/GA.
+        // inscription que pour une reconnexion classique — created_at est
+        // fixé au moment de la demande du code (création du compte), tandis
+        // que last_sign_in_at n'est fixé qu'à la validation du code, qui
+        // peut arriver plusieurs minutes plus tard (le temps d'aller lire
+        // l'email) : un écart de quelques secondes seulement ratait donc la
+        // quasi-totalité des vraies inscriptions. Une reconnexion, elle,
+        // arrive forcément des heures/jours après created_at.
         if (event === "SIGNED_IN") {
           const created = new Date(u.created_at).getTime();
           const lastSignIn = new Date(u.last_sign_in_at).getTime();
-          if (Math.abs(lastSignIn - created) < 10000) {
+          if (Math.abs(lastSignIn - created) < 3600000) {
             trackEvent("CompleteRegistration");
           }
         }
