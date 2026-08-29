@@ -46,8 +46,8 @@ export async function getCurrentUser() {
 }
 
 export function onAuthChange(callback) {
-  return supabase.auth.onAuthStateChange((_event, session) => {
-    callback(session?.user ?? null);
+  return supabase.auth.onAuthStateChange((event, session) => {
+    callback(session?.user ?? null, event);
   });
 }
 

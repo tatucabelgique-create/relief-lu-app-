@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useI18n } from "../lib/i18n.jsx";
 import { getReservation, releaseReservation } from "../lib/reservations";
+import { trackEvent } from "../lib/analytics";
 
 // Affiché au retour de Stripe Checkout (voir App.jsx, déclenché par
 // ?paid=1|0&reservation=<id> dans l'URL de succès/annulation configurée dans
@@ -17,7 +18,19 @@ export default function PaymentResult({ reservationId, success, onClose }) {
       return;
     }
     getReservation(reservationId)
-      .then(setReservation)
+      .then((r) => {
+        setReservation(r);
+        // Le seul moment fiable où on sait qu'un paiement réel a abouti —
+        // reserveBag() crée la réservation avant paiement, donc suivre
+        // l'événement dès la création compterait des paniers abandonnés
+        // comme des ventes.
+        if (r.payment_status === "paid") {
+          trackEvent("Purchase", {
+            value: (r.bags?.price_cents ?? 0) * r.quantity / 100,
+            currency: "EUR",
+          });
+        }
+      })
       .catch(() => setError(t("payment.error")));
   }, [reservationId, success]);
 

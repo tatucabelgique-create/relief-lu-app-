@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { LangProvider } from "./lib/i18n.jsx";
 import { getCurrentUser, onAuthChange, consumePendingView, applySessionFromUrlHash } from "./lib/auth";
+import { trackEvent } from "./lib/analytics";
 import { getMerchantOrNull, isRegistrationComplete } from "./lib/merchants";
 import Header from "./components/Header.jsx";
 import BottomNav from "./components/BottomNav.jsx";
@@ -70,9 +71,22 @@ export default function App() {
     // commerçant, favoris, compte, ou "reserve:<id>" pour rouvrir la modale
     // de réservation du sachet précis) — sinon on retombe sur "public" après
     // le clic, puisque la vue n'est qu'un state React, pas dans l'URL.
-    function handleUser(u) {
+    function handleUser(u, event) {
       setUser(u);
       if (u) {
+        // "SIGNED_IN" se déclenche aussi bien pour une toute première
+        // inscription que pour une reconnexion classique — created_at et
+        // last_sign_in_at ne sont proches (quelques secondes) que lors du
+        // tout premier login, jamais lors des suivants. Sans cette
+        // distinction, CompleteRegistration se déclencherait à chaque
+        // connexion, faussant complètement la mesure de conversion Meta/GA.
+        if (event === "SIGNED_IN") {
+          const created = new Date(u.created_at).getTime();
+          const lastSignIn = new Date(u.last_sign_in_at).getTime();
+          if (Math.abs(lastSignIn - created) < 10000) {
+            trackEvent("CompleteRegistration");
+          }
+        }
         const pendingView = consumePendingView();
         if (pendingView?.startsWith("reserve:")) {
           setView("public");
@@ -82,7 +96,7 @@ export default function App() {
         }
       }
     }
-    getCurrentUser().then(handleUser);
+    getCurrentUser().then((u) => handleUser(u));
     const {
       data: { subscription },
     } = onAuthChange(handleUser);

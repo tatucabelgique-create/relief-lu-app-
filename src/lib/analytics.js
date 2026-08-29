@@ -39,3 +39,11 @@ export function loadAnalytics() {
   window.fbq("init", FB_PIXEL_ID);
   window.fbq("track", "PageView");
 }
+
+// Ne fait rien si l'utilisateur a refusé les cookies marketing (fbq/gtag
+// jamais chargés dans ce cas, voir loadAnalytics ci-dessus) — sans cette
+// garde, appeler window.fbq directement plante avec "fbq is not a function".
+export function trackEvent(name, params) {
+  if (window.fbq) window.fbq("track", name, params);
+  if (window.gtag) window.gtag("event", name, params);
+}

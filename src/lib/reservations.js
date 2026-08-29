@@ -22,7 +22,11 @@ export async function releaseReservation(id) {
 }
 
 export async function getReservation(id) {
-  const { data, error } = await supabase.from("reservations").select("*").eq("id", id).single();
+  const { data, error } = await supabase
+    .from("reservations")
+    .select("*, bags(price_cents)")
+    .eq("id", id)
+    .single();
   if (error) throw error;
   return data;
 }
