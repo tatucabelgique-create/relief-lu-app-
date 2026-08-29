@@ -5,12 +5,12 @@ const DISMISS_KEY = "relief_install_dismissed";
 const COOLDOWN_MS = 14 * 24 * 60 * 60 * 1000; // 14 jours
 
 // Bandeau discret d'invitation à l'installation PWA — se redéclenche
-// périodiquement (à chaque paiement confirmé, voir l'événement
-// "relief:engaged" dispatché par PaymentResult.jsx) tant que l'app n'est
-// pas installée, plutôt qu'une seule fois par utilisateur : quelqu'un qui
-// ignore le bandeau une fois n'est pas forcément fermé à l'idée plus tard.
-// Le cooldown de 14 jours après un rejet explicite évite juste d'insister
-// à chaque réservation.
+// périodiquement (à chaque ouverture du détail d'un sachet, voir
+// l'événement "relief:engaged" dispatché par BagDetail.jsx) tant que
+// l'app n'est pas installée, plutôt qu'une seule fois par utilisateur :
+// quelqu'un qui ignore le bandeau une fois n'est pas forcément fermé à
+// l'idée plus tard. Le cooldown de 14 jours après un rejet explicite
+// évite juste d'insister à chaque sachet consulté.
 export default function InstallPrompt() {
   const { t } = useI18n();
   const [show, setShow] = useState(false);
@@ -53,8 +53,9 @@ export default function InstallPrompt() {
   );
 }
 
-// Appelé par PaymentResult.jsx dès qu'un paiement est confirmé — le seul
-// signal d'engagement assez fort pour justifier de proposer l'installation.
+// Appelé par BagDetail.jsx à chaque ouverture du détail d'un sachet —
+// signal d'engagement suffisant pour proposer l'installation, pas besoin
+// d'attendre un paiement.
 export function notifyEngaged() {
   window.dispatchEvent(new Event("relief:engaged"));
 }

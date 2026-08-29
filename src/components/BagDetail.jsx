@@ -3,6 +3,7 @@ import { MapContainer, TileLayer, Marker } from "react-leaflet";
 import { useI18n } from "../lib/i18n.jsx";
 import { formatPickupWindow, isToday, isTomorrow } from "./BagCard.jsx";
 import { merchantMarkerIcon } from "../lib/leafletIcon";
+import { notifyEngaged } from "./InstallPrompt.jsx";
 
 // Icône "Share2" de Lucide (trois points reliés) — même icône que celle
 // utilisée pour "Partager" dans tatuca, pour rester cohérent entre les apps.
@@ -40,6 +41,12 @@ export default function BagDetail({ bag, rating, isFavorite, onToggleFavorite, o
     el?.addEventListener("scroll", onScroll);
     return () => el?.removeEventListener("scroll", onScroll);
   }, []);
+
+  // Signal d'engagement pour le bandeau d'installation PWA — ouvrir le détail
+  // d'un sachet montre un vrai intérêt, pas besoin d'attendre un paiement.
+  useEffect(() => {
+    notifyEngaged();
+  }, [bag.id]);
 
   const address = [merchant?.address, merchant?.city].filter(Boolean).join(", ");
   const hasCoords = merchant?.lat != null && merchant?.lng != null;
