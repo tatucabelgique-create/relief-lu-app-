@@ -33,7 +33,7 @@ Deno.serve(async (req) => {
 
     const { data: reservation, error } = await supabase
       .from("reservations")
-      .select("id, quantity, user_id, payment_status, bags(title, price_cents, merchant_id, merchants(stripe_account_id, stripe_payouts_enabled))")
+      .select("id, quantity, user_id, payment_status, bags(title, price_cents, merchant_id, merchants(stripe_account_id))")
       .eq("id", reservation_id)
       .single();
 
@@ -59,14 +59,25 @@ Deno.serve(async (req) => {
     const commissionHtCents = Math.round(totalCents * COMMISSION_RATE);
     const commissionTtcCents = commissionHtCents + Math.round(commissionHtCents * VAT_RATE);
 
-    const merchant = reservation.bags.merchants as { stripe_account_id: string | null; stripe_payouts_enabled: boolean } | null;
+    const merchant = reservation.bags.merchants as { stripe_account_id: string | null } | null;
     // Destination charge : Stripe répartit le paiement au moment de la
     // transaction — la part du commerçant part directement sur son compte
     // connecté, la commission reste chez relief.lu. Si le commerçant n'a pas
     // encore terminé l'onboarding Stripe Connect (schema-v17), on retombe sur
     // l'ancien comportement (tout sur le compte relief.lu) plutôt que de
     // bloquer la vente — le reversement devra alors se faire manuellement.
-    const canSplit = merchant?.stripe_account_id && merchant.stripe_payouts_enabled;
+    //
+    // Vérifié en direct auprès de Stripe (charges_enabled) plutôt que via la
+    // colonne stripe_payouts_enabled mise à jour par webhook : le routage des
+    // événements account.updated pour les comptes créés via l'API v2 s'est
+    // révélé peu fiable en pratique (voir schema-v17) — un appel direct évite
+    // de dépendre de la bonne réception d'un webhook pour une information
+    // aussi critique que "peut-on reverser sa part à ce commerçant".
+    let canSplit = false;
+    if (merchant?.stripe_account_id) {
+      const account = await stripe.accounts.retrieve(merchant.stripe_account_id);
+      canSplit = !!account.charges_enabled;
+    }
 
     const session = await stripe.checkout.sessions.create({
       mode: "payment",

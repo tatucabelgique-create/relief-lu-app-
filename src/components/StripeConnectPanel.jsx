@@ -24,7 +24,13 @@ export default function StripeConnectPanel({ merchant }) {
     }
   }
 
-  const connected = merchant.stripe_payouts_enabled;
+  // L'état réel (charges_enabled) est vérifié en direct auprès de Stripe au
+  // moment du paiement (create-checkout-session), pas via une colonne tenue à
+  // jour par webhook — le routage des événements account.updated pour les
+  // comptes créés via l'API v2 s'est révélé peu fiable. Ce badge se contente
+  // donc de refléter si l'onboarding a été entamé, pas son état de
+  // vérification final.
+  const connected = !!merchant.stripe_account_id;
 
   return (
     <div className="panel">
