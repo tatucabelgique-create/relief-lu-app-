@@ -2,8 +2,7 @@ import { supabase } from "./supabase";
 
 // Le nom réel de la fonction déployée dans le dashboard Supabase (peut différer
 // du nom du dossier source si renommée au déploiement — voir payments.js/notify.js).
-// À mettre à jour après le premier déploiement de create-connect-account.
-const CONNECT_FUNCTION_NAME = "create-connect-account";
+const CONNECT_FUNCTION_NAME = "super-service";
 
 // Crée le compte Stripe Connect du commerçant si besoin, et renvoie l'URL
 // d'onboarding hébergée par Stripe (IBAN/identité — rien ne transite par
