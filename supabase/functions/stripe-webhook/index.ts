@@ -1,8 +1,9 @@
-// Reçoit les événements Stripe (paiement réussi / session expirée) et met à
-// jour la réservation en conséquence. À configurer dans le Dashboard Stripe
-// (Developers → Webhooks → Add endpoint) une fois l'URL de cette fonction
-// déployée : .../functions/v1/stripe-webhook, événements à cocher :
-// checkout.session.completed, checkout.session.expired.
+// Reçoit les événements Stripe (paiement réussi / session expirée / compte
+// Connect mis à jour) et met à jour la réservation ou le commerçant en
+// conséquence. À configurer dans le Dashboard Stripe (Developers → Webhooks
+// → Add endpoint) une fois l'URL de cette fonction déployée :
+// .../functions/v1/stripe-webhook, événements à cocher :
+// checkout.session.completed, checkout.session.expired, account.updated.
 // Secrets requis : STRIPE_SECRET_KEY, STRIPE_WEBHOOK_SECRET (donné par Stripe
 // au moment de créer le endpoint), SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY,
 // VAPID_PUBLIC_KEY, VAPID_PRIVATE_KEY (mêmes clés que notify-new-bag, pour
@@ -152,6 +153,18 @@ Deno.serve(async (req) => {
     if (reservationId) {
       await supabase.rpc("release_reservation", { p_reservation_id: reservationId });
     }
+  }
+
+  // Le compte Connect passe par plusieurs étapes (identité, IBAN, vérification)
+  // avant de pouvoir réellement recevoir des paiements — charges_enabled ne
+  // devient true qu'une fois tout validé côté Stripe. On ne l'active donc
+  // jamais depuis create-connect-account (juste après création), seulement ici.
+  if (event.type === "account.updated") {
+    const account = event.data.object as Stripe.Account;
+    await supabase
+      .from("merchants")
+      .update({ stripe_payouts_enabled: !!account.charges_enabled })
+      .eq("stripe_account_id", account.id);
   }
 
   return new Response("ok", { status: 200 });

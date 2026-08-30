@@ -33,7 +33,7 @@ Deno.serve(async (req) => {
 
     const { data: reservation, error } = await supabase
       .from("reservations")
-      .select("id, quantity, user_id, payment_status, bags(title, price_cents)")
+      .select("id, quantity, user_id, payment_status, bags(title, price_cents, merchant_id, merchants(stripe_account_id, stripe_payouts_enabled))")
       .eq("id", reservation_id)
       .single();
 
@@ -51,6 +51,22 @@ Deno.serve(async (req) => {
     // par le client (voir payments.js), plus fiable que de le déduire du seul
     // header Origin côté serveur (qui ne contient jamais de chemin).
     const base = (return_base || "https://relief.lu/").replace(/\/+$/, "");
+
+    // Mêmes taux que merchantStats.js/billing.js — à garder synchronisés.
+    const COMMISSION_RATE = 0.18;
+    const VAT_RATE = 0.17;
+    const totalCents = reservation.bags.price_cents * reservation.quantity;
+    const commissionHtCents = Math.round(totalCents * COMMISSION_RATE);
+    const commissionTtcCents = commissionHtCents + Math.round(commissionHtCents * VAT_RATE);
+
+    const merchant = reservation.bags.merchants as { stripe_account_id: string | null; stripe_payouts_enabled: boolean } | null;
+    // Destination charge : Stripe répartit le paiement au moment de la
+    // transaction — la part du commerçant part directement sur son compte
+    // connecté, la commission reste chez relief.lu. Si le commerçant n'a pas
+    // encore terminé l'onboarding Stripe Connect (schema-v17), on retombe sur
+    // l'ancien comportement (tout sur le compte relief.lu) plutôt que de
+    // bloquer la vente — le reversement devra alors se faire manuellement.
+    const canSplit = merchant?.stripe_account_id && merchant.stripe_payouts_enabled;
 
     const session = await stripe.checkout.sessions.create({
       mode: "payment",
@@ -76,6 +92,12 @@ Deno.serve(async (req) => {
       // qu'un filet de sécurité si l'onglet est fermé avant d'y revenir,
       // pour éviter de bloquer le sachet jusqu'à l'expiration par défaut (24h).
       expires_at: Math.floor(Date.now() / 1000) + 30 * 60,
+      ...(canSplit && {
+        payment_intent_data: {
+          application_fee_amount: commissionTtcCents,
+          transfer_data: { destination: merchant!.stripe_account_id! },
+        },
+      }),
     });
 
     await supabase.from("reservations").update({ stripe_session_id: session.id }).eq("id", reservation.id);

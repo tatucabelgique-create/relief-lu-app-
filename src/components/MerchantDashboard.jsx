@@ -8,6 +8,7 @@ import MerchantStats from "./MerchantStats.jsx";
 import MerchantBagRow from "./MerchantBagRow.jsx";
 import MerchantRegistrationForm from "./MerchantRegistrationForm.jsx";
 import NotificationToggle from "./NotificationToggle.jsx";
+import StripeConnectPanel from "./StripeConnectPanel.jsx";
 
 const emptyForm = {
   title: "",
@@ -173,6 +174,8 @@ export default function MerchantDashboard({ user, merchant, onMerchantChanged })
           <NotificationToggle user={user} />
         </div>
       )}
+
+      {merchant?.verified && <StripeConnectPanel merchant={merchant} />}
 
       {merchant && !merchant.verified && (
         <div className="panel">
