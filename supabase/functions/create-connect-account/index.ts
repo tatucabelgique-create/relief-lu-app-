@@ -42,18 +42,45 @@ Deno.serve(async (req) => {
 
     let accountId = merchant.stripe_account_id;
     if (!accountId) {
-      const account = await stripe.accounts.create({
-        type: "express",
-        country: "LU",
-        email: user.email,
-        business_type: "individual",
-        business_profile: { name: merchant.business_name },
-        capabilities: {
-          card_payments: { requested: true },
-          transfers: { requested: true },
+      // Stripe ne recommande plus la création de comptes via l'API Accounts v1
+      // pour les nouvelles plateformes Connect (celle-ci l'a immédiatement
+      // refusée) — v2 (encore en preview, d'où l'en-tête Stripe-Version dédié
+      // ci-dessous) est requis. stripe-node@17 n'a pas encore de méthode
+      // dédiée pour ce endpoint, d'où l'appel HTTP direct. "recipient" avec
+      // stripe_balance.stripe_transfers remplace la capability "transfers" de
+      // la v1 ; le lien d'onboarding (plus bas) reste, lui, sur l'API v1
+      // classique — un ID de compte v2 y est explicitement accepté (voir
+      // docs.stripe.com/connect/accounts-v2).
+      const v2Res = await fetch("https://api.stripe.com/v2/core/accounts", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${Deno.env.get("STRIPE_SECRET_KEY")!}`,
+          "Stripe-Version": "2026-08-26.preview",
+          "Content-Type": "application/json",
         },
+        body: JSON.stringify({
+          contact_email: user.email,
+          display_name: merchant.business_name,
+          dashboard: "express",
+          identity: { country: "lu" },
+          configuration: {
+            merchant: { capabilities: { card_payments: { requested: true } } },
+            recipient: { capabilities: { "stripe_balance.stripe_transfers": { requested: true } } },
+          },
+          defaults: {
+            currency: "eur",
+            responsibilities: { fees_collector: "stripe", losses_collector: "stripe" },
+          },
+        }),
       });
-      accountId = account.id;
+      const v2Account = await v2Res.json();
+      if (!v2Res.ok) {
+        return new Response(JSON.stringify({ error: v2Account.error?.message || "Erreur Stripe (création du compte)." }), {
+          status: 500,
+          headers: corsHeaders,
+        });
+      }
+      accountId = v2Account.id;
       await supabase.from("merchants").update({ stripe_account_id: accountId }).eq("id", user.id);
     }
 
