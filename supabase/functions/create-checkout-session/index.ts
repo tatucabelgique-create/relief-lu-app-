@@ -75,8 +75,16 @@ Deno.serve(async (req) => {
     // aussi critique que "peut-on reverser sa part à ce commerçant".
     let canSplit = false;
     if (merchant?.stripe_account_id) {
-      const account = await stripe.accounts.retrieve(merchant.stripe_account_id);
-      canSplit = !!account.charges_enabled;
+      // try/catch dédié : un échec ici (réseau, compte invalide...) ne doit
+      // jamais faire échouer le paiement lui-même — au pire, on retombe sur
+      // l'ancien comportement (tout sur le compte relief.lu, reversement
+      // manuel), jamais bloquer la vente.
+      try {
+        const account = await stripe.accounts.retrieve(merchant.stripe_account_id);
+        canSplit = !!account.charges_enabled;
+      } catch {
+        canSplit = false;
+      }
     }
 
     const session = await stripe.checkout.sessions.create({
