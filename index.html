@@ -142,6 +142,33 @@
     max-width:46ch; margin:0 0 38px;
   }
 
+  /* compte à rebours */
+  .countdown{ margin-bottom:26px; }
+  .countdown-label{
+    font-family:'IBM Plex Mono', monospace; font-size:12px;
+    color:var(--paper-dim); text-transform:uppercase; letter-spacing:1.5px;
+    margin-bottom:10px;
+  }
+  .countdown-boxes{ display:flex; gap:10px; }
+  .countdown-box{
+    background:var(--navy-2); border:1px solid rgba(232,163,61,0.25);
+    border-radius:12px; padding:12px 14px; min-width:64px;
+    display:flex; flex-direction:column; align-items:center;
+  }
+  .countdown-num{
+    font-family:'IBM Plex Mono', monospace; font-weight:600; font-size:26px;
+    color:var(--honey); line-height:1; font-variant-numeric:tabular-nums;
+  }
+  .countdown-unit{
+    font-size:11px; color:var(--paper-dim); text-transform:uppercase;
+    letter-spacing:0.5px; margin-top:6px;
+  }
+  @media (max-width:480px){
+    .countdown-boxes{ gap:7px; }
+    .countdown-box{ min-width:0; flex:1; padding:10px 8px; }
+    .countdown-num{ font-size:21px; }
+  }
+
   /* email capture */
   .capture{
     display:flex; gap:10px; flex-wrap:wrap; align-items:center;
@@ -524,6 +551,16 @@
       <h1><span data-i18n="h1.part1">Le Luxembourg est l'un des pays les plus riches du monde.</span> <em data-i18n="h1.part2">Ce n'est pas le cas pour tout le monde.</em></h1>
       <p class="sub" data-i18n="sub">Relief redonne de la valeur à la nourriture qui allait être jetée — boulangeries, restaurants, épiceries, traiteurs — pour que chaque euro compte un peu moins fort.</p>
 
+      <div class="countdown" id="countdown" aria-live="polite">
+        <div class="countdown-label" data-i18n="countdown.label">Lancement dans</div>
+        <div class="countdown-boxes">
+          <div class="countdown-box"><span class="countdown-num" id="cd-days">--</span><span class="countdown-unit" data-i18n="countdown.days">jours</span></div>
+          <div class="countdown-box"><span class="countdown-num" id="cd-hours">--</span><span class="countdown-unit" data-i18n="countdown.hours">heures</span></div>
+          <div class="countdown-box"><span class="countdown-num" id="cd-minutes">--</span><span class="countdown-unit" data-i18n="countdown.minutes">min</span></div>
+          <div class="countdown-box"><span class="countdown-num" id="cd-seconds">--</span><span class="countdown-unit" data-i18n="countdown.seconds">sec</span></div>
+        </div>
+      </div>
+
       <form class="capture" id="capture-form">
         <input type="email" id="capture-email" data-i18n-placeholder="capture.placeholder" placeholder="ton-email@exemple.lu" required>
         <button type="submit" data-i18n="capture.button">Je veux être prévenu·e</button>
@@ -801,6 +838,11 @@
     fr: {
       "intro.tagline": "Anti-gaspillage alimentaire",
       "eyebrow": "Arrive à la rentrée",
+      "countdown.label": "Lancement dans",
+      "countdown.days": "jours",
+      "countdown.hours": "heures",
+      "countdown.minutes": "min",
+      "countdown.seconds": "sec",
       "h1.part1": "Le Luxembourg est l'un des pays les plus riches du monde.",
       "h1.part2": "Ce n'est pas le cas pour tout le monde.",
       "sub": "Relief redonne de la valeur à la nourriture qui allait être jetée — boulangeries, restaurants, épiceries, traiteurs — pour que chaque euro compte un peu moins fort.",
@@ -889,6 +931,11 @@
     de: {
       "intro.tagline": "Gegen Lebensmittelverschwendung",
       "eyebrow": "Startet zum Schulanfang",
+      "countdown.label": "Start in",
+      "countdown.days": "Tage",
+      "countdown.hours": "Std",
+      "countdown.minutes": "Min",
+      "countdown.seconds": "Sek",
       "h1.part1": "Luxemburg ist eines der reichsten Länder der Welt.",
       "h1.part2": "Das gilt nicht für alle.",
       "sub": "Relief bringt Lebensmittel, die sonst weggeworfen würden, zurück in Umlauf — Bäckereien, Restaurants, Lebensmittelgeschäfte, Caterer — damit jeder Euro etwas mehr zählt.",
@@ -977,6 +1024,11 @@
     en: {
       "intro.tagline": "Fighting food waste",
       "eyebrow": "Launching this fall",
+      "countdown.label": "Launching in",
+      "countdown.days": "days",
+      "countdown.hours": "hrs",
+      "countdown.minutes": "min",
+      "countdown.seconds": "sec",
       "h1.part1": "Luxembourg is one of the richest countries in the world.",
       "h1.part2": "That's not true for everyone.",
       "sub": "Relief brings back into circulation food that was going to be thrown away — bakeries, restaurants, grocery stores, caterers — so every euro counts a little less hard.",
@@ -1081,6 +1133,33 @@
     b.addEventListener("click", () => { LANG = b.dataset.lang; applyI18n(); });
   });
   applyI18n();
+
+  // Compte à rebours jusqu'au lancement (1er octobre 2026, heure du Luxembourg).
+  // Cible fixe en UTC+2 (CEST) plutôt que l'heure locale du visiteur, pour que
+  // le décompte tombe à zéro au même moment pour tout le monde, où qu'il soit.
+  const LAUNCH_DATE = new Date("2026-10-01T00:00:00+02:00").getTime();
+  function updateCountdown(){
+    const diff = LAUNCH_DATE - Date.now();
+    const els = {
+      days: document.getElementById("cd-days"),
+      hours: document.getElementById("cd-hours"),
+      minutes: document.getElementById("cd-minutes"),
+      seconds: document.getElementById("cd-seconds"),
+    };
+    if (!els.days) return;
+    if (diff <= 0){
+      els.days.textContent = "00"; els.hours.textContent = "00";
+      els.minutes.textContent = "00"; els.seconds.textContent = "00";
+      return;
+    }
+    const pad = n => String(n).padStart(2, "0");
+    els.days.textContent = pad(Math.floor(diff / 86400000));
+    els.hours.textContent = pad(Math.floor(diff / 3600000) % 24);
+    els.minutes.textContent = pad(Math.floor(diff / 60000) % 60);
+    els.seconds.textContent = pad(Math.floor(diff / 1000) % 60);
+  }
+  updateCountdown();
+  setInterval(updateCountdown, 1000);
 
   // 1. Dans Supabase → Project Settings → API, copie "Project URL" et la clé "anon public".
   // 2. Colle-les ci-dessous. La clé "anon" est faite pour être publique côté client
