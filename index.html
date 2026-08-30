@@ -143,30 +143,42 @@
   }
 
   /* compte à rebours */
-  .countdown{ margin-bottom:26px; }
-  .countdown-label{
-    font-family:'IBM Plex Mono', monospace; font-size:12px;
-    color:var(--paper-dim); text-transform:uppercase; letter-spacing:1.5px;
-    margin-bottom:10px;
+  .countdown{
+    margin-bottom:30px; padding:22px 24px; border-radius:18px;
+    background:linear-gradient(135deg, rgba(232,163,61,0.14), rgba(232,163,61,0.02) 60%), var(--navy-2);
+    border:1px solid rgba(232,163,61,0.35);
+    box-shadow:0 8px 28px rgba(0,0,0,0.25);
+    max-width:fit-content;
   }
-  .countdown-boxes{ display:flex; gap:10px; }
+  .countdown-label{
+    font-family:'IBM Plex Mono', monospace; font-size:13px; font-weight:600;
+    color:var(--honey); text-transform:uppercase; letter-spacing:2px;
+    margin-bottom:16px; display:flex; align-items:center; gap:8px;
+  }
+  .countdown-label::before{ content:"🔥"; font-size:14px; }
+  .countdown-boxes{ display:flex; align-items:center; gap:4px; }
   .countdown-box{
-    background:var(--navy-2); border:1px solid rgba(232,163,61,0.25);
-    border-radius:12px; padding:12px 14px; min-width:64px;
-    display:flex; flex-direction:column; align-items:center;
+    display:flex; flex-direction:column; align-items:center; min-width:72px;
+  }
+  .countdown-sep{
+    font-family:'Fraunces', serif; font-size:34px; color:rgba(232,163,61,0.4);
+    line-height:1; margin:0 2px 22px;
   }
   .countdown-num{
-    font-family:'IBM Plex Mono', monospace; font-weight:600; font-size:26px;
-    color:var(--honey); line-height:1; font-variant-numeric:tabular-nums;
+    font-family:'Fraunces', serif; font-weight:680; font-size:44px;
+    color:var(--paper); line-height:1; font-variant-numeric:tabular-nums;
+    text-shadow:0 0 24px rgba(232,163,61,0.3);
   }
   .countdown-unit{
-    font-size:11px; color:var(--paper-dim); text-transform:uppercase;
-    letter-spacing:0.5px; margin-top:6px;
+    font-family:'IBM Plex Mono', monospace; font-size:11px; color:var(--paper-dim);
+    text-transform:uppercase; letter-spacing:1px; margin-top:8px;
   }
   @media (max-width:480px){
-    .countdown-boxes{ gap:7px; }
-    .countdown-box{ min-width:0; flex:1; padding:10px 8px; }
-    .countdown-num{ font-size:21px; }
+    .countdown{ padding:18px; max-width:none; }
+    .countdown-boxes{ gap:0; justify-content:space-between; }
+    .countdown-box{ min-width:0; flex:1; }
+    .countdown-sep{ font-size:24px; margin:0 0 20px; }
+    .countdown-num{ font-size:30px; }
   }
 
   /* email capture */
@@ -555,8 +567,11 @@
         <div class="countdown-label" data-i18n="countdown.label">Lancement dans</div>
         <div class="countdown-boxes">
           <div class="countdown-box"><span class="countdown-num" id="cd-days">--</span><span class="countdown-unit" data-i18n="countdown.days">jours</span></div>
+          <span class="countdown-sep">:</span>
           <div class="countdown-box"><span class="countdown-num" id="cd-hours">--</span><span class="countdown-unit" data-i18n="countdown.hours">heures</span></div>
+          <span class="countdown-sep">:</span>
           <div class="countdown-box"><span class="countdown-num" id="cd-minutes">--</span><span class="countdown-unit" data-i18n="countdown.minutes">min</span></div>
+          <span class="countdown-sep">:</span>
           <div class="countdown-box"><span class="countdown-num" id="cd-seconds">--</span><span class="countdown-unit" data-i18n="countdown.seconds">sec</span></div>
         </div>
       </div>
