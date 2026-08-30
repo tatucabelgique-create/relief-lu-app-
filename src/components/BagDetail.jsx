@@ -260,8 +260,14 @@ export default function BagDetail({ bag, rating, isFavorite, onToggleFavorite, o
             </span>
           </div>
         </div>
-        {(!bag.container_provided || !bag.bag_provided) && (
+        {!bag.container_provided && !bag.bag_provided && (
           <div className="info-banner">ℹ️ {t("bagDetail.packaging.info")}</div>
+        )}
+        {!bag.container_provided && bag.bag_provided && (
+          <div className="info-banner">ℹ️ {t("bagDetail.packaging.infoContainer")}</div>
+        )}
+        {bag.container_provided && !bag.bag_provided && (
+          <div className="info-banner">ℹ️ {t("bagDetail.packaging.infoBag")}</div>
         )}
 
         <div className="divider" />
