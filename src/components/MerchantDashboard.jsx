@@ -74,11 +74,19 @@ export default function MerchantDashboard({ user, merchant, onMerchantChanged })
     setForm((f) => ({
       ...f,
       originalPrice: value,
-      // Arrondi vers le bas (pas .toFixed, qui arrondirait au-dessus de la
-      // réduction visée) — la réduction affichée ne doit jamais être
-      // inférieure à celle annoncée.
-      price: priceTouched ? f.price : value ? (Math.floor(parseFloat(value) * discountedRatio) / 100).toFixed(2) : f.price,
+      price: priceTouched ? f.price : value ? suggestPrice(parseFloat(value), discountedRatio) : f.price,
     }));
+  }
+
+  // Prix psychologique façon TGTG : toujours en ".99", jamais au-dessus de la
+  // réduction annoncée (donc arrondi au .99 immédiatement EN DESSOUS du prix
+  // exact, pas au plus proche — un -70% calculé à 3,47€ affiche 2,99€, pas
+  // 3,46€ ni 3,99€, qui serait une réduction plus faible que promise).
+  function suggestPrice(original, discountedRatio) {
+    const rawCents = Math.floor(original * discountedRatio); // ex: 10€ * 30 = 300 (cents)
+    const wholeEuros = Math.floor(rawCents / 100);
+    const cents = Math.max(99, wholeEuros * 100 - 1); // jamais en dessous de 0,99€
+    return (cents / 100).toFixed(2);
   }
 
   function setPrice(value) {
