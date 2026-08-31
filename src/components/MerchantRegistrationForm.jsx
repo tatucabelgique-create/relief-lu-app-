@@ -12,6 +12,7 @@ export default function MerchantRegistrationForm({ user, merchant, onDone }) {
     city: merchant?.city || "",
     phone: merchant?.phone || "",
     registration_number: merchant?.registration_number || "",
+    dynamic_pricing_threshold: merchant?.dynamic_pricing_threshold ?? "",
   });
   const [msg, setMsg] = useState(null);
   const [saving, setSaving] = useState(false);
@@ -31,7 +32,14 @@ export default function MerchantRegistrationForm({ user, merchant, onDone }) {
       // Géocode l'adresse tapée en coordonnées GPS automatiquement — le
       // commerçant n'a plus besoin de positionner un repère sur une carte.
       const coords = await geocodeAddress(form.address, form.city);
-      await updateMerchantProfile(user.id, { ...form, lat: coords?.lat, lng: coords?.lng });
+      await updateMerchantProfile(user.id, {
+        ...form,
+        lat: coords?.lat,
+        lng: coords?.lng,
+        // Chaîne vide = désactivé (NULL en base), pas 0 — un seuil de 0
+        // déclencherait le prix dynamique dès la première vente.
+        dynamic_pricing_threshold: form.dynamic_pricing_threshold === "" ? null : parseInt(form.dynamic_pricing_threshold, 10),
+      });
       onDone();
     } catch (err) {
       setMsg({ type: "error", text: err.message });
@@ -79,6 +87,19 @@ export default function MerchantRegistrationForm({ user, merchant, onDone }) {
             placeholder="RCS Luxembourg B123456"
           />
         </div>
+      </div>
+
+      <div className="field">
+        <label>{t("merchant.reg.dynamicThreshold")}</label>
+        <input
+          type="number"
+          min="1"
+          step="1"
+          value={form.dynamic_pricing_threshold}
+          onChange={(e) => set("dynamic_pricing_threshold", e.target.value)}
+          placeholder={t("merchant.reg.dynamicThresholdPlaceholder")}
+        />
+        <span className="field-hint">{t("merchant.reg.dynamicThresholdHint")}</span>
       </div>
 
       <button className="btn" onClick={handleSubmit} disabled={saving}>

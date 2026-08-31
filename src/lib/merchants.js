@@ -27,6 +27,7 @@ export async function updateMerchantProfile(userId, profile) {
     city: profile.city,
     phone: profile.phone,
     registration_number: profile.registration_number,
+    dynamic_pricing_threshold: profile.dynamic_pricing_threshold ?? null,
   };
   // lat/lng optionnels : seulement si le géocodage de l'adresse a réussi
   // (voir MerchantRegistrationForm) — sinon on ne touche pas aux coordonnées
