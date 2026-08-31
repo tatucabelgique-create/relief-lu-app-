@@ -85,7 +85,10 @@ export default function MerchantDashboard({ user, merchant, onMerchantChanged })
   function suggestPrice(original, discountedRatio) {
     const rawCents = Math.floor(original * discountedRatio); // ex: 10€ * 30 = 300 (cents)
     const wholeEuros = Math.floor(rawCents / 100);
-    const cents = Math.max(99, wholeEuros * 100 - 1); // jamais en dessous de 0,99€
+    // Plancher à 399 (3,99€), pas 99 : en dessous, les frais de paiement fixes
+    // rendent la vente non rentable (même seuil que la validation dans
+    // handlePublish) — un prix normal trop bas ne doit jamais suggérer un prix invalide.
+    const cents = Math.max(399, wholeEuros * 100 - 1);
     return (cents / 100).toFixed(2);
   }
 
@@ -109,6 +112,15 @@ export default function MerchantDashboard({ user, merchant, onMerchantChanged })
     }
     if (new Date(form.end) <= new Date(form.start)) {
       setMsg({ type: "error", text: "Le retrait « jusqu'à » doit être après le retrait « à partir de »." });
+      return;
+    }
+    // En dessous de ce seuil, les frais fixes de traitement Stripe (~0,25-0,35€,
+    // incompressibles quel que soit le prestataire) mangent une part
+    // disproportionnée de la commission — pas un problème de taux, un problème
+    // structurel des petites transactions. 3,99€ reste cohérent avec le prix
+    // d'entrée habituel chez TGTG.
+    if (parseFloat(form.price || "0") < 3.99) {
+      setMsg({ type: "error", text: "Le prix réduit doit être d'au moins 3,99€ (les frais de paiement fixes rendent les sachets moins chers non rentables)." });
       return;
     }
     // La photo est un plus, pas une condition pour publier — si son envoi
@@ -250,7 +262,7 @@ export default function MerchantDashboard({ user, merchant, onMerchantChanged })
           </div>
           <div className="field">
             <label>{t("merchant.f.price")}</label>
-            <input type="number" min="1" step="0.5" value={form.price} onChange={(e) => setPrice(e.target.value)} />
+            <input type="number" min="3.99" step="0.5" value={form.price} onChange={(e) => setPrice(e.target.value)} />
             <span className="field-hint">
               {merchant?.dynamic_pricing_threshold != null && recentSoldCount >= merchant.dynamic_pricing_threshold
                 ? `${t("merchant.f.priceHint50Prefix")} ${merchant.dynamic_pricing_threshold} ${t("merchant.f.priceHint50Suffix")}`
