@@ -45,7 +45,7 @@ export default function MerchantBilling() {
     <div className="panel">
       <h2>Facturation commerçants</h2>
       <p className="page-sub">
-        Calcule, pour chaque commerçant, le chiffre d'affaires payé sur la période, la commission relief.lu (18% HT +
+        Calcule, pour chaque commerçant, le chiffre d'affaires payé sur la période, la commission relief.lu (20% HT +
         TVA 17%) et le montant net à leur reverser. Usage interne — rien n'est envoyé aux commerçants.
       </p>
 
