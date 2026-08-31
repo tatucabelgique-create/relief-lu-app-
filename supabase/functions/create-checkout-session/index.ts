@@ -53,7 +53,7 @@ Deno.serve(async (req) => {
     const base = (return_base || "https://relief.lu/").replace(/\/+$/, "");
 
     // Mêmes taux que merchantStats.js/billing.js — à garder synchronisés.
-    const COMMISSION_RATE = 0.18;
+    const COMMISSION_RATE = 0.2;
     const VAT_RATE = 0.17;
     const totalCents = reservation.bags.price_cents * reservation.quantity;
     const commissionHtCents = Math.round(totalCents * COMMISSION_RATE);

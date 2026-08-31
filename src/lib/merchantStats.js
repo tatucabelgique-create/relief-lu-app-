@@ -2,9 +2,33 @@ import { supabase } from "./supabase";
 
 // Taux appliqués sur le chiffre d'affaires encaissé (réservations payées
 // uniquement — pending/failed/refunded ne comptent pas comme vente réelle) :
-// commission de 18% hors TVA, TVA luxembourgeoise standard de 17% dessus.
-const COMMISSION_RATE = 0.18;
+// commission de 20% hors TVA (relevée depuis 18% — les frais Stripe rognaient
+// trop la marge nette), TVA luxembourgeoise standard de 17% dessus.
+const COMMISSION_RATE = 0.2;
 const VAT_RATE = 0.17;
+
+// Nombre de sachets vendus (payés) sur les 28 derniers jours glissants — sert
+// à déterminer le prix conseillé à la publication (voir MerchantDashboard :
+// -70% en dessous de 5 sachets vendus sur la période, -50% au-delà, même
+// mécanique que TGTG). Fenêtre glissante plutôt qu'un total cumulé : un
+// commerçant qui ralentit doit repasser à la remise la plus attractive, pas
+// rester bloqué sur -50% pour toujours à cause d'un pic passé.
+export async function getRecentSoldCount(merchantId) {
+  const since = new Date(Date.now() - 28 * 24 * 60 * 60 * 1000).toISOString();
+  const { data: bags, error: bagsError } = await supabase.from("bags").select("id").eq("merchant_id", merchantId);
+  if (bagsError) throw bagsError;
+  const bagIds = bags.map((b) => b.id);
+  if (!bagIds.length) return 0;
+
+  const { data: reservations, error } = await supabase
+    .from("reservations")
+    .select("quantity")
+    .in("bag_id", bagIds)
+    .eq("payment_status", "paid")
+    .gte("created_at", since);
+  if (error) throw error;
+  return reservations.reduce((sum, r) => sum + r.quantity, 0);
+}
 
 export async function getMerchantStats(merchantId) {
   const { data: bags, error: bagsError } = await supabase

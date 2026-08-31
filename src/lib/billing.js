@@ -2,7 +2,7 @@ import { supabase } from "./supabase";
 
 // Mêmes taux que src/lib/merchantStats.js (stats affichées au commerçant) —
 // à garder synchronisés, voir le commentaire là-bas pour le détail.
-const COMMISSION_RATE = 0.18;
+const COMMISSION_RATE = 0.2;
 const VAT_RATE = 0.17;
 
 // Lundi 00:00 -> dimanche 23:59:59 de la semaine complète précédant

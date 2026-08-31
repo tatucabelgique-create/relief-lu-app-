@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useI18n } from "../lib/i18n.jsx";
 import { loadMerchantBags, publishBag, uploadBagPhoto } from "../lib/bags";
+import { getRecentSoldCount } from "../lib/merchantStats";
 import { notifyNewBag } from "../lib/notify";
 import { getErrorMessage } from "../lib/auth";
 import MerchantLogoUpload from "./MerchantLogoUpload.jsx";
@@ -35,6 +36,11 @@ export default function MerchantDashboard({ user, merchant, onMerchantChanged })
   const [myBags, setMyBags] = useState([]);
   const [statsKey, setStatsKey] = useState(0);
   const [editingInfo, setEditingInfo] = useState(false);
+  // Prix conseillé façon TGTG : -70% tant que le commerçant vend peu, -50%
+  // au-delà d'un certain volume (voir getRecentSoldCount) — sert uniquement
+  // de suggestion par défaut, jamais imposé (voir setOriginalPrice).
+  const DYNAMIC_PRICING_THRESHOLD = 5;
+  const [recentSoldCount, setRecentSoldCount] = useState(0);
 
   async function refreshMyBags() {
     setMyBags(await loadMerchantBags(user.id));
@@ -43,22 +49,29 @@ export default function MerchantDashboard({ user, merchant, onMerchantChanged })
 
   useEffect(() => {
     refreshMyBags();
+    getRecentSoldCount(user.id)
+      .then(setRecentSoldCount)
+      .catch(() => {}); // best-effort : le prix conseillé retombe sur -70% par défaut si l'appel échoue
   }, [user.id]);
 
   function set(field, value) {
     setForm((f) => ({ ...f, [field]: value }));
   }
 
-  // Le prix réduit se calcule automatiquement à -50% du prix normal tant que
-  // le commerçant n'a pas modifié ce champ lui-même — sitôt qu'il y touche,
-  // on respecte son choix et on arrête de l'écraser.
+  // Le prix réduit se calcule automatiquement (-70% en dessous de
+  // DYNAMIC_PRICING_THRESHOLD sachets vendus sur les 28 derniers jours, -50%
+  // au-delà, même mécanique que TGTG) tant que le commerçant n'a pas modifié
+  // ce champ lui-même — sitôt qu'il y touche, on respecte son choix et on
+  // arrête de l'écraser.
   function setOriginalPrice(value) {
+    const discountedRatio = recentSoldCount >= DYNAMIC_PRICING_THRESHOLD ? 50 : 30;
     setForm((f) => ({
       ...f,
       originalPrice: value,
-      // Arrondi vers le bas (pas .toFixed, qui arrondirait 9,99/2 = 4,995 à
-      // 5,00) — la réduction affichée ne doit jamais être inférieure à 50 %.
-      price: priceTouched ? f.price : value ? (Math.floor(parseFloat(value) * 50) / 100).toFixed(2) : f.price,
+      // Arrondi vers le bas (pas .toFixed, qui arrondirait au-dessus de la
+      // réduction visée) — la réduction affichée ne doit jamais être
+      // inférieure à celle annoncée.
+      price: priceTouched ? f.price : value ? (Math.floor(parseFloat(value) * discountedRatio) / 100).toFixed(2) : f.price,
     }));
   }
 
@@ -224,7 +237,9 @@ export default function MerchantDashboard({ user, merchant, onMerchantChanged })
           <div className="field">
             <label>{t("merchant.f.price")}</label>
             <input type="number" min="1" step="0.5" value={form.price} onChange={(e) => setPrice(e.target.value)} />
-            <span className="field-hint">{t("merchant.f.priceHint")}</span>
+            <span className="field-hint">
+              {recentSoldCount >= DYNAMIC_PRICING_THRESHOLD ? t("merchant.f.priceHint50") : t("merchant.f.priceHint70")}
+            </span>
           </div>
         </div>
         <div className="two-col">
