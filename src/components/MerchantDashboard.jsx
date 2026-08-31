@@ -78,13 +78,14 @@ export default function MerchantDashboard({ user, merchant, onMerchantChanged })
     }));
   }
 
-  // Prix psychologique façon TGTG : toujours en ".99", jamais au-dessus de la
-  // réduction annoncée (donc arrondi au .99 immédiatement EN DESSOUS du prix
-  // exact, pas au plus proche — un -70% calculé à 3,47€ affiche 2,99€, pas
-  // 3,46€ ni 3,99€, qui serait une réduction plus faible que promise).
+  // Prix psychologique façon TGTG : toujours en ".99", arrondi au plus proche
+  // (pas systématiquement vers le bas) — confirmé sur un vrai sachet TGTG :
+  // 12€ à -70% (calcul exact 3,60€) affiche 3,99€, le .99 le plus proche de
+  // 3,60€, pas 2,99€. La remise réelle affichée tourne donc en moyenne autour
+  // de 67%, pas 70% pile.
   function suggestPrice(original, discountedRatio) {
     const rawCents = Math.floor(original * discountedRatio); // ex: 10€ * 30 = 300 (cents)
-    const wholeEuros = Math.floor(rawCents / 100);
+    const wholeEuros = Math.round(rawCents / 100);
     // Plancher à 399 (3,99€), pas 99 : en dessous, les frais de paiement fixes
     // rendent la vente non rentable (même seuil que la validation dans
     // handlePublish) — un prix normal trop bas ne doit jamais suggérer un prix invalide.
