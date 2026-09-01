@@ -64,32 +64,35 @@ export default function MerchantDashboard({ user, merchant, onMerchantChanged })
     setForm((f) => ({ ...f, [field]: value }));
   }
 
-  // Le prix réduit se calcule automatiquement (-70% en dessous du seuil
-  // choisi par le commerçant, -50% au-delà, même mécanique que TGTG) tant que
-  // le commerçant n'a pas modifié ce champ lui-même — sitôt qu'il y touche, on
-  // respecte son choix et on arrête de l'écraser.
+  // Le prix réduit se calcule automatiquement (÷3 en dessous du seuil choisi
+  // par le commerçant, ÷2 au-delà, mécanique exacte de TGTG — voir
+  // suggestPrice) tant que le commerçant n'a pas modifié ce champ lui-même —
+  // sitôt qu'il y touche, on respecte son choix et on arrête de l'écraser.
   function setOriginalPrice(value) {
     const threshold = merchant?.dynamic_pricing_threshold;
-    const discountedRatio = threshold != null && recentSoldCount >= threshold ? 50 : 30;
+    const divisor = threshold != null && recentSoldCount >= threshold ? 2 : 3;
     setForm((f) => ({
       ...f,
       originalPrice: value,
-      price: priceTouched ? f.price : value ? suggestPrice(parseFloat(value), discountedRatio) : f.price,
+      price: priceTouched ? f.price : value ? suggestPrice(parseFloat(value), divisor) : f.price,
     }));
   }
 
-  // Prix psychologique façon TGTG : toujours en ".99", arrondi au plus proche
-  // (pas systématiquement vers le bas) — confirmé sur un vrai sachet TGTG :
-  // 12€ à -70% (calcul exact 3,60€) affiche 3,99€, le .99 le plus proche de
-  // 3,60€, pas 2,99€. La remise réelle affichée tourne donc en moyenne autour
-  // de 67%, pas 70% pile.
-  function suggestPrice(original, discountedRatio) {
-    const rawCents = Math.floor(original * discountedRatio); // ex: 10€ * 30 = 300 (cents)
-    const wholeEuros = Math.round(rawCents / 100);
-    // Plancher à 399 (3,99€), pas 99 : en dessous, les frais de paiement fixes
+  // Reproduit le calcul exact observé sur 4 vrais sachets TGTG (captures
+  // fournies) : le prix réduit est le prix normal divisé par 3 (palier de
+  // base, ≈ -66,7%, pas -70% comme on le suppose souvent) ou par 2 (palier
+  // haut volume, -50%) — PAS un pourcentage arrondi. Ex. 11,85€÷3 = 3,95€
+  // pile, 14,85€÷3 = 4,95€ pile : la division est affichée telle quelle.
+  // Seule exception : un résultat "trop rond" (se terminant par ,00 ou ,50,
+  // ex. 9€÷3=3,00 ou 15€÷2=7,50) est décalé d'un centime (2,99€ / 7,49€) —
+  // TGTG semble éviter ces deux terminaisons précises, pas toutes les autres.
+  function suggestPrice(original, divisor) {
+    let cents = Math.round((original * 100) / divisor);
+    if (cents % 50 === 0) cents -= 1;
+    // Plancher à 399 (3,99€) : en dessous, les frais de paiement fixes
     // rendent la vente non rentable (même seuil que la validation dans
     // handlePublish) — un prix normal trop bas ne doit jamais suggérer un prix invalide.
-    const cents = Math.max(399, wholeEuros * 100 - 1);
+    cents = Math.max(399, cents);
     return (cents / 100).toFixed(2);
   }
 
