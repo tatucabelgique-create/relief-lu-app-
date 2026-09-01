@@ -78,17 +78,23 @@ export default function MerchantDashboard({ user, merchant, onMerchantChanged })
     }));
   }
 
-  // Reproduit le calcul exact observé sur 4 vrais sachets TGTG (captures
-  // fournies) : le prix réduit est le prix normal divisé par 3 (palier de
-  // base, ≈ -66,7%, pas -70% comme on le suppose souvent) ou par 2 (palier
-  // haut volume, -50%) — PAS un pourcentage arrondi. Ex. 11,85€÷3 = 3,95€
-  // pile, 14,85€÷3 = 4,95€ pile : la division est affichée telle quelle.
-  // Seule exception : un résultat "trop rond" (se terminant par ,00 ou ,50,
-  // ex. 9€÷3=3,00 ou 15€÷2=7,50) est décalé d'un centime (2,99€ / 7,49€) —
-  // TGTG semble éviter ces deux terminaisons précises, pas toutes les autres.
+  // Reproduit le calcul observé sur 4 vrais sachets TGTG (captures fournies) :
+  // le prix normal divisé par 3 (palier de base, ≈ -66,7%) ou par 2 (palier
+  // haut volume, -50%) donne une valeur brute, mais TGTG n'affiche JAMAIS ce
+  // brut tel quel — les 4 exemples réels se terminent tous par ,49 / ,95 ou
+  // ,99 (jamais un centime arbitraire du type ,67). On arrondit donc au prix
+  // "charme" le plus proche parmi ces trois terminaisons plutôt qu'au centime
+  // près. Ex. 14,85€÷3 = 4,95€ pile (déjà dans le catalogue) ; 9€÷3 = 3,00€
+  // brut → 2,99€ est la terminaison la plus proche ; 15€÷2 = 7,50€ brut →
+  // 7,49€ la plus proche.
   function suggestPrice(original, divisor) {
-    let cents = Math.round((original * 100) / divisor);
-    if (cents % 50 === 0) cents -= 1;
+    const rawCents = (original * 100) / divisor;
+    const wholeEuros = Math.floor(rawCents / 100);
+    const candidates = [];
+    for (let e = wholeEuros - 1; e <= wholeEuros + 1; e++) {
+      for (const ending of [49, 95, 99]) candidates.push(e * 100 + ending);
+    }
+    let cents = candidates.reduce((best, c) => (Math.abs(c - rawCents) < Math.abs(best - rawCents) ? c : best));
     // Plancher à 399 (3,99€) : en dessous, les frais de paiement fixes
     // rendent la vente non rentable (même seuil que la validation dans
     // handlePublish) — un prix normal trop bas ne doit jamais suggérer un prix invalide.
