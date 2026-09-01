@@ -273,11 +273,11 @@ export default function MerchantDashboard({ user, merchant, onMerchantChanged })
           <div className="field">
             <label>{t("merchant.f.price")}</label>
             <input type="number" min="3.99" step="0.5" value={form.price} onChange={(e) => setPrice(e.target.value)} />
-            <span className="field-hint">
-              {merchant?.dynamic_pricing_threshold != null && recentSoldCount >= merchant.dynamic_pricing_threshold
-                ? `${t("merchant.f.priceHint50Prefix")} ${merchant.dynamic_pricing_threshold} ${t("merchant.f.priceHint50Suffix")}`
-                : t("merchant.f.priceHint70")}
-            </span>
+            {merchant?.dynamic_pricing_threshold != null && recentSoldCount >= merchant.dynamic_pricing_threshold && (
+              <span className="field-hint">
+                {t("merchant.f.priceHint50Prefix")} {merchant.dynamic_pricing_threshold} {t("merchant.f.priceHint50Suffix")}
+              </span>
+            )}
           </div>
         </div>
         <div className="two-col">
