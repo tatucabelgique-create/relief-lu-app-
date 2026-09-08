@@ -1,14 +1,21 @@
 // Génère une page statique indexable par commerçant vérifié, sur le modèle
 // de la stratégie SEO programmatique de TGTG (une page crawlable par
 // commerçant/sachet, plutôt qu'une seule page d'accueil dans le sitemap).
-// Tourne après `vite build` (voir "postbuild" dans package.json) : le SPA
-// React ne peut pas être crawlé de façon fiable, ces pages le sont par
+// Tourne après `vite build` (voir "build" dans package.json) : le SPA React
+// ne peut pas être crawlé de façon fiable, ces pages le sont par
 // construction (HTML statique généré ici, pas de JS nécessaire pour lire
 // le contenu).
 import { createClient } from "@supabase/supabase-js";
+import { WebSocket } from "ws";
 import { mkdirSync, writeFileSync } from "node:fs";
 import { resolve, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
+
+// supabase-js initialise toujours un client Realtime (WebSocket) même pour
+// une simple requête ponctuelle, et Node 20 (utilisé par le workflow de
+// déploiement) n'a pas de WebSocket global natif — contrairement à Node 22.
+// Sans ce polyfill, createClient() plante immédiatement en CI.
+if (!globalThis.WebSocket) globalThis.WebSocket = WebSocket;
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const DIST = resolve(__dirname, "..", "dist");
