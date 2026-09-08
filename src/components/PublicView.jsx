@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { createPortal } from "react-dom";
 import { useI18n } from "../lib/i18n.jsx";
 import { loadActiveBags, loadSoldOutToday } from "../lib/bags";
+import { getMerchantOrNull } from "../lib/merchants";
 import { haversineKm, loadSavedPosition, locate } from "../lib/geolocation";
 import { useFavorites } from "../lib/favorites";
 import { getMerchantRatings } from "../lib/reviews";
@@ -62,6 +63,17 @@ export default function PublicView({ user, pendingReserveBagId, onPendingReserve
     }
     document.addEventListener("visibilitychange", onVisible);
     return () => document.removeEventListener("visibilitychange", onVisible);
+  }, []);
+
+  // Ouvre directement la fiche commerçant depuis ?merchant=<id> — utilisé
+  // par les pages statiques /commercant/<slug>/ générées au build (voir
+  // scripts/generate-merchant-pages.mjs) pour renvoyer vers l'app réelle.
+  useEffect(() => {
+    const merchantId = new URLSearchParams(window.location.search).get("merchant");
+    if (!merchantId) return;
+    getMerchantOrNull(merchantId)
+      .then((m) => m && setViewingMerchant(m))
+      .catch(() => {});
   }, []);
 
   // Rouvre la modale de réservation sur le sachet précis après un retour de
