@@ -86,7 +86,7 @@ Deno.serve(async (req) => {
 
   const { data: merchant } = await supabase
     .from("merchants")
-    .select("business_name")
+    .select("business_name, city")
     .eq("id", bag.merchant_id)
     .single();
 
@@ -95,8 +95,15 @@ Deno.serve(async (req) => {
     .select("user_id")
     .eq("merchant_id", bag.merchant_id);
 
-  const userIds = (favorites ?? []).map((f) => f.user_id);
-  if (!userIds.length) return new Response("no favorites", { status: 200 });
+  // En plus des favoris (commerçant précis déjà connu), notifie aussi les
+  // utilisateurs abonnés à la ville du commerçant — voir CityNotifications.jsx.
+  // Un même utilisateur peut être dans les deux listes, d'où le Set pour dédupliquer.
+  const { data: citySubs } = merchant?.city
+    ? await supabase.from("city_subscriptions").select("user_id").eq("city", merchant.city)
+    : { data: [] };
+
+  const userIds = [...new Set([...(favorites ?? []).map((f) => f.user_id), ...(citySubs ?? []).map((c) => c.user_id)])];
+  if (!userIds.length) return new Response("no subscribers", { status: 200 });
 
   const { data: subs } = await supabase
     .from("push_subscriptions")

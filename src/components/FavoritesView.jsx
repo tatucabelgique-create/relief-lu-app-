@@ -8,6 +8,7 @@ import MerchantProfile from "./MerchantProfile.jsx";
 import ReserveModal from "./ReserveModal.jsx";
 import AuthPrompt from "./AuthPrompt.jsx";
 import NotificationToggle from "./NotificationToggle.jsx";
+import CityNotifications from "./CityNotifications.jsx";
 
 export default function FavoritesView({ user }) {
   const { t } = useI18n();
@@ -44,6 +45,7 @@ export default function FavoritesView({ user }) {
       ) : (
         <>
         <NotificationToggle user={user} />
+        <CityNotifications user={user} />
         <div className="grid">
           {!favBags.length ? (
             <div className="empty">{t("favorites.empty")}</div>
