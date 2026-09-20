@@ -1149,10 +1149,10 @@
   });
   applyI18n();
 
-  // Compte à rebours jusqu'au lancement (1er octobre 2026, heure du Luxembourg).
+  // Compte à rebours jusqu'au lancement (15 octobre 2026, heure du Luxembourg).
   // Cible fixe en UTC+2 (CEST) plutôt que l'heure locale du visiteur, pour que
   // le décompte tombe à zéro au même moment pour tout le monde, où qu'il soit.
-  const LAUNCH_DATE = new Date("2026-10-01T00:00:00+02:00").getTime();
+  const LAUNCH_DATE = new Date("2026-10-15T00:00:00+02:00").getTime();
   function updateCountdown(){
     const diff = LAUNCH_DATE - Date.now();
     const els = {
