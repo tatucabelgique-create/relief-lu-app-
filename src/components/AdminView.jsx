@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import AuthPrompt from "./AuthPrompt.jsx";
 import MarketingPush from "./MarketingPush.jsx";
+import DailyReminderToggle from "./DailyReminderToggle.jsx";
 import MerchantVerification from "./MerchantVerification.jsx";
 import MerchantBilling from "./MerchantBilling.jsx";
 import { supabase } from "../lib/supabase";
@@ -156,6 +157,7 @@ export default function AdminView({ user }) {
       <MerchantVerification />
       <MerchantBilling />
       <MarketingPush />
+      <DailyReminderToggle />
     </div>
   );
 }

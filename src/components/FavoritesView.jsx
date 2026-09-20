@@ -9,6 +9,7 @@ import ReserveModal from "./ReserveModal.jsx";
 import AuthPrompt from "./AuthPrompt.jsx";
 import NotificationToggle from "./NotificationToggle.jsx";
 import CityNotifications from "./CityNotifications.jsx";
+import DailyReminders from "./DailyReminders.jsx";
 
 export default function FavoritesView({ user }) {
   const { t } = useI18n();
@@ -46,6 +47,7 @@ export default function FavoritesView({ user }) {
         <>
         <NotificationToggle user={user} />
         <CityNotifications user={user} />
+        <DailyReminders user={user} />
         <div className="grid">
           {!favBags.length ? (
             <div className="empty">{t("favorites.empty")}</div>
