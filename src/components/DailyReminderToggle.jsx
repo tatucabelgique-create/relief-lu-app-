@@ -30,7 +30,10 @@ export default function DailyReminderToggle() {
     try {
       const res = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/toggle-daily-reminders`, {
         method: "POST",
-        headers: { "content-type": "application/json" },
+        headers: {
+          "content-type": "application/json",
+          authorization: `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
+        },
         body: JSON.stringify({ enabled: !enabled, admin_secret: secret }),
       });
       const data = await res.json();
