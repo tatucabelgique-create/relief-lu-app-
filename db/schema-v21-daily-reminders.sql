@@ -25,7 +25,8 @@ alter table feature_flags enable row level security;
 
 -- Lecture publique (le front doit savoir si la fonctionnalité est active),
 -- aucune policy d'écriture : seule une Edge Function avec la clé service_role
--- (qui contourne RLS) peut modifier ce flag, via toggle-daily-reminders.
+-- (qui contourne RLS) peut modifier ce flag, via la fonction "rapid-api"
+-- (nom généré par Supabase pour le code de toggle-daily-reminders/index.ts).
 create policy "feature flags are publicly readable"
   on feature_flags for select
   to anon, authenticated
@@ -57,12 +58,13 @@ create extension if not exists pg_net;
 -- L'en-tête Authorization est requis : les Edge Functions Supabase exigent un
 -- JWT valide par défaut. Remplace <TON_ANON_KEY> par la clé "anon public"
 -- (Project Settings → API) avant d'exécuter ce script.
+-- URL "super-action" = nom généré par Supabase pour send-daily-reminders/index.ts.
 select cron.schedule(
   'send-daily-reminders',
   '0 16 * * *',
   $$
   select net.http_post(
-    url := 'https://ucxsqregeorfjakgomaj.supabase.co/functions/v1/send-daily-reminders',
+    url := 'https://ucxsqregeorfjakgomaj.supabase.co/functions/v1/super-action',
     headers := jsonb_build_object('Content-Type', 'application/json', 'Authorization', 'Bearer <TON_ANON_KEY>'),
     body := '{}'::jsonb
   );

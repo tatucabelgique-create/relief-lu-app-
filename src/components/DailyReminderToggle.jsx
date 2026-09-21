@@ -5,7 +5,7 @@ const SECRET_KEY = "relief_marketing_secret"; // même secret que MarketingPush 
 
 // Interrupteur admin pour le rappel quotidien : tant que c'est désactivé,
 // DailyReminders.jsx reste invisible pour tous les utilisateurs et le job
-// planifié (send-daily-reminders) n'envoie rien. À activer une fois qu'il y a
+// planifié (super-action) n'envoie rien. À activer une fois qu'il y a
 // assez de commerçants actifs pour qu'un rappel mène à de vrais paniers.
 export default function DailyReminderToggle() {
   const [secret, setSecret] = useState(() => localStorage.getItem(SECRET_KEY) || "");
@@ -28,7 +28,7 @@ export default function DailyReminderToggle() {
     setBusy(true);
     setResult(null);
     try {
-      const res = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/toggle-daily-reminders`, {
+      const res = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/rapid-api`, {
         method: "POST",
         headers: {
           "content-type": "application/json",
