@@ -17,21 +17,37 @@ export default function PaymentResult({ reservationId, success, onClose }) {
       releaseReservation(reservationId).catch(() => {});
       return;
     }
-    getReservation(reservationId)
-      .then((r) => {
-        setReservation(r);
-        // Le seul moment fiable où on sait qu'un paiement réel a abouti —
-        // reserveBag() crée la réservation avant paiement, donc suivre
-        // l'événement dès la création compterait des paniers abandonnés
-        // comme des ventes.
-        if (r.payment_status === "paid") {
-          trackEvent("Purchase", {
-            value: (r.bags?.price_cents ?? 0) * r.quantity / 100,
-            currency: "EUR",
-          });
-        }
-      })
-      .catch(() => setError(t("payment.error")));
+    // Stripe redirige souvent le client avant que le webhook n'ait confirmé
+    // le paiement : on revérifie toutes les 2 s pendant 30 s au lieu de
+    // laisser le client bloqué sur « en attente » sans son code.
+    let cancelled = false;
+    let timer;
+    let attempts = 0;
+    function check() {
+      getReservation(reservationId)
+        .then((r) => {
+          if (cancelled) return;
+          setReservation(r);
+          if (r.payment_status === "paid") {
+            // Le seul moment fiable où on sait qu'un paiement réel a abouti —
+            // reserveBag() crée la réservation avant paiement, donc suivre
+            // l'événement dès la création compterait des paniers abandonnés
+            // comme des ventes.
+            trackEvent("Purchase", {
+              value: (r.bags?.price_cents ?? 0) * r.quantity / 100,
+              currency: "EUR",
+            });
+          } else if (r.payment_status === "pending" && ++attempts < 15) {
+            timer = setTimeout(check, 2000);
+          }
+        })
+        .catch(() => !cancelled && setError(t("payment.error")));
+    }
+    check();
+    return () => {
+      cancelled = true;
+      clearTimeout(timer);
+    };
   }, [reservationId, success]);
 
   return (

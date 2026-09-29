@@ -1,14 +1,16 @@
 // Reçoit les événements Stripe (paiement réussi / session expirée / compte
 // Connect mis à jour) et met à jour la réservation ou le commerçant en
-// conséquence. À configurer dans le Dashboard Stripe (Developers → Webhooks
-// → Add endpoint) une fois l'URL de cette fonction déployée :
-// .../functions/v1/stripe-webhook, événements à cocher :
-// checkout.session.completed, checkout.session.expired, account.updated.
+// conséquence, puis envoie l'email de confirmation au client. À configurer
+// dans le Dashboard Stripe (Developers → Webhooks → Add endpoint) une fois
+// l'URL de cette fonction déployée : .../functions/v1/stripe-webhook,
+// événements à cocher : voir la liste juste au-dessus de Deno.serve.
+// Nécessite la migration db/schema-v22-payment-hardening.sql.
 // Secrets requis : STRIPE_SECRET_KEY, STRIPE_WEBHOOK_SECRET (donné par Stripe
 // au moment de créer le endpoint), SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY,
 // VAPID_PUBLIC_KEY, VAPID_PRIVATE_KEY (mêmes clés que notify-new-bag, pour
 // prévenir le commerçant par push qu'une réservation vient d'être payée —
-// seul moyen pour lui de le savoir sans garder le tableau de bord ouvert).
+// seul moyen pour lui de le savoir sans garder le tableau de bord ouvert),
+// RESEND_API_KEY et EMAIL_FROM (email de confirmation, voir plus bas).
 import Stripe from "npm:stripe@17";
 import { createClient } from "npm:@supabase/supabase-js@2";
 import * as webpush from "jsr:@negrel/webpush@0";
@@ -127,6 +129,134 @@ async function notifyMerchantOfPaidReservation(reservationId: string) {
   }
 }
 
+// ---------- Email de confirmation (Resend) ----------
+// Secrets requis : RESEND_API_KEY, et EMAIL_FROM (ex. "relief.lu
+// <reservations@relief.lu>", domaine vérifié dans Resend). Sans
+// RESEND_API_KEY, l'envoi est simplement ignoré : le paiement fonctionne
+// comme avant, seul l'email manque.
+const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY");
+const EMAIL_FROM = Deno.env.get("EMAIL_FROM") ?? "relief.lu <reservations@relief.lu>";
+const APP_URL = Deno.env.get("APP_URL") ?? "https://relief.lu/app.html";
+
+function escapeHtml(s: string): string {
+  return s.replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]!);
+}
+
+function formatPickup(startIso: string, endIso: string): string {
+  const tz = "Europe/Luxembourg";
+  const day = new Intl.DateTimeFormat("fr-FR", { timeZone: tz, weekday: "long", day: "numeric", month: "long" }).format(new Date(startIso));
+  const time = (iso: string) => new Intl.DateTimeFormat("fr-FR", { timeZone: tz, hour: "2-digit", minute: "2-digit" }).format(new Date(iso));
+  return `${day}, ${time(startIso)} – ${time(endIso)}`;
+}
+
+// Best-effort, et au plus une fois par réservation : la colonne
+// confirmation_email_sent_at est « réservée » avant l'envoi, donc un webhook
+// rejoué par Stripe ne renvoie jamais un deuxième email.
+async function sendConfirmationEmail(reservationId: string) {
+  if (!RESEND_API_KEY) return;
+  try {
+    const { data: claimed } = await supabase
+      .from("reservations")
+      .update({ confirmation_email_sent_at: new Date().toISOString() })
+      .eq("id", reservationId)
+      .is("confirmation_email_sent_at", null)
+      .select("email, quantity, pickup_code, bags(title, price_cents, pickup_start, pickup_end, merchants(business_name, address, city))")
+      .maybeSingle();
+    if (!claimed?.email) return;
+
+    const bag = claimed.bags as {
+      title: string;
+      price_cents: number;
+      pickup_start: string;
+      pickup_end: string;
+      merchants: { business_name: string; address: string | null; city: string | null } | null;
+    };
+    const m = bag.merchants;
+    const where = [m?.business_name, m?.address, m?.city].filter(Boolean).map((s) => escapeHtml(s!)).join(", ");
+    const total = ((bag.price_cents * claimed.quantity) / 100).toFixed(2).replace(".", ",");
+    const pickup = formatPickup(bag.pickup_start, bag.pickup_end);
+    const code = escapeHtml(claimed.pickup_code);
+
+    const html = `<div style="font-family:Arial,sans-serif;max-width:520px;margin:auto;color:#1c2536">
+  <h2 style="margin-bottom:4px">Ta réservation est confirmée ✅</h2>
+  <p style="margin-top:0;color:#555">Merci d'avoir sauvé un panier avec relief.lu.</p>
+  <div style="border:2px dashed #e0a526;border-radius:12px;padding:16px;text-align:center;margin:20px 0">
+    <div style="font-size:13px;color:#555">Code de retrait · Abholcode · Pickup code</div>
+    <div style="font-size:32px;font-weight:bold;letter-spacing:4px">${code}</div>
+  </div>
+  <p><b>${claimed.quantity} × ${escapeHtml(bag.title)}</b> — ${total} € payés</p>
+  <p><b>Où :</b> ${where}<br><b>Quand :</b> ${escapeHtml(pickup)}</p>
+  <p>Présente ce code au commerçant pendant le créneau de retrait.</p>
+  <p style="color:#555;font-size:13px">DE : Zeige diesen Code dem Händler während des Abholzeitfensters.<br>
+  EN: Show this code to the shop during the pickup window.</p>
+  <p><a href="${APP_URL}?view=account" style="color:#1c2536">Voir mes réservations</a></p>
+</div>`;
+
+    const res = await fetch("https://api.resend.com/emails", {
+      method: "POST",
+      headers: { Authorization: `Bearer ${RESEND_API_KEY}`, "Content-Type": "application/json" },
+      body: JSON.stringify({
+        from: EMAIL_FROM,
+        to: claimed.email,
+        subject: `Réservation confirmée — code ${claimed.pickup_code}`,
+        html,
+      }),
+    });
+    if (!res.ok) {
+      console.error("Resend a refusé l'email", reservationId, res.status, await res.text());
+      // Libère le verrou pour permettre un renvoi manuel / au prochain rejeu.
+      await supabase.from("reservations").update({ confirmation_email_sent_at: null }).eq("id", reservationId);
+    }
+  } catch (err) {
+    console.error("Email de confirmation non envoyé", reservationId, err);
+  }
+}
+
+// Paiement reçu alors qu'il n'y a plus de sachet à livrer (réservation
+// annulée entre-temps et stock revendu) : on rembourse intégralement, y
+// compris la part déjà transférée au commerçant et la commission.
+async function refundOrphanPayment(session: Stripe.Checkout.Session, reservationId: string) {
+  const piId = typeof session.payment_intent === "string" ? session.payment_intent : session.payment_intent?.id;
+  if (!piId) throw new Error(`Aucun payment_intent pour la session ${session.id}`);
+  const pi = await stripe.paymentIntents.retrieve(piId);
+  await stripe.refunds.create(
+    {
+      payment_intent: piId,
+      ...(pi.transfer_data && { reverse_transfer: true, refund_application_fee: true }),
+    },
+    { idempotencyKey: `refund-orphan-${reservationId}` }
+  );
+  await supabase.from("reservations").update({ payment_status: "refunded" }).eq("id", reservationId);
+  console.warn("Paiement remboursé : plus de stock pour la réservation", reservationId);
+}
+
+async function handlePaidSession(session: Stripe.Checkout.Session) {
+  const reservationId = session.metadata?.reservation_id;
+  if (!reservationId) return;
+
+  const { data: outcome, error } = await supabase.rpc("confirm_reservation_payment", { p_reservation_id: reservationId });
+  // Erreur base de données → on la remonte : réponse 500, Stripe rejouera le
+  // webhook. Répondre 200 ici laisserait un paiement encaissé sans réservation.
+  if (error) throw error;
+
+  if (outcome === "paid" || outcome === "paid_restored") {
+    await notifyMerchantOfPaidReservation(reservationId);
+    await sendConfirmationEmail(reservationId);
+  } else if (outcome === "needs_refund") {
+    await refundOrphanPayment(session, reservationId);
+  }
+}
+
+async function releaseSession(session: Stripe.Checkout.Session) {
+  const reservationId = session.metadata?.reservation_id;
+  if (!reservationId) return;
+  const { error } = await supabase.rpc("release_reservation", { p_reservation_id: reservationId });
+  if (error) throw error;
+}
+
+// Événements à cocher dans le Dashboard Stripe : checkout.session.completed,
+// checkout.session.async_payment_succeeded, checkout.session.async_payment_failed,
+// checkout.session.expired, account.updated.
 Deno.serve(async (req) => {
   const signature = req.headers.get("stripe-signature");
   const body = await req.text();
@@ -138,33 +268,39 @@ Deno.serve(async (req) => {
     return new Response(`Signature invalide: ${err instanceof Error ? err.message : "erreur"}`, { status: 400 });
   }
 
-  if (event.type === "checkout.session.completed") {
-    const session = event.data.object as Stripe.Checkout.Session;
-    const reservationId = session.metadata?.reservation_id;
-    if (reservationId) {
-      await supabase.from("reservations").update({ payment_status: "paid" }).eq("id", reservationId);
-      await notifyMerchantOfPaidReservation(reservationId);
+  try {
+    switch (event.type) {
+      case "checkout.session.completed": {
+        const session = event.data.object as Stripe.Checkout.Session;
+        // Moyen de paiement différé : la session est « complétée » mais
+        // l'argent n'est pas encore là → on attend async_payment_succeeded.
+        if (session.payment_status === "paid") await handlePaidSession(session);
+        break;
+      }
+      case "checkout.session.async_payment_succeeded":
+        await handlePaidSession(event.data.object as Stripe.Checkout.Session);
+        break;
+      case "checkout.session.async_payment_failed":
+      case "checkout.session.expired":
+        await releaseSession(event.data.object as Stripe.Checkout.Session);
+        break;
+      // Le compte Connect passe par plusieurs étapes (identité, IBAN, vérification)
+      // avant de pouvoir réellement recevoir des paiements — charges_enabled ne
+      // devient true qu'une fois tout validé côté Stripe. On ne l'active donc
+      // jamais depuis create-connect-account (juste après création), seulement ici.
+      case "account.updated": {
+        const account = event.data.object as Stripe.Account;
+        const { error } = await supabase
+          .from("merchants")
+          .update({ stripe_payouts_enabled: !!account.charges_enabled })
+          .eq("stripe_account_id", account.id);
+        if (error) throw error;
+        break;
+      }
     }
-  }
-
-  if (event.type === "checkout.session.expired") {
-    const session = event.data.object as Stripe.Checkout.Session;
-    const reservationId = session.metadata?.reservation_id;
-    if (reservationId) {
-      await supabase.rpc("release_reservation", { p_reservation_id: reservationId });
-    }
-  }
-
-  // Le compte Connect passe par plusieurs étapes (identité, IBAN, vérification)
-  // avant de pouvoir réellement recevoir des paiements — charges_enabled ne
-  // devient true qu'une fois tout validé côté Stripe. On ne l'active donc
-  // jamais depuis create-connect-account (juste après création), seulement ici.
-  if (event.type === "account.updated") {
-    const account = event.data.object as Stripe.Account;
-    await supabase
-      .from("merchants")
-      .update({ stripe_payouts_enabled: !!account.charges_enabled })
-      .eq("stripe_account_id", account.id);
+  } catch (err) {
+    console.error("Échec du traitement du webhook", event.type, event.id, err);
+    return new Response("Erreur de traitement, à rejouer", { status: 500 });
   }
 
   return new Response("ok", { status: 200 });

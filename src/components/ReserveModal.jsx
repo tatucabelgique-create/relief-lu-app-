@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useI18n } from "../lib/i18n.jsx";
-import { reserveBag } from "../lib/reservations";
+import { reserveBag, releaseReservation } from "../lib/reservations";
 import { createCheckoutSession } from "../lib/payments";
 import { formatPickupWindow, isToday, isTomorrow } from "./BagCard.jsx";
 import AuthPrompt from "./AuthPrompt.jsx";
@@ -38,12 +38,17 @@ export default function ReserveModal({ bag, user, onClose, onReserved }) {
   async function handleConfirm() {
     setError("");
     setRedirecting(true);
+    let reservationId = null;
     try {
       const row = await reserveBag(bag.id, qty);
+      reservationId = row.reservation_id;
       onReserved();
-      const url = await createCheckoutSession(row.reservation_id);
+      const url = await createCheckoutSession(reservationId);
       window.location.href = url;
     } catch (err) {
+      // Réservation créée mais pas de session Stripe : on rend le stock tout
+      // de suite plutôt que de le bloquer jusqu'au nettoyage planifié (45 min).
+      if (reservationId) releaseReservation(reservationId).catch(() => {});
       setError(err.message || "Une erreur est survenue.");
       setRedirecting(false);
     }

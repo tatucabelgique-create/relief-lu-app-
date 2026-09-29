@@ -111,8 +111,18 @@ par commerçant vérifié, sitemap généré au build.
   paiements le 15/10 : à vérifier avec un professionnel avant le lancement.
 - **Textes légaux** rédigés sans juriste (le texte le dit lui-même). À
   faire relire avant une exploitation à grande échelle.
-- **Email de confirmation de réservation** : aucune Edge Function n'envoie
-  d'email ; le code de retrait n'existe que dans l'app.
+- **Email de confirmation de réservation + durcissement paiement** : codé
+  le 29/09 (`stripe-webhook` + `db/schema-v22-payment-hardening.sql`),
+  **pas encore déployé**. Il faut : exécuter la migration v22, créer un
+  compte Resend et vérifier le domaine relief.lu (DNS), ajouter les secrets
+  `RESEND_API_KEY` et `EMAIL_FROM`, redéployer la fonction webhook sous son
+  nom actuel, cocher `checkout.session.async_payment_succeeded` et
+  `async_payment_failed` dans le webhook Stripe.
+- **Annulation d'un sachet par le commerçant avec des réservations payées** :
+  aucun remboursement automatique. À faire à la main dans Stripe.
+- `reserve_bag` ne vérifie ni que le sachet est `active` ni que le créneau
+  n'est pas passé (seulement le stock). L'app filtre, mais un appel direct
+  passerait.
 - **Traduction du contenu commerçant** : seule l'interface est traduite
   FR/DE/EN.
 - **Pas de tests automatisés.** Tout est validé à la main en production.
