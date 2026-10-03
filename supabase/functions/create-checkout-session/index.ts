@@ -115,7 +115,7 @@ Deno.serve(async (req) => {
             currency: "eur",
             product_data: {
               name: "Frais de service",
-              description: "Couvre les frais de paiement — reversé intégralement à relief.lu, jamais au commerçant.",
+              description: "Permet de faire fonctionner la plateforme relief.lu — jamais reversé au commerçant.",
             },
             unit_amount: SERVICE_FEE_CENTS,
           },
