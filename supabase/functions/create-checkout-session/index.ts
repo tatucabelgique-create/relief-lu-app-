@@ -53,11 +53,19 @@ Deno.serve(async (req) => {
     const base = (return_base || "https://relief.lu/").replace(/\/+$/, "");
 
     // Mêmes taux que merchantStats.js/billing.js — à garder synchronisés.
-    const COMMISSION_RATE = 0.2;
+    // Commission redescendue à 18% (depuis 20%) en complément du nouveau
+    // SERVICE_FEE_CENTS côté acheteur, qui couvre les frais Stripe que la
+    // commission seule ne suffisait pas à absorber sur les petits paniers.
+    const COMMISSION_RATE = 0.18;
     const VAT_RATE = 0.17;
+    // Frais de service fixes, payés par l'acheteur en plus du prix du panier,
+    // affichés avec un point d'info dans ReserveModal.jsx. Entièrement
+    // conservés par relief.lu (jamais reversés au commerçant) — d'où leur
+    // ajout à commissionTtcCents, qui alimente application_fee_amount plus bas.
+    const SERVICE_FEE_CENTS = 50;
     const totalCents = reservation.bags.price_cents * reservation.quantity;
     const commissionHtCents = Math.round(totalCents * COMMISSION_RATE);
-    const commissionTtcCents = commissionHtCents + Math.round(commissionHtCents * VAT_RATE);
+    const commissionTtcCents = commissionHtCents + Math.round(commissionHtCents * VAT_RATE) + SERVICE_FEE_CENTS;
 
     const merchant = reservation.bags.merchants as { stripe_account_id: string | null } | null;
     // Destination charge : Stripe répartit le paiement au moment de la
@@ -101,6 +109,17 @@ Deno.serve(async (req) => {
             unit_amount: reservation.bags.price_cents,
           },
           quantity: reservation.quantity,
+        },
+        {
+          price_data: {
+            currency: "eur",
+            product_data: {
+              name: "Frais de service",
+              description: "Couvre les frais de paiement — reversé intégralement à relief.lu, jamais au commerçant.",
+            },
+            unit_amount: SERVICE_FEE_CENTS,
+          },
+          quantity: 1,
         },
       ],
       metadata: { reservation_id: reservation.id },

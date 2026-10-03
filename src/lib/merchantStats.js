@@ -2,9 +2,11 @@ import { supabase } from "./supabase";
 
 // Taux appliqués sur le chiffre d'affaires encaissé (réservations payées
 // uniquement — pending/failed/refunded ne comptent pas comme vente réelle) :
-// commission de 20% hors TVA (relevée depuis 18% — les frais Stripe rognaient
-// trop la marge nette), TVA luxembourgeoise standard de 17% dessus.
-const COMMISSION_RATE = 0.2;
+// commission de 18% hors TVA, TVA luxembourgeoise standard de 17% dessus.
+// Redescendue à 18% (depuis 20%) une fois les frais de service acheteur
+// introduits (voir SERVICE_FEE_CENTS dans create-checkout-session/index.ts) —
+// ce sont eux, pas la commission, qui couvrent désormais les frais Stripe.
+const COMMISSION_RATE = 0.18;
 const VAT_RATE = 0.17;
 
 // Nombre de sachets vendus (payés) sur les 28 derniers jours glissants — sert
