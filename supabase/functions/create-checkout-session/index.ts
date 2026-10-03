@@ -99,8 +99,11 @@ Deno.serve(async (req) => {
       mode: "payment",
       // "card" couvre déjà Apple Pay / Google Pay (détectés automatiquement
       // par Stripe selon l'appareil du client) — "bancontact" ajoute le
-      // moyen de paiement belge/luxembourgeois le plus courant après la carte.
-      payment_method_types: ["card", "bancontact"],
+      // moyen de paiement belge/luxembourgeois le plus courant après la carte,
+      // "wero" le virement instantané européen (actif aussi au Luxembourg).
+      // Doit être activé en plus côté Dashboard Stripe (Paramètres → Moyens
+      // de paiement) — l'ajouter ici seul ne suffit pas.
+      payment_method_types: ["card", "bancontact", "wero"],
       line_items: [
         {
           price_data: {
