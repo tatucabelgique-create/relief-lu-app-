@@ -65,7 +65,7 @@ const CONTENT = {
     cguClients: {
       title: "Conditions Générales d'Utilisation — Clients",
       paragraphs: [
-        `Les présentes Conditions Générales d'Utilisation ("CGU Clients") régissent l'utilisation de la plateforme relief.lu par les utilisateurs souhaitant réserver des sachets, éditée par ${COMPANY} (SARL-S en cours de constitution), dont le siège social est situé ${ADDRESS}. Les commerçants sont soumis à des conditions distinctes (voir les CGU Commerçants). Ce texte, rédigé pour ce type de plateforme, sera revu par un professionnel du droit avant une exploitation à grande échelle.`,
+        `Les présentes Conditions Générales d'Utilisation ("CGU Clients") régissent l'utilisation de la plateforme relief.lu par les utilisateurs souhaitant réserver des sachets, éditée par ${COMPANY} (SARL-S en cours de constitution), dont le siège social est situé ${ADDRESS}. Les commerçants sont soumis à des conditions distinctes (voir les CGU Commerçants).`,
         {
           heading: "1. Objet et rôle de relief.lu",
           text: "relief.lu est une plateforme de mise en relation entre des commerçants (boulangeries, restaurants, épiceries, traiteurs, supermarchés...) disposant d'invendus alimentaires et des utilisateurs souhaitant les acquérir à prix réduit sous forme de \"sachets surprise\". relief.lu agit exclusivement en tant qu'intermédiaire technique : elle n'est ni producteur, ni vendeur, ni propriétaire des denrées proposées, et n'est partie à aucun moment au contrat de vente conclu directement entre le commerçant et l'utilisateur.",
@@ -118,7 +118,7 @@ const CONTENT = {
     cguCommercants: {
       title: "Conditions Générales d'Utilisation — Commerçants",
       paragraphs: [
-        `Les présentes Conditions Générales d'Utilisation ("CGU Commerçants") régissent l'inscription et l'utilisation de la plateforme relief.lu par les commerçants souhaitant y publier des sachets, éditées par ${COMPANY} (SARL-S en cours de constitution), dont le siège social est situé ${ADDRESS}. Les clients sont soumis à des conditions distinctes (voir les CGU Clients). Ce texte, rédigé pour ce type de plateforme, sera revu par un professionnel du droit avant une exploitation à grande échelle.`,
+        `Les présentes Conditions Générales d'Utilisation ("CGU Commerçants") régissent l'inscription et l'utilisation de la plateforme relief.lu par les commerçants souhaitant y publier des sachets, éditées par ${COMPANY} (SARL-S en cours de constitution), dont le siège social est situé ${ADDRESS}. Les clients sont soumis à des conditions distinctes (voir les CGU Clients).`,
         {
           heading: "1. Objet et rôle de relief.lu",
           text: "relief.lu est une plateforme de mise en relation entre des commerçants disposant d'invendus alimentaires et des utilisateurs souhaitant les acquérir à prix réduit sous forme de \"sachets surprise\". relief.lu agit exclusivement en tant qu'intermédiaire technique : elle n'est ni acheteur, ni revendeur, ni propriétaire des denrées proposées, et n'est partie à aucun moment au contrat de vente conclu directement entre le commerçant et l'utilisateur.",
@@ -259,7 +259,7 @@ const CONTENT = {
     cguClients: {
       title: "Allgemeine Nutzungsbedingungen — Kund:innen",
       paragraphs: [
-        `Diese Allgemeinen Nutzungsbedingungen ("AGB Kund:innen") regeln die Nutzung der Plattform relief.lu durch Nutzer:innen, die Tüten reservieren möchten, herausgegeben von ${COMPANY} (SARL-S in Gründung) mit Sitz ${ADDRESS}. Für Geschäfte gelten gesonderte Bedingungen (siehe AGB Geschäfte). Dieser Text wird vor einem umfangreichen Betrieb von einem Rechtsexperten geprüft.`,
+        `Diese Allgemeinen Nutzungsbedingungen ("AGB Kund:innen") regeln die Nutzung der Plattform relief.lu durch Nutzer:innen, die Tüten reservieren möchten, herausgegeben von ${COMPANY} (SARL-S in Gründung) mit Sitz ${ADDRESS}. Für Geschäfte gelten gesonderte Bedingungen (siehe AGB Geschäfte).`,
         {
           heading: "1. Gegenstand und Rolle von relief.lu",
           text: "relief.lu ist eine Vermittlungsplattform zwischen Geschäften (Bäckereien, Restaurants, Lebensmittelgeschäfte, Caterer, Supermärkte usw.) mit überschüssigen Lebensmitteln und Nutzer:innen, die diese zu reduzierten Preisen als \"Überraschungstüte\" erwerben möchten. relief.lu handelt ausschließlich als technischer Vermittler: sie ist weder Hersteller noch Verkäufer noch Eigentümer der angebotenen Waren und zu keinem Zeitpunkt Vertragspartei des Kaufvertrags zwischen Geschäft und Nutzer.",
@@ -309,7 +309,7 @@ const CONTENT = {
     cguCommercants: {
       title: "Allgemeine Nutzungsbedingungen — Geschäfte",
       paragraphs: [
-        `Diese Allgemeinen Nutzungsbedingungen ("AGB Geschäfte") regeln die Registrierung und Nutzung der Plattform relief.lu durch Geschäfte, die dort Tüten veröffentlichen möchten, herausgegeben von ${COMPANY} (SARL-S in Gründung) mit Sitz ${ADDRESS}. Für Kund:innen gelten gesonderte Bedingungen (siehe AGB Kund:innen). Dieser Text wird vor einem umfangreichen Betrieb von einem Rechtsexperten geprüft.`,
+        `Diese Allgemeinen Nutzungsbedingungen ("AGB Geschäfte") regeln die Registrierung und Nutzung der Plattform relief.lu durch Geschäfte, die dort Tüten veröffentlichen möchten, herausgegeben von ${COMPANY} (SARL-S in Gründung) mit Sitz ${ADDRESS}. Für Kund:innen gelten gesonderte Bedingungen (siehe AGB Kund:innen).`,
         {
           heading: "1. Gegenstand und Rolle von relief.lu",
           text: "relief.lu ist eine Vermittlungsplattform zwischen Geschäften mit überschüssigen Lebensmitteln und Nutzer:innen, die diese zu reduzierten Preisen als \"Überraschungstüte\" erwerben möchten. relief.lu handelt ausschließlich als technischer Vermittler: sie ist weder Käufer noch Wiederverkäufer noch Eigentümer der angebotenen Waren und zu keinem Zeitpunkt Vertragspartei des Kaufvertrags zwischen Geschäft und Nutzer.",
@@ -450,7 +450,7 @@ const CONTENT = {
     cguClients: {
       title: "Terms of Service — Customers",
       paragraphs: [
-        `These Terms of Service ("Customer Terms") govern the use of the relief.lu platform by users wishing to reserve bags, published by ${COMPANY} (SARL-S being incorporated), with registered office at ${ADDRESS}. Merchants are subject to separate terms (see the Merchant Terms). This text, written for this type of platform, will be reviewed by a legal professional before large-scale operation.`,
+        `These Terms of Service ("Customer Terms") govern the use of the relief.lu platform by users wishing to reserve bags, published by ${COMPANY} (SARL-S being incorporated), with registered office at ${ADDRESS}. Merchants are subject to separate terms (see the Merchant Terms).`,
         {
           heading: "1. Purpose and role of relief.lu",
           text: "relief.lu is a matchmaking platform between merchants (bakeries, restaurants, grocery stores, caterers, supermarkets...) with surplus food and users wishing to buy it at a reduced price as a \"surprise bag\". relief.lu acts exclusively as a technical intermediary: it is neither the producer, seller, nor owner of the food offered, and is never a party to the sale contract concluded directly between the merchant and the user.",
@@ -500,7 +500,7 @@ const CONTENT = {
     cguCommercants: {
       title: "Terms of Service — Merchants",
       paragraphs: [
-        `These Terms of Service ("Merchant Terms") govern the registration and use of the relief.lu platform by merchants wishing to publish bags on it, published by ${COMPANY} (SARL-S being incorporated), with registered office at ${ADDRESS}. Customers are subject to separate terms (see the Customer Terms). This text, written for this type of platform, will be reviewed by a legal professional before large-scale operation.`,
+        `These Terms of Service ("Merchant Terms") govern the registration and use of the relief.lu platform by merchants wishing to publish bags on it, published by ${COMPANY} (SARL-S being incorporated), with registered office at ${ADDRESS}. Customers are subject to separate terms (see the Customer Terms).`,
         {
           heading: "1. Purpose and role of relief.lu",
           text: "relief.lu is a matchmaking platform between merchants with surplus food and users wishing to buy it at a reduced price as a \"surprise bag\". relief.lu acts exclusively as a technical intermediary: it is neither the buyer, reseller, nor owner of the food offered, and is never a party to the sale contract concluded directly between the merchant and the user.",
