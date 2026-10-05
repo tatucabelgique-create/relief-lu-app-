@@ -44,7 +44,7 @@ export default function MerchantLogoUpload({ user, merchant, onUpdated }) {
           }}
         >
           {logoUrl ? (
-            <img src={logoUrl} alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+            <img src={logoUrl} alt="" loading="lazy" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
           ) : (
             <span style={{ fontSize: 24 }}>🏪</span>
           )}

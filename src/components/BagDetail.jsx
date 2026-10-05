@@ -112,7 +112,7 @@ export default function BagDetail({ bag, rating, isFavorite, onToggleFavorite, o
             <div className="bag-detail-merchant">
               {merchant.logo_url && (
                 <div className="merchant-logo" style={{ position: "static", width: 40, height: 40 }}>
-                  <img src={merchant.logo_url} alt="" />
+                  <img src={merchant.logo_url} alt="" loading="lazy" />
                 </div>
               )}
               <b>{merchant.business_name}</b>

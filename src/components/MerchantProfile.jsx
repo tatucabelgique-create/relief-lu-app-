@@ -28,7 +28,7 @@ export default function MerchantProfile({ merchant, bags, rating, distanceKm, on
         <div className="merchant-profile-head">
           {merchant.logo_url && (
             <div className="merchant-logo" style={{ position: "static", width: 56, height: 56 }}>
-              <img src={merchant.logo_url} alt="" />
+              <img src={merchant.logo_url} alt="" loading="lazy" />
             </div>
           )}
           <div>

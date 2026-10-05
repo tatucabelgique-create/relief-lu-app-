@@ -72,7 +72,7 @@ export default function BagCard({ bag, onReserve, onToggleFavorite, isFavorite, 
         )}
         {bag.merchants?.logo_url && (
           <div className="merchant-logo">
-            <img src={bag.merchants.logo_url} alt="" />
+            <img src={bag.merchants.logo_url} alt="" loading="lazy" />
           </div>
         )}
       </div>

@@ -38,7 +38,7 @@ export default function CookieConsent({ onOpenLegal }) {
     <div className="overlay open">
       <div className="modal cookie-modal" style={{ maxHeight: "85vh", overflowY: "auto" }}>
         <div className="cookie-modal-logo">
-          <img src={`${import.meta.env.BASE_URL}icon-192.png`} alt="relief.lu" />
+          <img src={`${import.meta.env.BASE_URL}icon-192.png`} alt="relief.lu" loading="lazy" />
         </div>
         <p className="desc" style={{ textAlign: "center" }}>
           {t("cookies.intro")}
