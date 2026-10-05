@@ -593,11 +593,13 @@ export default function LegalModal({ type, onClose }) {
   // Laisse l'animation de sortie (CSS, voir .overlay.closing dans
   // index.css) jouer avant de retirer réellement la fenêtre du DOM — sans
   // ça, onClose() démonte le composant instantanément et rien ne peut
-  // s'animer. Le délai doit rester synchronisé avec la durée CSS (160ms).
+  // s'animer. Le délai doit rester synchronisé avec la durée CSS (220ms —
+  // 160ms mesuré correct mais imperceptible à l'usage réel, rallongé pour
+  // être clairement visible).
   function requestClose() {
     if (closing) return;
     setClosing(true);
-    setTimeout(onClose, 160);
+    setTimeout(onClose, 220);
   }
 
   return (
