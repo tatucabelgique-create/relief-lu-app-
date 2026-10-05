@@ -6,10 +6,10 @@
 -- d'inscription actuel. AFTER INSERT uniquement — une modification de fiche
 -- existante (UPDATE) ne redéclenche pas l'email.
 --
--- Déployer d'abord la fonction supabase/functions/notify-new-merchant/
--- (voir son en-tête pour le secret RESEND_API_KEY à ajouter), noter le nom
--- généré par Supabase (ex. "clever-handler"), puis remplacer <NOM_FONCTION>
--- et <TON_ANON_KEY> ci-dessous avant d'exécuter ce script.
+-- Fonction déployée sous le nom généré par Supabase "bright-endpoint" (voir
+-- supabase/functions/notify-new-merchant/ pour le code source et le secret
+-- RESEND_API_KEY à y ajouter). Remplace <TON_ANON_KEY> ci-dessous (clé "anon
+-- public", Project Settings → API) avant d'exécuter ce script.
 create extension if not exists pg_net;
 
 create or replace function notify_new_merchant()
@@ -19,7 +19,7 @@ security definer
 as $$
 begin
   perform net.http_post(
-    url := 'https://ucxsqregeorfjakgomaj.supabase.co/functions/v1/<NOM_FONCTION>',
+    url := 'https://ucxsqregeorfjakgomaj.supabase.co/functions/v1/bright-endpoint',
     headers := jsonb_build_object('Content-Type', 'application/json', 'Authorization', 'Bearer <TON_ANON_KEY>'),
     body := jsonb_build_object(
       'business_name', new.business_name,
