@@ -60,18 +60,34 @@ Deno.serve(async (req) => {
     const VAT_RATE = 0.17;
     // Frais de service par sachet, intégrés directement dans le prix affiché
     // au client (voir src/lib/pricing.js, à garder synchronisé avec les
-    // constantes ci-dessous) — il n'y a plus de ligne "Frais de service"
-    // séparée nulle part, ni dans l'app ni sur la page Stripe : un seul
-    // prix, déjà majoré, par sachet. Entièrement conservés par relief.lu
-    // (jamais reversés au commerçant) — d'où leur ajout à commissionTtcCents,
-    // qui alimente application_fee_amount plus bas.
+    // constantes/logique ci-dessous) — il n'y a plus de ligne "Frais de
+    // service" séparée nulle part, ni dans l'app ni sur la page Stripe : un
+    // seul prix, déjà majoré puis arrondi au centime supérieur se terminant
+    // par 9 (prix "charme"), par sachet. Entièrement conservés par
+    // relief.lu (jamais reversés au commerçant) — d'où leur ajout à
+    // commissionTtcCents, qui alimente application_fee_amount plus bas.
     const SERVICE_FEE_CENTS = 50;
     const SERVICE_FEE_VAT_CENTS = Math.round(SERVICE_FEE_CENTS * VAT_RATE);
     const SERVICE_FEE_TOTAL_CENTS = SERVICE_FEE_CENTS + SERVICE_FEE_VAT_CENTS;
+
+    function roundUpToNiceCents(cents: number) {
+      const remainder = cents % 10;
+      return remainder === 9 ? cents : cents + (9 - remainder);
+    }
+
+    // L'arrondi ,X9 est calculé par sachet (même prix unitaire que
+    // l'affichage côté client) puis multiplié par la quantité pour obtenir
+    // le total réellement facturé par Stripe (unit_amount * quantity).
+    const unitDisplayCents = roundUpToNiceCents(reservation.bags.price_cents + SERVICE_FEE_TOTAL_CENTS);
+    const unitMarkupCents = unitDisplayCents - reservation.bags.price_cents;
+
     const totalCents = reservation.bags.price_cents * reservation.quantity;
     const commissionHtCents = Math.round(totalCents * COMMISSION_RATE);
-    const commissionTtcCents =
-      commissionHtCents + Math.round(commissionHtCents * VAT_RATE) + SERVICE_FEE_TOTAL_CENTS * reservation.quantity;
+    // Tout ce qui dépasse le prix du commerçant (frais de service + TVA +
+    // reste de l'arrondi charme) reste chez relief.lu, en plus de la
+    // commission — le commerçant ne voit jamais ce supplément ni n'est
+    // affecté par son montant exact.
+    const commissionTtcCents = commissionHtCents + Math.round(commissionHtCents * VAT_RATE) + unitMarkupCents * reservation.quantity;
 
     const merchant = reservation.bags.merchants as { stripe_account_id: string | null } | null;
     // Destination charge : Stripe répartit le paiement au moment de la
@@ -115,7 +131,7 @@ Deno.serve(async (req) => {
           price_data: {
             currency: "eur",
             product_data: { name: reservation.bags.title },
-            unit_amount: reservation.bags.price_cents + SERVICE_FEE_TOTAL_CENTS,
+            unit_amount: unitDisplayCents,
           },
           quantity: reservation.quantity,
         },
