@@ -34,6 +34,7 @@ export default function MerchantRegistrationForm({ user, merchant, onDone }) {
       const coords = await geocodeAddress(form.address, form.city);
       await updateMerchantProfile(user.id, {
         ...form,
+        email: user.email,
         lat: coords?.lat,
         lng: coords?.lng,
         // Chaîne vide = désactivé (NULL en base), pas 0 — un seuil de 0

@@ -28,6 +28,10 @@ export async function updateMerchantProfile(userId, profile) {
     phone: profile.phone,
     registration_number: profile.registration_number,
     dynamic_pricing_threshold: profile.dynamic_pricing_threshold ?? null,
+    // Dupliqué depuis auth.users (voir db/schema-v23-merchant-email.sql) —
+    // nécessaire pour que l'écran admin (MerchantVerification.jsx) puisse
+    // l'afficher, auth.users n'étant pas accessible via l'API publique.
+    email: profile.email,
   };
   // lat/lng optionnels : seulement si le géocodage de l'adresse a réussi
   // (voir MerchantRegistrationForm) — sinon on ne touche pas aux coordonnées
