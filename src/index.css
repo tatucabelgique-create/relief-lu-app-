@@ -157,11 +157,22 @@ h1.page-title {
 .countdown { font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: var(--honey); }
 
 /* modal */
+/* .closing est un état transitoire (voir requestClose() dans LegalModal.jsx
+   et al.) : la fenêtre reste montée et visible le temps de l'animation de
+   sortie, puis le composant est réellement démonté une fois le délai JS
+   écoulé (doit rester synchronisé avec les durées ci-dessous, 160ms). */
+@keyframes overlay-in { from { opacity: 0; } to { opacity: 1; } }
+@keyframes overlay-out { from { opacity: 1; } to { opacity: 0; } }
+@keyframes modal-in { from { opacity: 0; transform: scale(0.95) translateY(8px); } to { opacity: 1; transform: scale(1) translateY(0); } }
+@keyframes modal-out { from { opacity: 1; transform: scale(1); } to { opacity: 0; transform: scale(0.96); } }
 .overlay {
   position: fixed; inset: 0; background: rgba(10,16,20,0.72);
   display: none; align-items: center; justify-content: center; padding: 20px; z-index: 50;
 }
-.overlay.open { display: flex; }
+.overlay.open { display: flex; animation: overlay-in 0.18s ease; }
+.overlay.open .modal { animation: modal-in 0.2s ease-out; }
+.overlay.closing { display: flex; animation: overlay-out 0.16s ease forwards; }
+.overlay.closing .modal { animation: modal-out 0.16s ease forwards; }
 .modal { background: var(--navy-2); border-radius: 18px; padding: 30px; max-width: 420px; width: 100%; position: relative; }
 .modal h2 { font-family: 'Fraunces', serif; font-weight: 560; font-size: 24px; margin: 0 0 8px; }
 .modal p.desc { color: var(--paper-dim); font-size: 14px; margin: 0 0 20px; }

@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { useI18n } from "../lib/i18n.jsx";
 
 const CONTACT = "contact@relief.lu";
@@ -586,12 +587,23 @@ const CONTENT = {
 export default function LegalModal({ type, onClose }) {
   const { lang, setLang } = useI18n();
   const content = (CONTENT[lang] || CONTENT.fr)[type];
+  const [closing, setClosing] = useState(false);
   if (!content) return null;
 
+  // Laisse l'animation de sortie (CSS, voir .overlay.closing dans
+  // index.css) jouer avant de retirer réellement la fenêtre du DOM — sans
+  // ça, onClose() démonte le composant instantanément et rien ne peut
+  // s'animer. Le délai doit rester synchronisé avec la durée CSS (160ms).
+  function requestClose() {
+    if (closing) return;
+    setClosing(true);
+    setTimeout(onClose, 160);
+  }
+
   return (
-    <div className="overlay open" onClick={(e) => e.target === e.currentTarget && onClose()}>
+    <div className={`overlay ${closing ? "closing" : "open"}`} onClick={(e) => e.target === e.currentTarget && requestClose()}>
       <div className="modal" style={{ maxWidth: 560, maxHeight: "80vh", overflowY: "auto" }}>
-        <button className="close" onClick={onClose}>
+        <button className="close" onClick={requestClose}>
           ✕
         </button>
         {/* Le sélecteur de langue du header est caché derrière cette modale (overlay
