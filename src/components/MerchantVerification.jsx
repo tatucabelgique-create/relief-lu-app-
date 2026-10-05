@@ -49,6 +49,9 @@ export default function MerchantVerification() {
           <p className="page-sub" style={{ margin: "4px 0" }}>
             {m.phone || "Pas de téléphone"} — {m.registration_number || "Pas de n° RCS"}
           </p>
+          <p className="page-sub" style={{ margin: "4px 0", color: m.stripe_account_id ? "var(--sage)" : "var(--honey)" }}>
+            {m.stripe_account_id ? "✓ Compte Stripe connecté" : "⚠ Pas encore de compte Stripe — ventes non reversées automatiquement"}
+          </p>
           <button className="btn small" disabled={busyId === m.id} onClick={() => toggle(m.id, true)}>
             {busyId === m.id ? "…" : "Approuver"}
           </button>
@@ -62,6 +65,9 @@ export default function MerchantVerification() {
           <strong>{m.business_name}</strong>
           <p className="page-sub" style={{ margin: "4px 0" }}>
             {[m.address, m.city].filter(Boolean).join(", ")}
+          </p>
+          <p className="page-sub" style={{ margin: "4px 0", color: m.stripe_account_id ? "var(--sage)" : "var(--honey)" }}>
+            {m.stripe_account_id ? "✓ Compte Stripe connecté" : "⚠ Pas encore de compte Stripe — ventes non reversées automatiquement"}
           </p>
           <button className="btn secondary small" disabled={busyId === m.id} onClick={() => toggle(m.id, false)}>
             {busyId === m.id ? "…" : "Suspendre"}
