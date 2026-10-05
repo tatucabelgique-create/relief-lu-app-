@@ -11,6 +11,17 @@
   --sage: #7FA88C;
   --red: #D9694F;
 }
+/* Retire le flash gris par défaut au tap sur mobile — remplacé par les
+   états :active ajoutés ci-dessous, sélecteur par sélecteur. */
+button, a, .card, .bottom-nav-item {
+  -webkit-tap-highlight-color: transparent;
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    transition-duration: 0.001ms !important;
+  }
+}
 * { box-sizing: border-box; }
 body {
   margin: 0;
@@ -67,7 +78,9 @@ h1.page-title {
 .card {
   background: var(--navy-2); border-radius: 18px; overflow: hidden; display: flex; flex-direction: column;
   flex-shrink: 0; border: 1px solid rgba(239,230,211,0.08); box-shadow: 0 2px 8px rgba(0,0,0,0.18);
+  transition: transform 0.1s ease;
 }
+.card:active { transform: scale(0.985); }
 .card .thumb {
   height: 150px; flex-shrink: 0; background: var(--navy-3) center/cover no-repeat;
   display: flex; align-items: center; justify-content: center; font-size: 34px;
@@ -91,9 +104,12 @@ h1.page-title {
 .btn {
   background: var(--honey); color: var(--navy); border: none;
   font-weight: 700; font-size: 14px; padding: 10px 18px; border-radius: 100px;
+  transition: transform 0.1s ease, background-color 0.15s ease;
 }
 .btn:hover { background: #f0b862; }
+.btn:active { background: #d6922f; transform: scale(0.97); }
 .btn.secondary { background: transparent; border: 1px solid rgba(239,230,211,0.3); color: var(--paper); }
+.btn.secondary:active { background: rgba(239,230,211,0.1); }
 .btn.small { padding: 8px 14px; font-size: 13px; }
 .btn:disabled { opacity: 0.5; cursor: not-allowed; }
 .empty {
@@ -101,8 +117,9 @@ h1.page-title {
   font-family: 'IBM Plex Mono', monospace; font-size: 14px;
 }
 
-.favorite-btn-inline { background: none; border: none; font-size: 17px; color: var(--paper-dim); line-height: 1; }
+.favorite-btn-inline { background: none; border: none; font-size: 17px; color: var(--paper-dim); line-height: 1; transition: transform 0.1s ease; }
 .favorite-btn-inline.active { color: var(--red); }
+.favorite-btn-inline:active { transform: scale(0.8); }
 .merchant-logo {
   position: absolute; bottom: 10px; left: 10px; width: 34px; height: 34px;
   border-radius: 100%; overflow: hidden; background: var(--paper);
@@ -173,8 +190,10 @@ h1.page-title {
 .qty-stepper button {
   width: 30px; height: 30px; border-radius: 50%; border: 1px solid rgba(239,230,211,0.25);
   background: none; color: var(--paper); font-size: 16px; line-height: 1; cursor: pointer;
+  transition: background-color 0.15s ease;
 }
 .qty-stepper button:disabled { opacity: 0.35; cursor: default; }
+.qty-stepper button:active { background: rgba(239,230,211,0.14); }
 .qty-stepper span { min-width: 16px; text-align: center; color: var(--paper); font-weight: 600; }
 .code-box {
   background: var(--navy); border: 2px dashed var(--honey); border-radius: 12px;
@@ -190,8 +209,10 @@ h1.page-title {
 .tabs button {
   background: var(--navy-2); border: 1px solid rgba(239,230,211,0.15); color: var(--paper-dim);
   padding: 10px 18px; border-radius: 100px; font-size: 14px; font-weight: 600;
+  transition: opacity 0.15s ease;
 }
 .tabs button.active { background: var(--honey); color: var(--navy); border-color: var(--honey); }
+.tabs button:active { opacity: 0.75; }
 .panel { background: var(--navy-2); border-radius: 16px; padding: 26px; margin-bottom: 20px; }
 .panel h2 { font-family: 'Fraunces', serif; font-weight: 560; font-size: 22px; margin: 0 0 16px; }
 .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
@@ -252,7 +273,9 @@ h1.page-title {
   width: 44px; height: 44px; border-radius: 50%; background: var(--navy-2);
   border: none; display: flex; align-items: center; justify-content: center;
   flex-shrink: 0; font-size: 17px;
+  transition: transform 0.1s ease;
 }
+.browse-locate-btn:active { transform: scale(0.9); }
 .browse-chip-row { display: flex; gap: 8px; overflow-x: auto; }
 .browse-chip-row select {
   background: var(--navy-2); color: var(--paper); border: none; border-radius: 100px;
@@ -290,7 +313,9 @@ h1.page-title {
   background: var(--honey); color: var(--navy); border: none;
   border-radius: 100px; padding: 13px 24px; font-weight: 700; font-size: 15px;
   display: flex; align-items: center; gap: 8px; box-shadow: 0 6px 20px rgba(0,0,0,0.45); z-index: 5;
+  transition: transform 0.1s ease;
 }
+.browse-map-fab:active { transform: translateX(-50%) scale(0.95); }
 .browse-sheet-handle {
   width: 100%; padding: 10px 0 2px; display: flex; justify-content: center;
   background: none; border: none;
@@ -367,8 +392,10 @@ h1.page-title {
   flex: 1; display: flex; flex-direction: column; align-items: center; gap: 3px;
   background: none; border: none; color: var(--paper-dim);
   font-size: 11px; font-weight: 600; padding: 6px 4px; border-radius: 10px;
+  transition: opacity 0.15s ease;
 }
 .bottom-nav-item.active { color: var(--honey); }
+.bottom-nav-item:active { opacity: 0.55; }
 body { padding-bottom: 78px; }
 
 /* Bandeau discret d'invitation à l'installation PWA — au-dessus de la
@@ -408,8 +435,10 @@ body { padding-bottom: 78px; }
   width: 38px; height: 38px; border-radius: 100%; border: none;
   background: rgba(22,35,44,0.55); color: var(--paper); font-size: 17px;
   display: flex; align-items: center; justify-content: center; backdrop-filter: blur(4px);
+  transition: transform 0.1s ease, background-color 0.15s ease;
 }
 .icon-circle.active { color: var(--red); }
+.icon-circle:active { background: rgba(22,35,44,0.8); transform: scale(0.9); }
 .bag-detail-hero-bottom {
   display: flex; flex-direction: column; gap: 10px;
   background: linear-gradient(0deg, rgba(0,0,0,0.55), transparent 80%);
@@ -419,7 +448,9 @@ body { padding-bottom: 78px; }
 .chip-pill {
   background: rgba(22,35,44,0.6); color: var(--paper); backdrop-filter: blur(4px);
   padding: 4px 10px; border-radius: 100px; font-size: 11px; font-weight: 600;
+  transition: opacity 0.15s ease;
 }
+.chip-pill:active { opacity: 0.65; }
 .bag-detail-merchant { display: flex; align-items: center; gap: 10px; }
 .bag-detail-merchant b { color: #fff; font-size: 17px; font-family: 'Fraunces', serif; font-weight: 560; }
 
@@ -442,7 +473,9 @@ body { padding-bottom: 78px; }
 .chip-pill-outline {
   border: 1px solid rgba(239,230,211,0.25); color: var(--paper-dim);
   padding: 3px 9px; border-radius: 100px; font-size: 11px; font-weight: 600;
+  transition: opacity 0.15s ease;
 }
+.chip-pill-outline:active { opacity: 0.65; }
 .payment-chip-paid { border-color: rgba(127,168,140,0.4); color: var(--sage); }
 .payment-chip-pending { border-color: rgba(232,163,61,0.4); color: var(--honey); }
 .payment-chip-failed { border-color: rgba(217,105,79,0.4); color: var(--red); }
