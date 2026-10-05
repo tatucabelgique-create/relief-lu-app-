@@ -116,7 +116,7 @@ export default function BagCard({ bag, onReserve, onToggleFavorite, isFavorite, 
             {soldOut ? t("badge.soldOut") : t("reserve")}
           </button>
         </div>
-        <div className="co2-pill">🌍 ~{CO2_KG_PER_BAG} {t("badge.co2Suffix")}</div>
+        <div className="pill-base co2-pill">🌍 ~{CO2_KG_PER_BAG} {t("badge.co2Suffix")}</div>
       </div>
     </div>
   );
