@@ -75,10 +75,18 @@ h1.page-title {
   display: grid; grid-template-columns: repeat(auto-fill, minmax(240px,1fr));
   gap: 20px; padding-bottom: 60px;
 }
+/* Léger fondu + glissement à l'apparition d'une carte — ne rejoue qu'au
+   montage réel du nœud DOM (clé bag.id), pas à chaque re-render (countdown,
+   refresh favoris), donc ne clignote pas en continu. */
+@keyframes card-in {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
 .card {
   background: var(--navy-2); border-radius: 18px; overflow: hidden; display: flex; flex-direction: column;
   flex-shrink: 0; border: 1px solid rgba(239,230,211,0.08); box-shadow: 0 2px 8px rgba(0,0,0,0.18);
   transition: transform 0.1s ease;
+  animation: card-in 0.28s ease-out;
 }
 .card:active { transform: scale(0.985); }
 .card .thumb {
@@ -426,9 +434,16 @@ body { padding-bottom: 78px; }
 }
 
 /* Page détail d'un sachet, ouverte en plein écran par-dessus le reste. */
+/* La fiche sachet glisse depuis le bas à l'ouverture, façon feuille mobile,
+   plutôt que d'apparaître d'un coup. */
+@keyframes sheet-up {
+  from { transform: translateY(100%); }
+  to { transform: translateY(0); }
+}
 .bag-detail {
   position: fixed; inset: 0; z-index: 60; background: var(--navy);
   overflow-y: auto; padding-bottom: 90px;
+  animation: sheet-up 0.25s ease-out;
 }
 .bag-detail-hero {
   height: 260px; background: var(--navy-3) center/cover no-repeat; position: relative;
