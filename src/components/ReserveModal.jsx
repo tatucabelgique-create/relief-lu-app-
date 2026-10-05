@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useI18n } from "../lib/i18n.jsx";
 import { reserveBag } from "../lib/reservations";
-import { createCheckoutSession } from "../lib/payments";
+import { createCheckoutSession, arePaymentsLive } from "../lib/payments";
 import { formatPickupWindow, isToday, isTomorrow } from "./BagCard.jsx";
 import AuthPrompt from "./AuthPrompt.jsx";
 import { notifyEngaged } from "./InstallPrompt.jsx";
@@ -12,6 +12,10 @@ export default function ReserveModal({ bag, user, onClose, onReserved }) {
   const [qty, setQty] = useState(1);
   const [error, setError] = useState("");
   const [redirecting, setRedirecting] = useState(false);
+  // Démarre bloqué (fail-closed) : mieux vaut un très bref flash du message
+  // "bientôt disponible" le temps du fetch, que risquer d'autoriser un clic
+  // avant d'avoir confirmé que les paiements sont réellement en mode live.
+  const [paymentsLive, setPaymentsLive] = useState(false);
 
   // Ce composant reste monté en permanence (bag passe de null à un sachet à
   // l'ouverture, voir PublicView) — un simple useEffect au montage ne
@@ -22,6 +26,14 @@ export default function ReserveModal({ bag, user, onClose, onReserved }) {
   useEffect(() => {
     if (bag) notifyEngaged();
   }, [bag]);
+
+  // Vérifié une fois au montage (flag global, pas lié à un sachet précis) —
+  // voir arePaymentsLive() dans payments.js : tant que le compte Stripe
+  // n'est pas en mode live, on bloque ici plutôt que de laisser un client
+  // atteindre un Checkout qui refusera sa vraie carte.
+  useEffect(() => {
+    arePaymentsLive().then(setPaymentsLive);
+  }, []);
 
   if (!bag) return null;
 
@@ -39,6 +51,7 @@ export default function ReserveModal({ bag, user, onClose, onReserved }) {
   // l'étape suivante ; le code de retrait n'est montré qu'après paiement
   // confirmé (voir PaymentResult.jsx, appelé par App.jsx via ?paid=1).
   async function handleConfirm() {
+    if (!paymentsLive) return; // double sécurité, le bouton est déjà masqué dans ce cas
     setError("");
     setRedirecting(true);
     try {
@@ -93,9 +106,15 @@ export default function ReserveModal({ bag, user, onClose, onReserved }) {
               <b className="figures">{total} €</b>
             </div>
 
-            <button className="btn" onClick={handleConfirm} disabled={redirecting}>
-              {redirecting ? t("reserve.redirecting") : t("reserve.confirm")}
-            </button>
+            {paymentsLive ? (
+              <button className="btn" onClick={handleConfirm} disabled={redirecting}>
+                {redirecting ? t("reserve.redirecting") : t("reserve.confirm")}
+              </button>
+            ) : (
+              <p className="page-sub" style={{ textAlign: "center" }}>
+                {t("reserve.paymentsComingSoon")}
+              </p>
+            )}
             {error && <p className="error-msg">{error}</p>}
           </div>
         )}
