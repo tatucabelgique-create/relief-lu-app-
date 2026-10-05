@@ -4,6 +4,7 @@ import { loadMerchantBags, publishBag, uploadBagPhoto } from "../lib/bags";
 import { getRecentSoldCount } from "../lib/merchantStats";
 import { notifyNewBag } from "../lib/notify";
 import { getErrorMessage } from "../lib/auth";
+import { arePaymentsLive } from "../lib/payments";
 import MerchantLogoUpload from "./MerchantLogoUpload.jsx";
 import MerchantStats from "./MerchantStats.jsx";
 import MerchantBagRow from "./MerchantBagRow.jsx";
@@ -45,11 +46,20 @@ export default function MerchantDashboard({ user, merchant, onMerchantChanged })
   // même d'avoir construit une base de clients fidèles à -70%. NULL = désactivé,
   // toujours -70% suggéré.
   const [recentSoldCount, setRecentSoldCount] = useState(0);
+  // Démarre à true (pas de bandeau tant qu'on n'a pas confirmé le contraire)
+  // — contrairement à ReserveModal, ici un faux négatif temporaire n'a pas
+  // de conséquence grave (c'est juste un message d'info pour le commerçant,
+  // pas un garde-fou de paiement), donc pas besoin du fail-closed.
+  const [paymentsLive, setPaymentsLive] = useState(true);
 
   async function refreshMyBags() {
     setMyBags(await loadMerchantBags(user.id));
     setStatsKey((k) => k + 1);
   }
+
+  useEffect(() => {
+    arePaymentsLive().then(setPaymentsLive);
+  }, []);
 
   useEffect(() => {
     refreshMyBags();
@@ -186,6 +196,13 @@ export default function MerchantDashboard({ user, merchant, onMerchantChanged })
 
   return (
     <>
+      {!paymentsLive && (
+        <div className="panel" style={{ background: "rgba(232,163,61,0.14)", border: "1px solid rgba(232,163,61,0.3)" }}>
+          <p className="page-sub" style={{ margin: 0, color: "var(--paper)" }}>
+            {t("merchant.paymentsNotLive")}
+          </p>
+        </div>
+      )}
       <div className="panel">
         <MerchantStats merchantId={user.id} refreshKey={statsKey} />
       </div>
