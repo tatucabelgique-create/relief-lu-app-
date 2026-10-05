@@ -4,6 +4,7 @@ import MarketingPush from "./MarketingPush.jsx";
 import DailyReminderToggle from "./DailyReminderToggle.jsx";
 import MerchantVerification from "./MerchantVerification.jsx";
 import MerchantBilling from "./MerchantBilling.jsx";
+import NotificationToggle from "./NotificationToggle.jsx";
 import { supabase } from "../lib/supabase";
 import { ADMIN_EMAIL } from "../lib/admin";
 
@@ -154,6 +155,13 @@ export default function AdminView({ user }) {
   return (
     <div>
       <h1 className="page-title">Admin</h1>
+      <div className="panel">
+        <h2>Notifications admin</h2>
+        <p className="page-sub" style={{ marginBottom: 12 }}>
+          Active les notifications pour être prévenu directement sur cet appareil à chaque nouvelle inscription commerçant.
+        </p>
+        <NotificationToggle user={user} />
+      </div>
       <MerchantVerification />
       <MerchantBilling />
       <MarketingPush />
