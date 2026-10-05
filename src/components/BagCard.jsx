@@ -62,11 +62,11 @@ export default function BagCard({ bag, onReserve, onToggleFavorite, isFavorite, 
     >
       <div className="thumb" style={bag.image_url ? { backgroundImage: `url('${bag.image_url}')` } : undefined}>
         {!bag.image_url && "🥡"}
-        <div className={`badge-availability ${soldOut ? "badge-sold-out" : ""} ${sellingFast ? "badge-selling-fast" : ""}`}>
+        <div className={`pill-base badge-availability ${soldOut ? "badge-sold-out" : ""} ${sellingFast ? "badge-selling-fast" : ""}`}>
           {soldOut ? t("badge.soldOut") : sellingFast ? t("badge.sellingFast") : `${bag.quantity_left} ${t("badge.available")}`}
         </div>
         {rating && (
-          <div className="badge-rating">
+          <div className="pill-base badge-rating">
             ★ {rating.avg.toFixed(1)}
           </div>
         )}

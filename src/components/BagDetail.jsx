@@ -103,7 +103,7 @@ export default function BagDetail({ bag, rating, isFavorite, onToggleFavorite, o
         </div>
         <div className="bag-detail-hero-bottom">
           <div className="bag-detail-hero-badges">
-            <span className="badge-availability" style={{ position: "static" }}>
+            <span className="pill-base badge-availability" style={{ position: "static" }}>
               {bag.quantity_left} {t("badge.available")}
             </span>
             <span className="pill-base chip-pill">{t(`merchant.category.${bag.category}`)}</span>
