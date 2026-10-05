@@ -68,7 +68,7 @@ export default function MerchantBagRow({ bag, onChanged }) {
                     {r.pickup_code} · {r.quantity}x · {t(`status.${r.status}`)}
                   </span>
                   <span
-                    className={`chip-pill-outline payment-chip-${r.payment_status}`}
+                    className={`pill-base chip-pill-outline payment-chip-${r.payment_status}`}
                     style={{ display: "inline-block", width: "fit-content", marginTop: 6 }}
                   >
                     {t(`payment.status.${r.payment_status}`)}

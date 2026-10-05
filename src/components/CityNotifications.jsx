@@ -46,7 +46,7 @@ export default function CityNotifications({ user }) {
         {LUXEMBOURG_CITIES.map((city) => (
           <button
             key={city}
-            className={`chip-pill-outline${cities.has(city) ? " active" : ""}`}
+            className={`pill-base chip-pill-outline${cities.has(city) ? " active" : ""}`}
             style={{
               cursor: "pointer",
               border: "1px solid rgba(239,230,211,0.3)",

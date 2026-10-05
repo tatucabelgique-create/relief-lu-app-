@@ -70,8 +70,8 @@ export default function ReserveModal({ bag, user, onClose, onReserved }) {
             )}
 
             <div className="reserve-time-row">
-              {isToday(bag.pickup_start) && <span className="chip-pill-outline">{t("bagDetail.today")}</span>}
-              {isTomorrow(bag.pickup_start) && <span className="chip-pill-outline">{t("bagDetail.tomorrow")}</span>}
+              {isToday(bag.pickup_start) && <span className="pill-base chip-pill-outline">{t("bagDetail.today")}</span>}
+              {isTomorrow(bag.pickup_start) && <span className="pill-base chip-pill-outline">{t("bagDetail.tomorrow")}</span>}
               <span className="reserve-time-badge figures">{formatPickupWindow(bag.pickup_start, bag.pickup_end, lang)}</span>
             </div>
 

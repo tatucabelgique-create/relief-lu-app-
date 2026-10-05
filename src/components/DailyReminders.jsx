@@ -60,7 +60,7 @@ export default function DailyReminders({ user }) {
         {DAYS.map(({ iso, key }) => (
           <button
             key={iso}
-            className={`chip-pill-outline${days.has(iso) ? " active" : ""}`}
+            className={`pill-base chip-pill-outline${days.has(iso) ? " active" : ""}`}
             style={{
               cursor: "pointer",
               border: "1px solid rgba(239,230,211,0.3)",

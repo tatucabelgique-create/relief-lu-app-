@@ -133,10 +133,10 @@ export default function BagDetail({ bag, rating, isFavorite, onToggleFavorite, o
             🕒 {t("pickupWindow")} {formatPickupWindow(bag.pickup_start, bag.pickup_end, lang)}
             {distanceKm != null && <> · {distanceKm.toFixed(1)} km</>}
           </span>
-          {isToday(bag.pickup_start) && <span className="chip-pill-outline">{t("bagDetail.today")}</span>}
-          {isTomorrow(bag.pickup_start) && <span className="chip-pill-outline">{t("bagDetail.tomorrow")}</span>}
-          {bag.vegan && <span className="chip-pill-outline">🌿 {t("diet.vegan")}</span>}
-          {!bag.vegan && bag.vegetarian && <span className="chip-pill-outline">🌱 {t("diet.vegetarian")}</span>}
+          {isToday(bag.pickup_start) && <span className="pill-base chip-pill-outline">{t("bagDetail.today")}</span>}
+          {isTomorrow(bag.pickup_start) && <span className="pill-base chip-pill-outline">{t("bagDetail.tomorrow")}</span>}
+          {bag.vegan && <span className="pill-base chip-pill-outline">🌿 {t("diet.vegan")}</span>}
+          {!bag.vegan && bag.vegetarian && <span className="pill-base chip-pill-outline">🌱 {t("diet.vegetarian")}</span>}
         </div>
 
         {address && onOpenMerchant && (
@@ -188,7 +188,7 @@ export default function BagDetail({ bag, rating, isFavorite, onToggleFavorite, o
         <p className="page-sub" style={{ marginBottom: 10 }}>{t(`bagDetail.about.${bag.category || "autre"}`)}</p>
         <p className="page-sub" style={{ marginBottom: 10 }}>👉 {t("bagDetail.about.surprise")}</p>
         <p className="page-sub" style={{ marginBottom: 12 }}>💡 {t("bagDetail.about.fact")}</p>
-        <span className="chip-pill-outline">{t(`merchant.category.${bag.category || "autre"}`)}</span>
+        <span className="pill-base chip-pill-outline">{t(`merchant.category.${bag.category || "autre"}`)}</span>
 
         {rating?.criteria && Object.keys(rating.criteria).length > 0 && (
           <>

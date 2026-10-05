@@ -39,7 +39,7 @@ export default function StripeConnectPanel({ merchant }) {
         {connected ? t("merchant.stripe.connectedDesc") : t("merchant.stripe.pendingDesc")}
       </p>
       {connected ? (
-        <span className="chip-pill-outline">✓ {t("merchant.stripe.connected")}</span>
+        <span className="pill-base chip-pill-outline">✓ {t("merchant.stripe.connected")}</span>
       ) : (
         <button className="btn small" onClick={handleConnect} disabled={loading}>
           {loading ? t("merchant.stripe.redirecting") : t("merchant.stripe.connect")}

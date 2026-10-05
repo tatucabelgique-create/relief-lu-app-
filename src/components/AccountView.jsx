@@ -42,8 +42,8 @@ export default function AccountView({ user }) {
                     {r.bags?.merchants?.business_name} · {formatPickupWindow(r.bags?.pickup_start, r.bags?.pickup_end, lang)}
                   </span>
                   <div style={{ display: "flex", gap: 6, flexWrap: "wrap", marginTop: 6 }}>
-                    <span className="chip-pill-outline">{t(`status.${r.status}`)}</span>
-                    <span className={`chip-pill-outline payment-chip-${r.payment_status}`}>{t(`payment.status.${r.payment_status}`)}</span>
+                    <span className="pill-base chip-pill-outline">{t(`status.${r.status}`)}</span>
+                    <span className={`pill-base chip-pill-outline payment-chip-${r.payment_status}`}>{t(`payment.status.${r.payment_status}`)}</span>
                   </div>
                   {r.payment_status === "paid" && r.status === "confirmed" && (
                     <span className="page-sub" style={{ fontWeight: 700, display: "block", marginTop: 6 }}>

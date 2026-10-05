@@ -479,7 +479,6 @@ body { padding-bottom: 78px; }
 .bag-detail-row { color: var(--paper-dim); font-size: 14px; margin-bottom: 4px; display: flex; align-items: center; gap: 8px; }
 .chip-pill-outline {
   border: 1px solid rgba(239,230,211,0.25); color: var(--paper-dim);
-  padding: 3px 9px; border-radius: 100px; font-size: 11px; font-weight: 600;
   transition: opacity 0.15s ease;
 }
 .chip-pill-outline:active { opacity: 0.65; }
