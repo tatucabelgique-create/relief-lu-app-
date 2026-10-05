@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useI18n } from "../lib/i18n.jsx";
+import { displayPriceCents } from "../lib/pricing.js";
 
 // Même estimation que la bannière d'impact globale (lib/impact.js) — reprise
 // ici pour l'afficher sachet par sachet, comme le fait LastBite.
@@ -102,7 +103,7 @@ export default function BagCard({ bag, onReserve, onToggleFavorite, isFavorite, 
         <div className="row" style={{ marginTop: 10 }}>
           <span>
             {hasDiscount && <span className="price-original">{(bag.original_price_cents / 100).toFixed(2)} €</span>}
-            <span className="price">{(bag.price_cents / 100).toFixed(2)} €</span>
+            <span className="price">{(displayPriceCents(bag.price_cents) / 100).toFixed(2)} €</span>
           </span>
           <button
             className="btn small"

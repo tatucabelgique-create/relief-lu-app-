@@ -5,17 +5,13 @@ import { createCheckoutSession } from "../lib/payments";
 import { formatPickupWindow, isToday, isTomorrow } from "./BagCard.jsx";
 import AuthPrompt from "./AuthPrompt.jsx";
 import { notifyEngaged } from "./InstallPrompt.jsx";
-
-// Frais de service fixes côté acheteur — doit rester synchronisé avec
-// SERVICE_FEE_CENTS dans supabase/functions/create-checkout-session/index.ts.
-const SERVICE_FEE = 0.5;
+import { displayPriceCents } from "../lib/pricing.js";
 
 export default function ReserveModal({ bag, user, onClose, onReserved }) {
   const { lang, t } = useI18n();
   const [qty, setQty] = useState(1);
   const [error, setError] = useState("");
   const [redirecting, setRedirecting] = useState(false);
-  const [showFeeInfo, setShowFeeInfo] = useState(false);
 
   // Ce composant reste monté en permanence (bag passe de null à un sachet à
   // l'ouverture, voir PublicView) — un simple useEffect au montage ne
@@ -25,13 +21,13 @@ export default function ReserveModal({ bag, user, onClose, onReserved }) {
   // d'engagement doit s'y déclencher.
   useEffect(() => {
     if (bag) notifyEngaged();
-    setShowFeeInfo(false);
   }, [bag]);
 
   if (!bag) return null;
 
-  const subtotal = (bag.price_cents * qty) / 100;
-  const total = (subtotal + SERVICE_FEE).toFixed(2);
+  // Le prix affiché au client intègre déjà les frais de service (voir
+  // pricing.js) — il n'y a pas de ligne séparée à montrer, juste ce total.
+  const total = ((displayPriceCents(bag.price_cents) * qty) / 100).toFixed(2);
   const maxQty = Math.max(1, bag.quantity_left ?? 1);
 
   function changeQty(delta) {
@@ -91,42 +87,6 @@ export default function ReserveModal({ bag, user, onClose, onReserved }) {
                 </button>
               </div>
             </div>
-
-            <div className="reserve-row">
-              <span>{t("reserve.subtotal")}</span>
-              <span className="figures">{subtotal.toFixed(2)} €</span>
-            </div>
-
-            <div className="reserve-row">
-              <span style={{ display: "flex", alignItems: "center", gap: 6 }}>
-                {t("reserve.serviceFee")}
-                <button
-                  type="button"
-                  onClick={() => setShowFeeInfo((v) => !v)}
-                  aria-label={t("reserve.serviceFeeInfo")}
-                  style={{
-                    background: "none",
-                    border: "1px solid rgba(239,230,211,0.4)",
-                    borderRadius: "50%",
-                    width: 16,
-                    height: 16,
-                    fontSize: 11,
-                    lineHeight: "14px",
-                    padding: 0,
-                    cursor: "pointer",
-                    color: "inherit",
-                  }}
-                >
-                  i
-                </button>
-              </span>
-              <span className="figures">{SERVICE_FEE.toFixed(2)} €</span>
-            </div>
-            {showFeeInfo && (
-              <p className="field-hint" style={{ marginTop: -8, marginBottom: 8 }}>
-                {t("reserve.serviceFeeInfo")}
-              </p>
-            )}
 
             <div className="reserve-row reserve-total">
               <span>{t("reserve.total")}</span>

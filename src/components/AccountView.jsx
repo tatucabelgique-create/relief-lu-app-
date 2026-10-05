@@ -4,6 +4,7 @@ import { getMyReservations } from "../lib/reservations";
 import { formatPickupWindow } from "./BagCard.jsx";
 import AuthPrompt from "./AuthPrompt.jsx";
 import ReviewForm from "./ReviewForm.jsx";
+import { displayPriceCents } from "../lib/pricing.js";
 
 export default function AccountView({ user }) {
   const { lang, t } = useI18n();
@@ -61,7 +62,7 @@ export default function AccountView({ user }) {
                       </button>
                     ))}
                 </div>
-                <div className="price">{((r.bags?.price_cents || 0) / 100).toFixed(2)} €</div>
+                <div className="price">{(displayPriceCents(r.bags?.price_cents || 0) / 100).toFixed(2)} €</div>
               </div>
             );
           })}

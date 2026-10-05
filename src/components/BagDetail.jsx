@@ -4,6 +4,7 @@ import { useI18n } from "../lib/i18n.jsx";
 import { formatPickupWindow, isToday, isTomorrow } from "./BagCard.jsx";
 import { merchantMarkerIcon } from "../lib/leafletIcon";
 import { notifyEngaged } from "./InstallPrompt.jsx";
+import { displayPriceCents } from "../lib/pricing.js";
 
 // Icône "Share2" de Lucide (trois points reliés) — même icône que celle
 // utilisée pour "Partager" dans tatuca, pour rester cohérent entre les apps.
@@ -281,7 +282,7 @@ export default function BagDetail({ bag, rating, isFavorite, onToggleFavorite, o
       <div className="bag-detail-sticky">
         <span>
           {hasDiscount && <span className="price-original">{(bag.original_price_cents / 100).toFixed(2)} €</span>}
-          <span className="price">{(bag.price_cents / 100).toFixed(2)} €</span>
+          <span className="price">{(displayPriceCents(bag.price_cents) / 100).toFixed(2)} €</span>
         </span>
         <button className="btn" disabled={soldOut} onClick={() => !soldOut && onReserve(bag)}>
           {soldOut ? t("badge.soldOut") : t("reserve")}
