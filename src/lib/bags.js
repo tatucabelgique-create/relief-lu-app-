@@ -1,5 +1,25 @@
 import { supabase } from "./supabase";
 
+// Met en avant un commerçant vérifié qui vient de rejoindre relief.lu mais
+// n'a encore publié aucun sachet (ex. pendant qu'on prépare son lancement) —
+// pas de "NOT EXISTS" simple côté client Supabase, donc on récupère les
+// commerçants vérifiés puis on exclut ceux qui ont déjà au moins un sachet
+// (tous statuts confondus). Volume attendu faible à ce stade du projet.
+export async function loadNewMerchantsWithoutBags() {
+  const { data: merchants, error: merchErr } = await supabase
+    .from("merchants")
+    .select("id, business_name, city, logo_url")
+    .eq("verified", true);
+  if (merchErr) throw merchErr;
+  if (!merchants?.length) return [];
+
+  const { data: bagRows, error: bagErr } = await supabase.from("bags").select("merchant_id");
+  if (bagErr) throw bagErr;
+  const withBags = new Set((bagRows ?? []).map((b) => b.merchant_id));
+
+  return merchants.filter((m) => !withBags.has(m.id));
+}
+
 export async function loadActiveBags() {
   // pickup_end dans le futur : un sachet dont le créneau de retrait est
   // dépassé n'a plus de sens à afficher/réserver, récurrent ou non — pour

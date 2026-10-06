@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { createPortal } from "react-dom";
 import { useI18n } from "../lib/i18n.jsx";
-import { loadActiveBags, loadSoldOutToday } from "../lib/bags";
+import { loadActiveBags, loadSoldOutToday, loadNewMerchantsWithoutBags } from "../lib/bags";
 import { getMerchantOrNull } from "../lib/merchants";
 import { haversineKm, loadSavedPosition, locate } from "../lib/geolocation";
 import { useFavorites } from "../lib/favorites";
@@ -36,10 +36,12 @@ export default function PublicView({ user, pendingReserveBagId, onPendingReserve
   const { favoriteIds, toggleFavorite } = useFavorites(user);
   const [ratings, setRatings] = useState({});
   const [soldOutToday, setSoldOutToday] = useState([]);
+  const [newMerchants, setNewMerchants] = useState([]);
 
   async function refresh() {
     setBags(await loadActiveBags());
     setSoldOutToday(await loadSoldOutToday());
+    setNewMerchants(await loadNewMerchantsWithoutBags());
   }
 
   useEffect(() => {
@@ -305,6 +307,22 @@ export default function PublicView({ user, pendingReserveBagId, onPendingReserve
 
           <ImpactBanner />
         </>
+      )}
+
+      {!compact && newMerchants.length > 0 && (
+        <div className="carousel-section">
+          <h2>{t("public.newMerchants")}</h2>
+          <div className="carousel-track">
+            {newMerchants.map((m) => (
+              <div className="new-merchant-card" key={m.id}>
+                {m.logo_url && <img src={m.logo_url} alt="" loading="lazy" />}
+                <div className="new-merchant-name">{m.business_name}</div>
+                <div className="page-sub" style={{ margin: "2px 0 10px" }}>{m.city}</div>
+                <span className="pill-base badge-availability" style={{ position: "static" }}>{t("public.comingSoon")}</span>
+              </div>
+            ))}
+          </div>
+        </div>
       )}
 
       {!compact && showCarousel && (
