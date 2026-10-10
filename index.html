@@ -516,29 +516,47 @@
     width:100vw; position:relative; left:50%; right:50%; margin-left:-50vw; margin-right:-50vw;
     padding-top:56px;
   }
-  .footer-inner{max-width:980px; margin:0 auto; padding:0 28px;}
+  .footer-inner{max-width:1240px; margin:0 auto; padding:0 40px;}
   .footer-wordmark{
     font-family:'Fraunces', serif; font-weight:680; letter-spacing:-0.02em;
-    font-size:clamp(52px, 11vw, 128px); line-height:0.9; color:var(--paper); margin:0 0 44px;
+    font-size:clamp(64px, 13vw, 168px); line-height:0.88; color:var(--paper); margin:0 0 48px;
+    text-align:center;
   }
   .footer-wordmark span{color:var(--honey);}
-  .footer-grid{
-    display:grid; grid-template-columns:repeat(3, 1fr); gap:32px;
-    padding-bottom:36px; border-bottom:1px solid rgba(239,230,211,0.12);
+
+  /* une seule ligne de catégories — chaque clic déplie son contenu vers le haut, juste au-dessus */
+  .footer-accordion{
+    position:relative; display:flex; flex-wrap:wrap; gap:36px;
+    padding-bottom:30px; border-bottom:1px solid rgba(239,230,211,0.12);
   }
-  .footer-col h4{
-    font-family:'Work Sans', sans-serif; font-size:12px; font-weight:700; letter-spacing:0.06em;
-    text-transform:uppercase; color:var(--honey); margin:0 0 14px;
+  .footer-acc-item{position:relative;}
+  .footer-acc-trigger{
+    background:none; border:none; cursor:pointer; padding:0;
+    font-family:'Work Sans', sans-serif; font-size:14.5px; font-weight:400;
+    color:var(--paper-dim); display:inline-flex; align-items:center; gap:6px;
   }
-  .footer-col{display:flex; flex-direction:column; gap:10px;}
-  .footer-col a, .footer-col button{
+  .footer-acc-trigger .chev{transition:transform 0.2s ease;}
+  .footer-acc-trigger:hover, .footer-acc-trigger[aria-expanded="true"]{color:var(--paper);}
+  .footer-acc-trigger[aria-expanded="true"] .chev{transform:rotate(180deg);}
+  .footer-acc-panel{
+    position:absolute; left:0; bottom:calc(100% + 16px);
+    background:var(--navy-3); border:1px solid rgba(239,230,211,0.14); border-radius:16px;
+    padding:20px 22px; min-width:240px; max-width:300px; max-height:320px; overflow-y:auto;
+    display:flex; flex-direction:column; gap:9px;
+    box-shadow:0 24px 50px rgba(0,0,0,0.4);
+    opacity:0; visibility:hidden; transform:translateY(10px); pointer-events:none;
+    transition:opacity 0.2s ease, transform 0.2s ease;
+    z-index:10;
+  }
+  .footer-acc-panel.wide{display:grid; grid-template-columns:1fr 1fr; gap:6px 18px; max-width:380px;}
+  .footer-acc-panel.open{opacity:1; visibility:visible; transform:translateY(0); pointer-events:auto;}
+  .footer-acc-panel a, .footer-acc-panel button{
     background:none; border:none; padding:0; text-align:left; cursor:pointer;
-    color:var(--paper-dim); text-decoration:none; font-size:14.5px; font-family:'Work Sans', sans-serif;
-    border-bottom:1px solid transparent; width:fit-content;
+    color:var(--paper-dim); text-decoration:none; font-size:14px; font-family:'Work Sans', sans-serif;
   }
-  .footer-col a:hover, .footer-col button:hover{color:var(--honey); border-color:var(--honey);}
+  .footer-acc-panel a:hover, .footer-acc-panel button:hover{color:var(--honey);}
   .footer-bottom{
-    display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:14px;
+    display:flex; align-items:center; justify-content:center; flex-wrap:wrap; gap:14px;
     padding:22px 0 30px;
   }
   .footer-bottom-logo{display:flex; align-items:center; gap:8px; color:var(--paper-dim); font-size:13px;}
@@ -550,7 +568,9 @@
   }
   .social-icon:hover{color:var(--honey); transform:translateY(-1px);}
   @media (max-width:640px){
-    .footer-grid{grid-template-columns:1fr 1fr; row-gap:32px;}
+    .footer-acc-panel{left:50%; transform:translateX(-50%) translateY(10px); max-width:calc(100vw - 48px);}
+    .footer-acc-panel.open{transform:translateX(-50%) translateY(0);}
+    .footer-bottom{justify-content:flex-start;}
   }
 
   @media (max-width:760px){
@@ -825,38 +845,53 @@
       <div class="footer-inner">
         <div class="footer-wordmark">relief<span>.lu</span></div>
 
-        <div class="footer-grid">
-          <div class="footer-col">
-            <h4 data-i18n="footer.legalHeading">Légal</h4>
-            <a href="app.html?legal=mentions" data-i18n="footer.mentions">Mentions légales</a>
-            <a href="app.html?legal=cguClients" data-i18n="footer.cguClients">CGU Clients</a>
-            <a href="app.html?legal=cguCommercants" data-i18n="footer.cguCommercants">CGU Commerçants</a>
-            <a href="app.html?legal=confidentialite" data-i18n="footer.confidentialite">Confidentialité</a>
-            <button type="button" id="cookie-manage-link" data-i18n="footer.cookies">Cookies</button>
+        <div class="footer-accordion" id="footer-accordion">
+          <div class="footer-acc-item">
+            <div class="footer-acc-panel" id="facc-panel-legal">
+              <a href="app.html?legal=mentions" data-i18n="footer.mentions">Mentions légales</a>
+              <a href="app.html?legal=cguClients" data-i18n="footer.cguClients">CGU Clients</a>
+              <a href="app.html?legal=cguCommercants" data-i18n="footer.cguCommercants">CGU Commerçants</a>
+              <a href="app.html?legal=confidentialite" data-i18n="footer.confidentialite">Confidentialité</a>
+              <button type="button" id="cookie-manage-link" data-i18n="footer.cookies">Cookies</button>
+            </div>
+            <button type="button" class="footer-acc-trigger" aria-expanded="false" aria-controls="facc-panel-legal" data-i18n="footer.legalHeading">
+              Légal
+              <svg class="chev" viewBox="0 0 24 24" width="12" height="12"><path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </button>
           </div>
 
-          <div class="footer-col">
-            <h4 data-i18n="footer.villesHeading">Villes</h4>
-            <button type="button" class="footer-city" data-lat="49.6116" data-lng="6.1319">Luxembourg-Ville</button>
-            <button type="button" class="footer-city" data-lat="49.6217" data-lng="6.0728">Strassen</button>
-            <button type="button" class="footer-city" data-lat="49.6167" data-lng="6.0500">Bertrange</button>
-            <button type="button" class="footer-city" data-lat="49.6262" data-lng="6.0225">Mamer</button>
-            <button type="button" class="footer-city" data-lat="49.6539" data-lng="5.9153">Steinfort</button>
-            <button type="button" class="footer-city" data-lat="49.4958" data-lng="5.9805">Esch-sur-Alzette</button>
-            <button type="button" class="footer-city" data-lat="49.5239" data-lng="5.8916">Differdange</button>
-            <button type="button" class="footer-city" data-lat="49.4797" data-lng="6.0868">Dudelange</button>
-            <button type="button" class="footer-city" data-lat="49.8479" data-lng="6.1044">Ettelbruck</button>
-            <button type="button" class="footer-city" data-lat="49.8679" data-lng="6.1594">Diekirch</button>
-            <button type="button" class="footer-city" data-lat="49.8114" data-lng="6.4222">Echternach</button>
-            <button type="button" class="footer-city" data-lat="49.6797" data-lng="6.4408">Grevenmacher</button>
+          <div class="footer-acc-item">
+            <div class="footer-acc-panel wide" id="facc-panel-villes">
+              <button type="button" class="footer-city" data-lat="49.6116" data-lng="6.1319">Luxembourg-Ville</button>
+              <button type="button" class="footer-city" data-lat="49.6217" data-lng="6.0728">Strassen</button>
+              <button type="button" class="footer-city" data-lat="49.6167" data-lng="6.0500">Bertrange</button>
+              <button type="button" class="footer-city" data-lat="49.6262" data-lng="6.0225">Mamer</button>
+              <button type="button" class="footer-city" data-lat="49.6539" data-lng="5.9153">Steinfort</button>
+              <button type="button" class="footer-city" data-lat="49.4958" data-lng="5.9805">Esch-sur-Alzette</button>
+              <button type="button" class="footer-city" data-lat="49.5239" data-lng="5.8916">Differdange</button>
+              <button type="button" class="footer-city" data-lat="49.4797" data-lng="6.0868">Dudelange</button>
+              <button type="button" class="footer-city" data-lat="49.8479" data-lng="6.1044">Ettelbruck</button>
+              <button type="button" class="footer-city" data-lat="49.8679" data-lng="6.1594">Diekirch</button>
+              <button type="button" class="footer-city" data-lat="49.8114" data-lng="6.4222">Echternach</button>
+              <button type="button" class="footer-city" data-lat="49.6797" data-lng="6.4408">Grevenmacher</button>
+            </div>
+            <button type="button" class="footer-acc-trigger" aria-expanded="false" aria-controls="facc-panel-villes" data-i18n="footer.villesHeading">
+              Villes
+              <svg class="chev" viewBox="0 0 24 24" width="12" height="12"><path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </button>
           </div>
 
-          <div class="footer-col">
-            <h4 data-i18n="footer.contactHeading">Contact</h4>
-            <a href="mailto:contact@relief.lu">contact@relief.lu</a>
-            <a href="app.html?view=merchant" data-i18n="nav.merchant">Inscrivez votre commerce</a>
-            <a href="paniers-anti-gaspi-luxembourg.html">Paniers anti-gaspi au Luxembourg</a>
-            <a href="gaspillage-alimentaire-luxembourg.html">Le gaspillage alimentaire au Luxembourg, en chiffres</a>
+          <div class="footer-acc-item">
+            <div class="footer-acc-panel" id="facc-panel-contact">
+              <a href="mailto:contact@relief.lu">contact@relief.lu</a>
+              <a href="app.html?view=merchant" data-i18n="nav.merchant">Inscrivez votre commerce</a>
+              <a href="paniers-anti-gaspi-luxembourg.html">Paniers anti-gaspi au Luxembourg</a>
+              <a href="gaspillage-alimentaire-luxembourg.html">Le gaspillage alimentaire au Luxembourg, en chiffres</a>
+            </div>
+            <button type="button" class="footer-acc-trigger" aria-expanded="false" aria-controls="facc-panel-contact" data-i18n="footer.contactHeading">
+              Contact
+              <svg class="chev" viewBox="0 0 24 24" width="12" height="12"><path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </button>
           </div>
         </div>
 
@@ -1302,6 +1337,39 @@
       if (panel.classList.contains('open')) positionPanel();
     });
     panel.querySelectorAll('a').forEach(a => a.addEventListener('click', closePanel));
+  })();
+
+  // Accordéon du footer — une seule ligne de catégories, chaque clic déplie son contenu vers le haut
+  (function(){
+    const accordion = document.getElementById('footer-accordion');
+    if (!accordion) return;
+    const items = Array.from(accordion.querySelectorAll('.footer-acc-item'));
+    function closeItem(item){
+      item.querySelector('.footer-acc-panel').classList.remove('open');
+      item.querySelector('.footer-acc-trigger').setAttribute('aria-expanded', 'false');
+    }
+    function openItem(item){
+      items.forEach(closeItem);
+      item.querySelector('.footer-acc-panel').classList.add('open');
+      item.querySelector('.footer-acc-trigger').setAttribute('aria-expanded', 'true');
+    }
+    items.forEach(function(item){
+      const trigger = item.querySelector('.footer-acc-trigger');
+      const panel = item.querySelector('.footer-acc-panel');
+      trigger.addEventListener('click', function(e){
+        e.stopPropagation();
+        if (panel.classList.contains('open')) closeItem(item); else openItem(item);
+      });
+    });
+    document.addEventListener('click', function(e){
+      if (!accordion.contains(e.target)) items.forEach(closeItem);
+    });
+    document.addEventListener('keydown', function(e){
+      if (e.key === 'Escape') items.forEach(closeItem);
+    });
+    accordion.querySelectorAll('.footer-acc-panel a').forEach(function(a){
+      a.addEventListener('click', function(){ items.forEach(closeItem); });
+    });
   })();
 
   // Compte à rebours jusqu'au lancement (15 octobre 2026, heure du Luxembourg).
