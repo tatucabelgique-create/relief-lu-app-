@@ -11,6 +11,9 @@ const COOLDOWN_MS = 14 * 24 * 60 * 60 * 1000; // 14 jours
 // quelqu'un qui ignore le bandeau une fois n'est pas forcément fermé à
 // l'idée plus tard. Le cooldown de 14 jours après un rejet explicite
 // évite juste d'insister à chaque sachet consulté.
+// Un filet de 9s (voir fallbackTimer) couvre le cas où il n'y a aucun
+// sachet à consulter (carte vide, démo, lancement) — sans ça le bandeau
+// ne se déclencherait jamais pour ces visiteurs.
 export default function InstallPrompt() {
   const { t } = useI18n();
   const [show, setShow] = useState(false);
@@ -28,12 +31,23 @@ export default function InstallPrompt() {
   useEffect(() => {
     if (isStandalone) return;
 
-    function handleEngaged() {
+    function tryShow() {
       const dismissedAt = localStorage.getItem(DISMISS_KEY);
       if (dismissedAt && Date.now() - parseInt(dismissedAt, 10) < COOLDOWN_MS) return;
       setShow(true);
     }
+
+    function handleEngaged() {
+      clearTimeout(fallbackTimer);
+      tryShow();
+    }
     window.addEventListener("relief:engaged", handleEngaged);
+
+    // Filet de sécurité : si aucun sachet n'est consultable (carte vide,
+    // démo, zone sans commerçant), "relief:engaged" ne se déclenche jamais
+    // et la bannière n'apparaîtrait sinon pas du tout. On la propose quand
+    // même après un peu de navigation, pour ne pas perdre ces visiteurs.
+    const fallbackTimer = setTimeout(tryShow, 9000);
 
     // preventDefault() empêche la mini-barre native de Chrome de s'afficher
     // en plus de notre propre bandeau — on garde l'événement pour le
@@ -51,6 +65,7 @@ export default function InstallPrompt() {
     window.addEventListener("appinstalled", handleInstalled);
 
     return () => {
+      clearTimeout(fallbackTimer);
       window.removeEventListener("relief:engaged", handleEngaged);
       window.removeEventListener("beforeinstallprompt", handleBeforeInstall);
       window.removeEventListener("appinstalled", handleInstalled);
