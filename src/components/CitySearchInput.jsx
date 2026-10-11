@@ -12,9 +12,17 @@ export default function CitySearchInput({ value, onChange, onSelectPlace, onKeyD
   const [highlighted, setHighlighted] = useState(-1);
   const debounceRef = useRef(null);
   const containerRef = useRef(null);
+  // Évite qu'une sélection ne rouvre la liste : selectSuggestion() change
+  // "value" via onChange(s.label), ce qui redéclencherait sinon une
+  // nouvelle recherche 300ms plus tard comme si l'utilisateur avait retapé.
+  const skipNextSearchRef = useRef(false);
 
   useEffect(() => {
     clearTimeout(debounceRef.current);
+    if (skipNextSearchRef.current) {
+      skipNextSearchRef.current = false;
+      return;
+    }
     if (!value?.trim() || value.trim().length < 2) {
       setSuggestions([]);
       setOpen(false);
@@ -22,8 +30,12 @@ export default function CitySearchInput({ value, onChange, onSelectPlace, onKeyD
     }
     debounceRef.current = setTimeout(async () => {
       const results = await searchPlaces(value);
-      setSuggestions(results);
-      setOpen(results.length > 0);
+      // Dédoublonne par libellé affiché — Photon renvoie parfois plusieurs
+      // entités distinctes (ville + gare + quartier...) avec le même nom.
+      const seen = new Set();
+      const unique = results.filter((r) => (seen.has(r.label) ? false : seen.add(r.label)));
+      setSuggestions(unique);
+      setOpen(unique.length > 0);
       setHighlighted(-1);
     }, 300);
     return () => clearTimeout(debounceRef.current);
@@ -40,6 +52,7 @@ export default function CitySearchInput({ value, onChange, onSelectPlace, onKeyD
   }, []);
 
   function selectSuggestion(s) {
+    skipNextSearchRef.current = true;
     onChange(s.label);
     onSelectPlace({ lat: s.lat, lng: s.lng });
     setOpen(false);
