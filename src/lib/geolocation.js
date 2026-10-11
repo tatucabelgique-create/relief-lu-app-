@@ -50,27 +50,42 @@ export async function geocodeAddress(address, city) {
   }
 }
 
-// Géocodage de la recherche texte de l'app (Découvrir/Parcourir) — Photon
-// (komoot.io), pas Nominatim comme geocodeAddress() ci-dessus : c'est le
-// choix déjà fait côté page vitrine (index.html) spécifiquement pour éviter
-// un souci de CORS avec Nominatim appelé depuis le navigateur. On garde le
-// même service ici pour rester cohérent et ne pas réintroduire ce problème.
-// Retourne null si rien trouvé/échec réseau — le filtre texte existant sert
-// alors de repli silencieux (voir PublicView.jsx).
-export async function geocodeCity(query) {
-  if (!query?.trim()) return null;
+// Suggestions de lieux pour la recherche texte de l'app (Découvrir/
+// Parcourir) — Photon (komoot.io), pas Nominatim comme geocodeAddress()
+// ci-dessus : c'est le choix déjà fait côté page vitrine (index.html)
+// spécifiquement pour éviter un souci de CORS avec Nominatim appelé depuis
+// le navigateur. On garde le même service ici pour rester cohérent et ne
+// pas réintroduire ce problème. Retourne un tableau vide si rien trouvé/
+// échec réseau — le filtre texte existant sert alors de repli silencieux
+// (voir PublicView.jsx).
+export async function searchPlaces(query) {
+  if (!query?.trim()) return [];
   try {
     const res = await fetch(
-      "https://photon.komoot.io/api/?limit=1&lat=49.75&lon=6.15&zoom=10&lang=fr&q=" + encodeURIComponent(query)
+      "https://photon.komoot.io/api/?limit=5&lat=49.75&lon=6.15&zoom=10&lang=fr&q=" + encodeURIComponent(query)
     );
     const data = await res.json();
-    const feature = data.features?.[0];
-    if (!feature) return null;
-    const [lng, lat] = feature.geometry.coordinates;
-    return { lat, lng };
+    return (data.features ?? [])
+      .map((f) => {
+        const [lng, lat] = f.geometry.coordinates;
+        const p = f.properties ?? {};
+        // "name" porte la plupart du temps la ville/le lieu lui-même ; city
+        // le complète quand il s'agit d'une rue ou d'un lieu-dit précis.
+        const label = [p.name, p.name !== p.city ? p.city : null].filter(Boolean).join(", ");
+        return label ? { label, lat, lng } : null;
+      })
+      .filter(Boolean);
   } catch {
-    return null;
+    return [];
   }
+}
+
+// Géocode directement la meilleure correspondance — utilisé pour la
+// validation à la touche Entrée quand aucune suggestion n'a encore été
+// sélectionnée dans la liste déroulante.
+export async function geocodeCity(query) {
+  const [first] = await searchPlaces(query);
+  return first ? { lat: first.lat, lng: first.lng } : null;
 }
 
 export function locate() {

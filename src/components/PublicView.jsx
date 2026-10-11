@@ -12,6 +12,7 @@ import BagDetail from "./BagDetail.jsx";
 import MerchantProfile from "./MerchantProfile.jsx";
 import ReserveModal from "./ReserveModal.jsx";
 import FiltersBar from "./FiltersBar.jsx";
+import CitySearchInput from "./CitySearchInput.jsx";
 import MapView from "./MapView.jsx";
 import ImpactBanner from "./ImpactBanner.jsx";
 import MissionIntro from "./MissionIntro.jsx";
@@ -161,6 +162,15 @@ export default function PublicView({ user, pendingReserveBagId, onPendingReserve
     setGeoSearchActive(false);
   }
 
+  // Appelé par CitySearchInput quand une suggestion de la liste est choisie
+  // — même effet que la validation par Entrée dans handleSearchSubmit, mais
+  // la position est déjà connue (pas besoin de re-géocoder).
+  function handleSelectPlace(pos) {
+    setUserPos(pos);
+    setSort("distance");
+    setGeoSearchActive(true);
+  }
+
   const filtered = useMemo(() => {
     if (!bags) return [];
     let list = bags.map((b) => ({
@@ -275,11 +285,11 @@ export default function PublicView({ user, pendingReserveBagId, onPendingReserve
       <div className="browse-map-page">
         <div className="browse-topbar">
           <div className="browse-search-row">
-            <input
-              type="text"
+            <CitySearchInput
               placeholder={t("filters.search")}
               value={search}
-              onChange={(e) => handleSearchChange(e.target.value)}
+              onChange={handleSearchChange}
+              onSelectPlace={handleSelectPlace}
               onKeyDown={handleSearchSubmit}
             />
             <button className="browse-locate-btn" onClick={handleLocate} aria-label={t("filters.useLocation")}>
@@ -443,6 +453,7 @@ export default function PublicView({ user, pendingReserveBagId, onPendingReserve
           search={search}
           setSearch={handleSearchChange}
           onSearchSubmit={handleSearchSubmit}
+          onSelectPlace={handleSelectPlace}
           onLocate={handleLocate}
           geoStatus={geoStatus}
           viewMode={viewMode}
