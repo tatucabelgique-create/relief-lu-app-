@@ -98,7 +98,7 @@
   .head-left{display:flex; align-items:center; gap:22px; justify-self:start; min-width:0;}
   .head-right{display:flex; align-items:center; gap:16px; justify-self:end;}
   .city-search{
-    display:flex; align-items:center; gap:8px;
+    display:flex; align-items:center; gap:8px; position:relative;
     background:var(--navy-2); border:1px solid rgba(239,230,211,0.18);
     border-radius:100px; padding:9px 16px; flex:1 1 auto; max-width:280px;
     color:var(--paper-dim);
@@ -117,6 +117,22 @@
   .city-search-msg{
     font-size:12px; color:#D9694F; margin-top:6px; display:none;
   }
+  /* Suggestions de lieux pendant la frappe — même mécanique que le menu
+     "À propos" : posée en absolu sous le champ, fermée au clic en dehors. */
+  .city-suggestions{
+    position:absolute; top:calc(100% + 8px); left:0; right:0;
+    background:var(--navy-2); border:1px solid rgba(239,230,211,0.18);
+    border-radius:14px; box-shadow:0 16px 36px rgba(0,0,0,0.4);
+    overflow:hidden; z-index:20; display:none;
+  }
+  .city-suggestions.open{display:block;}
+  .city-suggestion{
+    display:block; width:100%; text-align:left; background:none; border:none;
+    color:var(--paper); font-size:13px; font-family:'Work Sans', sans-serif;
+    padding:10px 16px; cursor:pointer; border-bottom:1px solid rgba(239,230,211,0.08);
+  }
+  .city-suggestion:last-child{border-bottom:none;}
+  .city-suggestion:hover, .city-suggestion.highlighted{background:rgba(232,163,61,0.12); color:var(--honey);}
   .langs{display:flex; gap:6px; background:var(--navy-2); padding:4px; border-radius:100px;}
   .langs button{
     background:none; border:none; color:var(--paper-dim); cursor:pointer;
@@ -1457,6 +1473,94 @@
       function(){ citySearchLocate.disabled = false; showSearchError(t('citySearch.denied')); },
       { timeout: 8000 }
     );
+  });
+
+  // Menu de suggestions pendant la frappe (façon TGTG) — même service Photon
+  // que la validation par Entrée ci-dessous, juste interrogé en continu avec
+  // un debounce plutôt qu'une seule fois à la soumission.
+  const citySuggestions = document.createElement('div');
+  citySuggestions.className = 'city-suggestions';
+  citySearchForm.appendChild(citySuggestions);
+  let suggestionResults = [];
+  let suggestionHighlight = -1;
+  let suggestionDebounce = null;
+
+  async function fetchPlaces(query){
+    try {
+      const res = await fetch('https://photon.komoot.io/api/?limit=5&lat=49.75&lon=6.15&zoom=10&lang=fr&q=' + encodeURIComponent(query));
+      const data = await res.json();
+      const seen = new Set();
+      return (data.features || []).map(function(f){
+        const [lng, lat] = f.geometry.coordinates;
+        const p = f.properties || {};
+        const label = [p.name, p.name !== p.city ? p.city : null].filter(Boolean).join(', ');
+        return label ? { label: label, lat: lat, lng: lng } : null;
+      }).filter(function(s){
+        if (!s || seen.has(s.label)) return false;
+        seen.add(s.label);
+        return true;
+      });
+    } catch {
+      return [];
+    }
+  }
+
+  function renderSuggestions(){
+    citySuggestions.innerHTML = '';
+    suggestionResults.forEach(function(s, i){
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'city-suggestion' + (i === suggestionHighlight ? ' highlighted' : '');
+      btn.textContent = '📍 ' + s.label;
+      btn.addEventListener('mousedown', function(e){ e.preventDefault(); });
+      btn.addEventListener('click', function(){ selectSuggestion(s); });
+      citySuggestions.appendChild(btn);
+    });
+    citySuggestions.classList.toggle('open', suggestionResults.length > 0);
+  }
+
+  function closeSuggestions(){
+    suggestionResults = [];
+    suggestionHighlight = -1;
+    citySuggestions.classList.remove('open');
+  }
+
+  function selectSuggestion(s){
+    closeSuggestions();
+    goToApp({ lat: s.lat, lng: s.lng });
+  }
+
+  citySearchInput.addEventListener('input', function(){
+    clearTimeout(suggestionDebounce);
+    const query = citySearchInput.value.trim();
+    if (query.length < 2) { closeSuggestions(); return; }
+    suggestionDebounce = setTimeout(async function(){
+      suggestionResults = await fetchPlaces(query);
+      suggestionHighlight = -1;
+      renderSuggestions();
+    }, 300);
+  });
+
+  citySearchInput.addEventListener('keydown', function(e){
+    if (!citySuggestions.classList.contains('open') || !suggestionResults.length) return;
+    if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      suggestionHighlight = Math.min(suggestionHighlight + 1, suggestionResults.length - 1);
+      renderSuggestions();
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      suggestionHighlight = Math.max(suggestionHighlight - 1, 0);
+      renderSuggestions();
+    } else if (e.key === 'Escape') {
+      closeSuggestions();
+    } else if (e.key === 'Enter' && suggestionHighlight >= 0) {
+      e.preventDefault();
+      selectSuggestion(suggestionResults[suggestionHighlight]);
+    }
+  });
+
+  document.addEventListener('click', function(e){
+    if (!citySearchForm.contains(e.target)) closeSuggestions();
   });
 
   citySearchForm.addEventListener('submit', async function(e){
