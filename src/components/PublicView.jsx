@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { createPortal } from "react-dom";
 import { useI18n } from "../lib/i18n.jsx";
+import { supabase } from "../lib/supabase";
 import { loadActiveBags, loadSoldOutToday, loadNewMerchantsWithoutBags } from "../lib/bags";
 import { getMerchantOrNull } from "../lib/merchants";
 import { haversineKm, loadSavedPosition, locate } from "../lib/geolocation";
@@ -65,6 +66,45 @@ export default function PublicView({ user, pendingReserveBagId, onPendingReserve
     }
     document.addEventListener("visibilitychange", onVisible);
     return () => document.removeEventListener("visibilitychange", onVisible);
+  }, []);
+
+  // Pousse les changements de sachets (prix modifié, stock qui baisse, panier
+  // annulé/épuisé) aux visiteurs qui ont déjà la page ouverte, sans attendre
+  // un rechargement — voir schema-v26-realtime-bags.sql pour la publication
+  // Postgres correspondante. Un INSERT déclenche un refresh() complet plutôt
+  // qu'une fusion manuelle : le payload réaltime ne contient que les colonnes
+  // de "bags", pas la jointure merchants(...) dont BagCard a besoin pour
+  // afficher le nom/l'adresse du commerçant.
+  useEffect(() => {
+    function isStillActive(row) {
+      return row.status === "active" && row.quantity_left > 0 && new Date(row.pickup_end) > new Date();
+    }
+
+    const channel = supabase
+      .channel("public-bags-changes")
+      .on("postgres_changes", { event: "INSERT", schema: "public", table: "bags" }, () => refresh())
+      .on("postgres_changes", { event: "UPDATE", schema: "public", table: "bags" }, (payload) => {
+        setBags((current) => {
+          if (!current) return current;
+          const exists = current.some((b) => b.id === payload.new.id);
+          if (!exists) return current;
+          if (!isStillActive(payload.new)) {
+            return current.filter((b) => b.id !== payload.new.id);
+          }
+          return current.map((b) => (b.id === payload.new.id ? { ...b, ...payload.new } : b));
+        });
+        // viewingDetail garde sa propre référence (voir plus bas où elle est
+        // fixée depuis un clic) — sans ce merge, quelqu'un en train de lire
+        // le détail d'un panier verrait un prix figé même après ce qui
+        // précède a mis à jour la liste.
+        setViewingDetail((current) => (current?.id === payload.new.id ? { ...current, ...payload.new } : current));
+      })
+      .on("postgres_changes", { event: "DELETE", schema: "public", table: "bags" }, (payload) => {
+        setBags((current) => (current ? current.filter((b) => b.id !== payload.old.id) : current));
+      })
+      .subscribe();
+
+    return () => supabase.removeChannel(channel);
   }, []);
 
   // Ouvre directement la fiche commerçant depuis ?merchant=<id> — utilisé
