@@ -60,8 +60,17 @@ export default function BagCard({ bag, onReserve, onToggleFavorite, isFavorite, 
       onClick={() => onOpenDetail?.(bag)}
       style={onOpenDetail ? { cursor: "pointer" } : undefined}
     >
-      <div className="thumb" style={bag.image_url ? { backgroundImage: `url('${bag.image_url}')` } : undefined}>
-        {!bag.image_url && "🥡"}
+      <div
+        className="thumb"
+        style={
+          bag.image_url
+            ? { backgroundImage: `url('${bag.image_url}')` }
+            : bag.merchants?.banner_url
+            ? { backgroundImage: `url('${bag.merchants.banner_url}')` }
+            : undefined
+        }
+      >
+        {!bag.image_url && !bag.merchants?.banner_url && "🥡"}
         <div className={`pill-base badge-availability ${soldOut ? "badge-sold-out" : ""} ${sellingFast ? "badge-selling-fast" : ""}`}>
           {soldOut ? t("badge.soldOut") : sellingFast ? t("badge.sellingFast") : `${bag.quantity_left} ${t("badge.available")}`}
         </div>

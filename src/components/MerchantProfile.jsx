@@ -68,8 +68,17 @@ export default function MerchantProfile({ merchant, bags, rating, distanceKm, on
           <div className="merchant-bag-list">
             {bags.map((bag) => (
               <button key={bag.id} className="merchant-bag-row" onClick={() => onOpenBag(bag)}>
-                <div className="merchant-bag-row-thumb" style={bag.image_url ? { backgroundImage: `url('${bag.image_url}')` } : undefined}>
-                  {!bag.image_url && "🥡"}
+                <div
+                  className="merchant-bag-row-thumb"
+                  style={
+                    bag.image_url
+                      ? { backgroundImage: `url('${bag.image_url}')` }
+                      : merchant.banner_url
+                      ? { backgroundImage: `url('${merchant.banner_url}')` }
+                      : undefined
+                  }
+                >
+                  {!bag.image_url && !merchant.banner_url && "🥡"}
                 </div>
                 <div style={{ flex: 1 }}>
                   <b>{bag.title}</b>

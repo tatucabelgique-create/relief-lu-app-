@@ -27,7 +27,7 @@ export async function loadActiveBags() {
   // refresh_recurring_bags() (tâche planifiée, voir schema-v9).
   const { data, error } = await supabase
     .from("bags")
-    .select("*, merchants(business_name, address, city, lat, lng, logo_url)")
+    .select("*, merchants(business_name, address, city, lat, lng, logo_url, banner_url)")
     .eq("status", "active")
     .gt("quantity_left", 0)
     .gt("pickup_end", new Date().toISOString())
@@ -46,7 +46,7 @@ export async function loadSoldOutToday() {
 
   const { data, error } = await supabase
     .from("bags")
-    .select("*, merchants(business_name, address, city, lat, lng, logo_url)")
+    .select("*, merchants(business_name, address, city, lat, lng, logo_url, banner_url)")
     .eq("status", "sold_out")
     .gte("pickup_start", startOfDay.toISOString())
     .lte("pickup_start", endOfDay.toISOString())

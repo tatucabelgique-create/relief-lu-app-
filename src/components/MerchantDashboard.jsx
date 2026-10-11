@@ -6,6 +6,7 @@ import { notifyNewBag } from "../lib/notify";
 import { getErrorMessage } from "../lib/auth";
 import { arePaymentsLive } from "../lib/payments";
 import MerchantLogoUpload from "./MerchantLogoUpload.jsx";
+import MerchantBannerUpload from "./MerchantBannerUpload.jsx";
 import MerchantStats from "./MerchantStats.jsx";
 import MerchantBagRow from "./MerchantBagRow.jsx";
 import MerchantRegistrationForm from "./MerchantRegistrationForm.jsx";
@@ -208,6 +209,7 @@ export default function MerchantDashboard({ user, merchant, onMerchantChanged })
       </div>
 
       {merchant && <MerchantLogoUpload user={user} merchant={merchant} onUpdated={onMerchantChanged} />}
+      {merchant && <MerchantBannerUpload user={user} merchant={merchant} onUpdated={onMerchantChanged} />}
 
       {merchant && !editingInfo && (
         <div className="panel">

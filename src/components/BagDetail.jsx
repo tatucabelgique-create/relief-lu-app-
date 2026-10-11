@@ -82,8 +82,17 @@ export default function BagDetail({ bag, rating, isFavorite, onToggleFavorite, o
           )}
         </div>
       </div>
-      <div className="bag-detail-hero" style={bag.image_url ? { backgroundImage: `url('${bag.image_url}')` } : undefined}>
-        {!bag.image_url && <span className="bag-detail-hero-fallback">🥡</span>}
+      <div
+        className="bag-detail-hero"
+        style={
+          bag.image_url
+            ? { backgroundImage: `url('${bag.image_url}')` }
+            : bag.merchants?.banner_url
+            ? { backgroundImage: `url('${bag.merchants.banner_url}')` }
+            : undefined
+        }
+      >
+        {!bag.image_url && !bag.merchants?.banner_url && <span className="bag-detail-hero-fallback">🥡</span>}
         <div className="bag-detail-hero-top">
           <button className="icon-circle" onClick={onBack} aria-label="back">
             ←

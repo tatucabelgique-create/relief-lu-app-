@@ -76,3 +76,17 @@ export async function uploadMerchantLogo(userId, file) {
   if (updateError) throw updateError;
   return logo_url;
 }
+
+// Photo de fond par défaut des sachets de ce commerçant — uploadée une
+// seule fois ici plutôt qu'à chaque création de sachet (voir
+// schema-v27-merchant-banner.sql et BagCard.jsx qui l'utilise en repli
+// quand bag.image_url est vide).
+export async function uploadMerchantBanner(userId, file) {
+  const path = `${userId}/banner-${Date.now()}-${file.name}`;
+  const { error } = await supabase.storage.from("bag-photos").upload(path, file);
+  if (error) throw error;
+  const banner_url = supabase.storage.from("bag-photos").getPublicUrl(path).data.publicUrl;
+  const { error: updateError } = await supabase.from("merchants").update({ banner_url }).eq("id", userId);
+  if (updateError) throw updateError;
+  return banner_url;
+}
