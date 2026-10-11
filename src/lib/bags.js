@@ -95,3 +95,15 @@ export async function stopRecurring(bagId) {
   const { error } = await supabase.from("bags").update({ is_recurring: false }).eq("id", bagId);
   if (error) throw error;
 }
+
+// Changer le prix d'un sachet déjà publié — volontairement réservé aux
+// sachets sans aucune réservation (quantity_left === quantity_total, vérifié
+// côté appelant dans MerchantBagRow.jsx). create-checkout-session lit le
+// prix en direct depuis bags.price_cents au moment de payer plutôt que de se
+// baser sur un instantané pris à la réservation — changer le prix d'un
+// sachet déjà réservé par quelqu'un modifierait donc ce qu'il paie, d'où la
+// restriction.
+export async function updateBagPrice(bagId, priceCents) {
+  const { error } = await supabase.from("bags").update({ price_cents: priceCents }).eq("id", bagId);
+  if (error) throw error;
+}
