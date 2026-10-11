@@ -4,7 +4,7 @@ import { useI18n } from "../lib/i18n.jsx";
 import { supabase } from "../lib/supabase";
 import { loadActiveBags, loadSoldOutToday, loadNewMerchantsWithoutBags } from "../lib/bags";
 import { getMerchantOrNull } from "../lib/merchants";
-import { haversineKm, loadSavedPosition, locate, geocodeCity } from "../lib/geolocation";
+import { haversineKm, loadSavedPosition, locate } from "../lib/geolocation";
 import { useFavorites } from "../lib/favorites";
 import { getMerchantRatings } from "../lib/reviews";
 import BagCard, { isToday, isTomorrow } from "./BagCard.jsx";
@@ -12,7 +12,6 @@ import BagDetail from "./BagDetail.jsx";
 import MerchantProfile from "./MerchantProfile.jsx";
 import ReserveModal from "./ReserveModal.jsx";
 import FiltersBar from "./FiltersBar.jsx";
-import CitySearchInput from "./CitySearchInput.jsx";
 import MapView from "./MapView.jsx";
 import ImpactBanner from "./ImpactBanner.jsx";
 import MissionIntro from "./MissionIntro.jsx";
@@ -35,12 +34,6 @@ export default function PublicView({ user, pendingReserveBagId, onPendingReserve
   const [viewMode, setViewMode] = useState(initialViewMode);
   const [userPos, setUserPos] = useState(() => loadSavedPosition());
   const [geoStatus, setGeoStatus] = useState("idle");
-  // true juste après une recherche texte géocodée avec succès (Entrée) — le
-  // filtre texte habituel est alors mis de côté le temps d'une recherche,
-  // sinon un commerçant proche mais dont le champ "ville" ne contient pas
-  // littéralement le texte tapé serait exclu à tort. Repasse à false dès que
-  // l'utilisateur retape (voir setSearch plus bas).
-  const [geoSearchActive, setGeoSearchActive] = useState(false);
   const { favoriteIds, toggleFavorite } = useFavorites(user);
   const [ratings, setRatings] = useState({});
   const [soldOutToday, setSoldOutToday] = useState([]);
@@ -144,33 +137,6 @@ export default function PublicView({ user, pendingReserveBagId, onPendingReserve
     }
   }
 
-  // Déclenché à la touche Entrée dans le champ de recherche (pas à chaque
-  // frappe — coûteux et inutile côté API Photon gratuite). Si le texte tapé
-  // se géocode, on bascule en tri par distance autour de ce point, comme
-  // TGTG ; sinon on ne change rien, le filtre texte habituel reste le repli.
-  async function handleSearchSubmit(e) {
-    if (e.key !== "Enter") return;
-    const pos = await geocodeCity(search);
-    if (!pos) return;
-    setUserPos(pos);
-    setSort("distance");
-    setGeoSearchActive(true);
-  }
-
-  function handleSearchChange(value) {
-    setSearch(value);
-    setGeoSearchActive(false);
-  }
-
-  // Appelé par CitySearchInput quand une suggestion de la liste est choisie
-  // — même effet que la validation par Entrée dans handleSearchSubmit, mais
-  // la position est déjà connue (pas besoin de re-géocoder).
-  function handleSelectPlace(pos) {
-    setUserPos(pos);
-    setSort("distance");
-    setGeoSearchActive(true);
-  }
-
   const filtered = useMemo(() => {
     if (!bags) return [];
     let list = bags.map((b) => ({
@@ -183,7 +149,7 @@ export default function PublicView({ user, pendingReserveBagId, onPendingReserve
     else if (diet === "vegan") list = list.filter((b) => b.vegan);
     if (pickupTime === "today") list = list.filter((b) => isToday(b.pickup_start));
     else if (pickupTime === "tomorrow") list = list.filter((b) => isTomorrow(b.pickup_start));
-    if (search.trim() && !geoSearchActive) {
+    if (search.trim()) {
       const q = search.trim().toLowerCase();
       list = list.filter((b) => {
         const city = b.merchants?.city?.toLowerCase();
@@ -210,7 +176,7 @@ export default function PublicView({ user, pendingReserveBagId, onPendingReserve
     else list = [...list].sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
 
     return list;
-  }, [bags, category, diet, pickupTime, search, sort, userPos, geoSearchActive]);
+  }, [bags, category, diet, pickupTime, search, sort, userPos]);
 
   // Sous-ensemble trié par urgence de retrait — reprend le pattern "À sauver
   // avant qu'il ne soit trop tard" façon TGTG. Affiché seulement s'il reste
@@ -285,12 +251,11 @@ export default function PublicView({ user, pendingReserveBagId, onPendingReserve
       <div className="browse-map-page">
         <div className="browse-topbar">
           <div className="browse-search-row">
-            <CitySearchInput
+            <input
+              type="text"
               placeholder={t("filters.search")}
               value={search}
-              onChange={handleSearchChange}
-              onSelectPlace={handleSelectPlace}
-              onKeyDown={handleSearchSubmit}
+              onChange={(e) => setSearch(e.target.value)}
             />
             <button className="browse-locate-btn" onClick={handleLocate} aria-label={t("filters.useLocation")}>
               {geoStatus === "loading" ? "…" : "📍"}
@@ -451,9 +416,7 @@ export default function PublicView({ user, pendingReserveBagId, onPendingReserve
           sort={sort}
           setSort={setSort}
           search={search}
-          setSearch={handleSearchChange}
-          onSearchSubmit={handleSearchSubmit}
-          onSelectPlace={handleSelectPlace}
+          setSearch={setSearch}
           onLocate={handleLocate}
           geoStatus={geoStatus}
           viewMode={viewMode}

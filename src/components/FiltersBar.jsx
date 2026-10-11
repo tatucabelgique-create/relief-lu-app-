@@ -1,18 +1,16 @@
 import { useI18n } from "../lib/i18n.jsx";
-import CitySearchInput from "./CitySearchInput.jsx";
 
 const CATEGORIES = ["boulangerie", "restaurant", "epicerie", "supermarche", "traiteur", "autre"];
 
-export default function FiltersBar({ category, setCategory, sort, setSort, search, setSearch, onSearchSubmit, onSelectPlace, onLocate, geoStatus, viewMode, setViewMode }) {
+export default function FiltersBar({ category, setCategory, sort, setSort, search, setSearch, onLocate, geoStatus, viewMode, setViewMode }) {
   const { t } = useI18n();
   return (
     <div className="filters-bar">
-      <CitySearchInput
+      <input
+        type="text"
         placeholder={t("filters.search")}
         value={search}
-        onChange={setSearch}
-        onSelectPlace={onSelectPlace}
-        onKeyDown={onSearchSubmit}
+        onChange={(e) => setSearch(e.target.value)}
       />
       <select value={category} onChange={(e) => setCategory(e.target.value)}>
         <option value="">{t("filters.allCategories")}</option>

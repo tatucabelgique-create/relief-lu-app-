@@ -19,9 +19,9 @@ function InvalidateOnShow({ trigger }) {
 }
 
 // react-leaflet n'applique "center"/"zoom" qu'au montage initial de
-// MapContainer, pas de façon réactive — sans ce composant, une recherche
-// géocodée (voir geocodeCity dans PublicView.jsx) changerait bien userPos
-// mais la carte déjà montée resterait sur son centre d'origine.
+// MapContainer, pas de façon réactive — sans ce composant, cliquer sur
+// "Utiliser ma position" changerait bien userPos mais la carte déjà
+// montée resterait sur son centre d'origine.
 function RecenterOnChange({ lat, lng }) {
   const map = useMap();
   useEffect(() => {
