@@ -1,14 +1,17 @@
-// Supabase Edge Function — active/désactive le rappel quotidien (feature flag
-// "daily_reminders"), appelée par DailyReminderToggle.jsx dans l'admin.
+// Supabase Edge Function — active/désactive n'importe quel feature flag
+// (table feature_flags), appelée par DailyReminderToggle.jsx et
+// LowDemandAlertsToggle.jsx dans l'admin. "key" par défaut sur
+// "daily_reminders" pour rester compatible avec l'appelant existant qui ne
+// l'envoie pas encore.
 // Même secret partagé que send-marketing-push (MARKETING_PUSH_SECRET) — un
-// seul admin, pas besoin d'un secret dédié en plus.
+// seul admin, pas besoin d'un secret dédié par flag.
 // À déployer depuis le dashboard Supabase (Edge Functions → Code → coller
 // ceci → Deploy).
 //
 // Appel :
 // curl -X POST https://<ref>.supabase.co/functions/v1/toggle-daily-reminders \
 //   -H "content-type: application/json" \
-//   -d '{"enabled": true, "admin_secret": "<MARKETING_PUSH_SECRET>"}'
+//   -d '{"key": "low_demand_alerts", "enabled": true, "admin_secret": "<MARKETING_PUSH_SECRET>"}'
 
 import { createClient } from "npm:@supabase/supabase-js@2";
 
@@ -24,7 +27,8 @@ const corsHeaders = {
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
 
-  const { enabled, admin_secret } = await req.json();
+  const { enabled, admin_secret, key } = await req.json();
+  const flagKey = key || "daily_reminders";
 
   if (admin_secret !== ADMIN_SECRET) {
     return new Response(JSON.stringify({ error: "Clé secrète incorrecte." }), {
@@ -37,7 +41,7 @@ Deno.serve(async (req) => {
   const { error } = await supabase
     .from("feature_flags")
     .update({ enabled: !!enabled, updated_at: new Date().toISOString() })
-    .eq("key", "daily_reminders");
+    .eq("key", flagKey);
 
   if (error) {
     return new Response(JSON.stringify({ error: error.message }), {

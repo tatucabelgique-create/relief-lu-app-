@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import AuthPrompt from "./AuthPrompt.jsx";
 import MarketingPush from "./MarketingPush.jsx";
 import DailyReminderToggle from "./DailyReminderToggle.jsx";
+import LowDemandAlertsToggle from "./LowDemandAlertsToggle.jsx";
 import MerchantVerification from "./MerchantVerification.jsx";
 import MerchantBilling from "./MerchantBilling.jsx";
 import NotificationToggle from "./NotificationToggle.jsx";
@@ -166,6 +167,7 @@ export default function AdminView({ user }) {
       <MerchantBilling />
       <MarketingPush />
       <DailyReminderToggle />
+      <LowDemandAlertsToggle />
     </div>
   );
 }
