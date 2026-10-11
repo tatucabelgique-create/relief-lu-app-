@@ -1,0 +1,78 @@
+name: Build native apps (iOS / Android)
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build-android:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - run: npm install
+      - run: sed -i "s/__BUILD_ID__/${{ github.sha }}/" public/sw.js
+      - run: npm run build
+        env:
+          VITE_SUPABASE_URL: https://ucxsqregeorfjakgomaj.supabase.co
+          VITE_SUPABASE_ANON_KEY: eyJhbGci••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••
+          VITE_VAPID_PUBLIC_KEY: BGpA9U_1TZfvqGvEQG3x0sDb4s8qaFSZJpuuL7MoT1-AIjoDDCX878bvClA1qKKkQRI2qBGFTSv0Piic2uXGu-4
+      - name: Préparer native/www
+        run: |
+          cd native
+          npm install
+          npm run sync
+      - name: Ajouter la plateforme Android (fraîche à chaque run)
+        run: |
+          cd native
+          npx cap add android
+          npx cap sync android
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+      - name: Build APK debug
+        run: |
+          cd native/android
+          chmod +x gradlew
+          ./gradlew assembleDebug
+      - uses: actions/upload-artifact@v4
+        with:
+          name: relief-android-debug
+          path: native/android/app/build/outputs/apk/debug/app-debug.apk
+
+  build-ios:
+    runs-on: macos-14
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - run: npm install
+      - run: sed -i '' "s/__BUILD_ID__/${{ github.sha }}/" public/sw.js
+      - run: npm run build
+        env:
+          VITE_SUPABASE_URL: https://ucxsqregeorfjakgomaj.supabase.co
+          VITE_SUPABASE_ANON_KEY: eyJhbGci••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••
+          VITE_VAPID_PUBLIC_KEY: BGpA9U_1TZfvqGvEQG3x0sDb4s8qaFSZJpuuL7MoT1-AIjoDDCX878bvClA1qKKkQRI2qBGFTSv0Piic2uXGu-4
+      - name: Préparer native/www
+        run: |
+          cd native
+          npm install
+          npm run sync
+      - name: Ajouter la plateforme iOS (fraîche à chaque run)
+        run: |
+          cd native
+          npx cap add ios
+          npx cap sync ios
+      - name: Installer les pods CocoaPods
+        run: |
+          cd native/ios/App
+          pod install
+      - name: Build pour le simulateur (pas de signature nécessaire)
+        run: |
+          cd native/ios/App
+          xcodebuild -workspace App.xcworkspace -scheme App \
+            -sdk iphonesimulator -configuration Debug build \
+            CODE_SIGNING_ALLOWED=NO
