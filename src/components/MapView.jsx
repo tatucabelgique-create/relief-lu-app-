@@ -18,6 +18,18 @@ function InvalidateOnShow({ trigger }) {
   return null;
 }
 
+// react-leaflet n'applique "center"/"zoom" qu'au montage initial de
+// MapContainer, pas de façon réactive — sans ce composant, une recherche
+// géocodée (voir geocodeCity dans PublicView.jsx) changerait bien userPos
+// mais la carte déjà montée resterait sur son centre d'origine.
+function RecenterOnChange({ lat, lng }) {
+  const map = useMap();
+  useEffect(() => {
+    if (lat != null && lng != null) map.setView([lat, lng], map.getZoom());
+  }, [lat, lng]);
+  return null;
+}
+
 export default function MapView({ bags, userPos, invalidateKey }) {
   const { t } = useI18n();
 
@@ -37,6 +49,7 @@ export default function MapView({ bags, userPos, invalidateKey }) {
     <div className="map-container">
       <MapContainer center={center} zoom={12} scrollWheelZoom={false} style={{ width: "100%", height: "100%" }}>
         {invalidateKey !== undefined && <InvalidateOnShow trigger={invalidateKey} />}
+        {userPos && <RecenterOnChange lat={userPos.lat} lng={userPos.lng} />}
         <TileLayer
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"

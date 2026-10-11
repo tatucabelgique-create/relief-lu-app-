@@ -50,6 +50,29 @@ export async function geocodeAddress(address, city) {
   }
 }
 
+// Géocodage de la recherche texte de l'app (Découvrir/Parcourir) — Photon
+// (komoot.io), pas Nominatim comme geocodeAddress() ci-dessus : c'est le
+// choix déjà fait côté page vitrine (index.html) spécifiquement pour éviter
+// un souci de CORS avec Nominatim appelé depuis le navigateur. On garde le
+// même service ici pour rester cohérent et ne pas réintroduire ce problème.
+// Retourne null si rien trouvé/échec réseau — le filtre texte existant sert
+// alors de repli silencieux (voir PublicView.jsx).
+export async function geocodeCity(query) {
+  if (!query?.trim()) return null;
+  try {
+    const res = await fetch(
+      "https://photon.komoot.io/api/?limit=1&lat=49.75&lon=6.15&zoom=10&lang=fr&q=" + encodeURIComponent(query)
+    );
+    const data = await res.json();
+    const feature = data.features?.[0];
+    if (!feature) return null;
+    const [lng, lat] = feature.geometry.coordinates;
+    return { lat, lng };
+  } catch {
+    return null;
+  }
+}
+
 export function locate() {
   return new Promise((resolve, reject) => {
     if (!navigator.geolocation) {
