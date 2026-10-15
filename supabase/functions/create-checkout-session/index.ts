@@ -33,7 +33,7 @@ Deno.serve(async (req) => {
 
     const { data: reservation, error } = await supabase
       .from("reservations")
-      .select("id, quantity, user_id, payment_status, bags(title, price_cents, merchant_id, merchants(stripe_account_id))")
+      .select("id, quantity, user_id, payment_status, bags(title, price_cents, merchant_id, merchants(stripe_account_id, commission_rate))")
       .eq("id", reservation_id)
       .single();
 
@@ -56,7 +56,10 @@ Deno.serve(async (req) => {
     // Commission redescendue à 18% (depuis 20%) en complément du nouveau
     // SERVICE_FEE_CENTS côté acheteur, qui couvre les frais Stripe que la
     // commission seule ne suffisait pas à absorber sur les petits paniers.
-    const COMMISSION_RATE = 0.18;
+    // Un commerçant avec un taux négocié (merchants.commission_rate, v28)
+    // remplace ce défaut — NULL garde le taux standard.
+    const merchantRow = reservation.bags.merchants as { stripe_account_id: string | null; commission_rate: number | null } | null;
+    const COMMISSION_RATE = merchantRow?.commission_rate ?? 0.18;
     const VAT_RATE = 0.17;
     // Frais de service par sachet, intégrés directement dans le prix affiché
     // au client (voir src/lib/pricing.js, à garder synchronisé avec les
@@ -89,7 +92,7 @@ Deno.serve(async (req) => {
     // affecté par son montant exact.
     const commissionTtcCents = commissionHtCents + Math.round(commissionHtCents * VAT_RATE) + unitMarkupCents * reservation.quantity;
 
-    const merchant = reservation.bags.merchants as { stripe_account_id: string | null } | null;
+    const merchant = merchantRow;
     // Destination charge : Stripe répartit le paiement au moment de la
     // transaction — la part du commerçant part directement sur son compte
     // connecté, la commission reste chez relief.lu. Si le commerçant n'a pas
