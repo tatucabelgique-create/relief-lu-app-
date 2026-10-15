@@ -218,45 +218,6 @@
     max-width:46ch; margin:0 0 38px;
   }
 
-  /* compte à rebours */
-  .countdown{
-    margin:0 auto 30px; padding:22px 24px; border-radius:18px;
-    background:linear-gradient(135deg, rgba(232,163,61,0.14), rgba(232,163,61,0.02) 60%), var(--navy-2);
-    border:1px solid rgba(232,163,61,0.35);
-    box-shadow:0 8px 28px rgba(0,0,0,0.25);
-    max-width:fit-content;
-  }
-  .countdown-label{
-    font-family:'IBM Plex Mono', monospace; font-size:13px; font-weight:600;
-    color:var(--honey); text-transform:uppercase; letter-spacing:2px;
-    margin-bottom:16px; display:flex; align-items:center; justify-content:center; gap:8px;
-  }
-  .countdown-label::before{ content:"🔥"; font-size:14px; }
-  .countdown-boxes{ display:flex; align-items:center; gap:4px; }
-  .countdown-box{
-    display:flex; flex-direction:column; align-items:center; min-width:72px;
-  }
-  .countdown-sep{
-    font-family:'Fraunces', serif; font-size:34px; color:rgba(232,163,61,0.4);
-    line-height:1; margin:0 2px 22px;
-  }
-  .countdown-num{
-    font-family:'Fraunces', serif; font-weight:680; font-size:44px;
-    color:var(--paper); line-height:1; font-variant-numeric:tabular-nums;
-    text-shadow:0 0 24px rgba(232,163,61,0.3);
-  }
-  .countdown-unit{
-    font-family:'IBM Plex Mono', monospace; font-size:11px; color:var(--paper-dim);
-    text-transform:uppercase; letter-spacing:1px; margin-top:8px;
-  }
-  @media (max-width:480px){
-    .countdown{ padding:18px; max-width:none; }
-    .countdown-boxes{ gap:0; justify-content:space-between; }
-    .countdown-box{ min-width:0; flex:1; }
-    .countdown-sep{ font-size:24px; margin:0 0 20px; }
-    .countdown-num{ font-size:30px; }
-  }
-
   /* email capture */
   .capture{
     display:flex; gap:10px; flex-wrap:wrap; align-items:center;
@@ -688,19 +649,6 @@
       <h1><span data-i18n="h1.part1">Le Luxembourg est l'un des pays les plus riches du monde.</span> <em data-i18n="h1.part2">Ce n'est pas le cas pour tout le monde.</em></h1>
       <p class="sub" data-i18n="sub">Relief redonne de la valeur à la nourriture qui allait être jetée — boulangeries, restaurants, épiceries, traiteurs — pour que chaque euro compte un peu moins fort.</p>
 
-      <div class="countdown" id="countdown" aria-live="polite">
-        <div class="countdown-label" data-i18n="countdown.label">Lancement dans</div>
-        <div class="countdown-boxes">
-          <div class="countdown-box"><span class="countdown-num" id="cd-days">--</span><span class="countdown-unit" data-i18n="countdown.days">jours</span></div>
-          <span class="countdown-sep">:</span>
-          <div class="countdown-box"><span class="countdown-num" id="cd-hours">--</span><span class="countdown-unit" data-i18n="countdown.hours">heures</span></div>
-          <span class="countdown-sep">:</span>
-          <div class="countdown-box"><span class="countdown-num" id="cd-minutes">--</span><span class="countdown-unit" data-i18n="countdown.minutes">min</span></div>
-          <span class="countdown-sep">:</span>
-          <div class="countdown-box"><span class="countdown-num" id="cd-seconds">--</span><span class="countdown-unit" data-i18n="countdown.seconds">sec</span></div>
-        </div>
-      </div>
-
       <form class="capture" id="capture-form">
         <input type="email" id="capture-email" data-i18n-placeholder="capture.placeholder" placeholder="ton-email@exemple.lu" required>
         <button type="submit" data-i18n="capture.button">Je veux être prévenu·e</button>
@@ -995,11 +943,6 @@
     fr: {
       "intro.tagline": "Anti-gaspillage alimentaire",
       "eyebrow": "Arrive bientôt",
-      "countdown.label": "Lancement dans",
-      "countdown.days": "jours",
-      "countdown.hours": "heures",
-      "countdown.minutes": "min",
-      "countdown.seconds": "sec",
       "h1.part1": "Le Luxembourg est l'un des pays les plus riches du monde.",
       "h1.part2": "Ce n'est pas le cas pour tout le monde.",
       "sub": "Relief redonne de la valeur à la nourriture qui allait être jetée — boulangeries, restaurants, épiceries, traiteurs — pour que chaque euro compte un peu moins fort.",
@@ -1100,11 +1043,6 @@
     de: {
       "intro.tagline": "Gegen Lebensmittelverschwendung",
       "eyebrow": "Startet bald",
-      "countdown.label": "Start in",
-      "countdown.days": "Tage",
-      "countdown.hours": "Std",
-      "countdown.minutes": "Min",
-      "countdown.seconds": "Sek",
       "h1.part1": "Luxemburg ist eines der reichsten Länder der Welt.",
       "h1.part2": "Das gilt nicht für alle.",
       "sub": "Relief bringt Lebensmittel, die sonst weggeworfen würden, zurück in Umlauf — Bäckereien, Restaurants, Lebensmittelgeschäfte, Caterer — damit jeder Euro etwas mehr zählt.",
@@ -1205,11 +1143,6 @@
     en: {
       "intro.tagline": "Fighting food waste",
       "eyebrow": "Launching soon",
-      "countdown.label": "Launching in",
-      "countdown.days": "days",
-      "countdown.hours": "hrs",
-      "countdown.minutes": "min",
-      "countdown.seconds": "sec",
       "h1.part1": "Luxembourg is one of the richest countries in the world.",
       "h1.part2": "That's not true for everyone.",
       "sub": "Relief brings back into circulation food that was going to be thrown away — bakeries, restaurants, grocery stores, caterers — so every euro counts a little less hard.",
@@ -1394,33 +1327,6 @@
       a.addEventListener('click', function(){ items.forEach(closeItem); });
     });
   })();
-
-  // Compte à rebours jusqu'au lancement (15 octobre 2026, heure du Luxembourg).
-  // Cible fixe en UTC+2 (CEST) plutôt que l'heure locale du visiteur, pour que
-  // le décompte tombe à zéro au même moment pour tout le monde, où qu'il soit.
-  const LAUNCH_DATE = new Date("2026-10-15T00:00:00+02:00").getTime();
-  function updateCountdown(){
-    const diff = LAUNCH_DATE - Date.now();
-    const els = {
-      days: document.getElementById("cd-days"),
-      hours: document.getElementById("cd-hours"),
-      minutes: document.getElementById("cd-minutes"),
-      seconds: document.getElementById("cd-seconds"),
-    };
-    if (!els.days) return;
-    if (diff <= 0){
-      els.days.textContent = "00"; els.hours.textContent = "00";
-      els.minutes.textContent = "00"; els.seconds.textContent = "00";
-      return;
-    }
-    const pad = n => String(n).padStart(2, "0");
-    els.days.textContent = pad(Math.floor(diff / 86400000));
-    els.hours.textContent = pad(Math.floor(diff / 3600000) % 24);
-    els.minutes.textContent = pad(Math.floor(diff / 60000) % 60);
-    els.seconds.textContent = pad(Math.floor(diff / 1000) % 60);
-  }
-  updateCountdown();
-  setInterval(updateCountdown, 1000);
 
   // 1. Dans Supabase → Project Settings → API, copie "Project URL" et la clé "anon public".
   // 2. Colle-les ci-dessous. La clé "anon" est faite pour être publique côté client
