@@ -33,7 +33,7 @@ Deno.serve(async (req) => {
 
     const { data: reservation, error } = await supabase
       .from("reservations")
-      .select("id, quantity, user_id, payment_status, bags(title, price_cents, merchant_id, merchants(stripe_account_id, commission_rate))")
+      .select("id, quantity, user_id, payment_status, bags(title, price_cents, merchant_id, merchants(stripe_account_id, commission_rate, waive_service_fee))")
       .eq("id", reservation_id)
       .single();
 
@@ -58,7 +58,11 @@ Deno.serve(async (req) => {
     // commission seule ne suffisait pas à absorber sur les petits paniers.
     // Un commerçant avec un taux négocié (merchants.commission_rate, v28)
     // remplace ce défaut — NULL garde le taux standard.
-    const merchantRow = reservation.bags.merchants as { stripe_account_id: string | null; commission_rate: number | null } | null;
+    const merchantRow = reservation.bags.merchants as {
+      stripe_account_id: string | null;
+      commission_rate: number | null;
+      waive_service_fee: boolean | null;
+    } | null;
     const COMMISSION_RATE = merchantRow?.commission_rate ?? 0.18;
     const VAT_RATE = 0.17;
     // Frais de service par sachet, intégrés directement dans le prix affiché
@@ -69,7 +73,10 @@ Deno.serve(async (req) => {
     // par 9 (prix "charme"), par sachet. Entièrement conservés par
     // relief.lu (jamais reversés au commerçant) — d'où leur ajout à
     // commissionTtcCents, qui alimente application_fee_amount plus bas.
-    const SERVICE_FEE_CENTS = 50;
+    // Un commerçant avec waive_service_fee (merchants.waive_service_fee, v29)
+    // n'a pas ce frais — généralement en échange d'une commission plus
+    // élevée (merchants.commission_rate) négociée séparément.
+    const SERVICE_FEE_CENTS = merchantRow?.waive_service_fee ? 0 : 50;
     const SERVICE_FEE_VAT_CENTS = Math.round(SERVICE_FEE_CENTS * VAT_RATE);
     const SERVICE_FEE_TOTAL_CENTS = SERVICE_FEE_CENTS + SERVICE_FEE_VAT_CENTS;
 

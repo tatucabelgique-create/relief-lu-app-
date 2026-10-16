@@ -27,7 +27,7 @@ export default function PaymentResult({ reservationId, success, onClose }) {
         // comme des ventes.
         if (r.payment_status === "paid") {
           trackEvent("Purchase", {
-            value: (displayPriceCents(r.bags?.price_cents ?? 0) * r.quantity) / 100,
+            value: (displayPriceCents(r.bags?.price_cents ?? 0, r.bags?.merchants?.waive_service_fee) * r.quantity) / 100,
             currency: "EUR",
           });
         }

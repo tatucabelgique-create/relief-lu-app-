@@ -24,7 +24,7 @@ export async function releaseReservation(id) {
 export async function getReservation(id) {
   const { data, error } = await supabase
     .from("reservations")
-    .select("*, bags(price_cents)")
+    .select("*, bags(price_cents, merchants(waive_service_fee))")
     .eq("id", id)
     .single();
   if (error) throw error;
@@ -50,7 +50,7 @@ export async function getMyReservations(userId) {
   const { data, error } = await supabase
     .from("reservations")
     .select(
-      "*, bags(title, price_cents, pickup_start, pickup_end, image_url, merchant_id, merchants(business_name, city)), reviews(id, rating, comment)"
+      "*, bags(title, price_cents, pickup_start, pickup_end, image_url, merchant_id, merchants(business_name, city, waive_service_fee)), reviews(id, rating, comment)"
     )
     .eq("user_id", userId)
     .order("created_at", { ascending: false });

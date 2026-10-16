@@ -112,7 +112,7 @@ export default function BagCard({ bag, onReserve, onToggleFavorite, isFavorite, 
         <div className="row" style={{ marginTop: 10 }}>
           <span>
             {hasDiscount && <span className="price-original">{(bag.original_price_cents / 100).toFixed(2)} €</span>}
-            <span className="price">{(displayPriceCents(bag.price_cents) / 100).toFixed(2)} €</span>
+            <span className="price">{(displayPriceCents(bag.price_cents, bag.merchants?.waive_service_fee) / 100).toFixed(2)} €</span>
           </span>
           <button
             className="btn small"

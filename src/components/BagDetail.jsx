@@ -291,7 +291,7 @@ export default function BagDetail({ bag, rating, isFavorite, onToggleFavorite, o
       <div className="bag-detail-sticky">
         <span>
           {hasDiscount && <span className="price-original">{(bag.original_price_cents / 100).toFixed(2)} €</span>}
-          <span className="price">{(displayPriceCents(bag.price_cents) / 100).toFixed(2)} €</span>
+          <span className="price">{(displayPriceCents(bag.price_cents, bag.merchants?.waive_service_fee) / 100).toFixed(2)} €</span>
         </span>
         <button className="btn" disabled={soldOut} onClick={() => !soldOut && onReserve(bag)}>
           {soldOut ? t("badge.soldOut") : t("reserve")}

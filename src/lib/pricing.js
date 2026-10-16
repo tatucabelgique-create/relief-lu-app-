@@ -22,6 +22,11 @@ export function roundUpToNiceCents(cents) {
   return remainder === 9 ? cents : cents + (9 - remainder);
 }
 
-export function displayPriceCents(priceCents) {
+// `waiveServiceFee` (optionnel) : true pour un commerçant ayant négocié
+// l'absence de frais client (merchants.waive_service_fee, v29) — le prix
+// affiché n'est alors que l'arrondi charme du prix du commerçant, sans
+// majoration. Toujours false par défaut, comportement inchangé sinon.
+export function displayPriceCents(priceCents, waiveServiceFee = false) {
+  if (waiveServiceFee) return roundUpToNiceCents(priceCents);
   return roundUpToNiceCents(priceCents + SERVICE_FEE_TOTAL_CENTS);
 }

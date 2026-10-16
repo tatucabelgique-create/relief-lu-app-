@@ -39,7 +39,7 @@ export default function ReserveModal({ bag, user, onClose, onReserved }) {
 
   // Le prix affiché au client intègre déjà les frais de service (voir
   // pricing.js) — il n'y a pas de ligne séparée à montrer, juste ce total.
-  const total = ((displayPriceCents(bag.price_cents) * qty) / 100).toFixed(2);
+  const total = ((displayPriceCents(bag.price_cents, bag.merchants?.waive_service_fee) * qty) / 100).toFixed(2);
   const maxQty = Math.max(1, bag.quantity_left ?? 1);
 
   function changeQty(delta) {

@@ -62,7 +62,7 @@ export default function AccountView({ user }) {
                       </button>
                     ))}
                 </div>
-                <div className="price">{(displayPriceCents(r.bags?.price_cents || 0) / 100).toFixed(2)} €</div>
+                <div className="price">{(displayPriceCents(r.bags?.price_cents || 0, r.bags?.merchants?.waive_service_fee) / 100).toFixed(2)} €</div>
               </div>
             );
           })}
