@@ -4,7 +4,7 @@ import { useI18n } from "../lib/i18n.jsx";
 import { supabase } from "../lib/supabase";
 import { loadActiveBags, loadSoldOutToday, loadNewMerchantsWithoutBags } from "../lib/bags";
 import { getMerchantOrNull } from "../lib/merchants";
-import { haversineKm, loadSavedPosition, locate, savePosition } from "../lib/geolocation";
+import { haversineKm, loadSavedPosition, locate, savePosition, reverseGeocode } from "../lib/geolocation";
 import { useFavorites } from "../lib/favorites";
 import { getMerchantRatings } from "../lib/reviews";
 import BagCard, { isToday, isTomorrow } from "./BagCard.jsx";
@@ -35,6 +35,10 @@ export default function PublicView({ user, pendingReserveBagId, onPendingReserve
   const [pickupTime, setPickupTime] = useState("");
   const [viewMode, setViewMode] = useState(initialViewMode);
   const [userPos, setUserPos] = useState(() => loadSavedPosition());
+  // Nom lisible du lieu courant ("Cap d'Agde, Agde" façon TGTG), affiché à
+  // côté du bouton position — distinct de userPos (coordonnées), car la
+  // géolocalisation GPS ne renvoie qu'un lat/lng, pas de nom.
+  const [userPosLabel, setUserPosLabel] = useState(() => loadSavedPosition()?.label || null);
   const [geoStatus, setGeoStatus] = useState("idle");
   const [showLocationPicker, setShowLocationPicker] = useState(false);
   const { favoriteIds, toggleFavorite } = useFavorites(user);
@@ -132,18 +136,28 @@ export default function PublicView({ user, pendingReserveBagId, onPendingReserve
 
   // Choix depuis LocationPicker (recherche libre ou emplacement enregistré,
   // Domicile/Travail/Autre) — même état que la géolocalisation GPS
-  // (userPos), pour que tri par distance et carte réagissent pareil.
-  function handleSelectPlace(pos) {
+  // (userPos), pour que tri par distance et carte réagissent pareil. Le
+  // label vient déjà de Photon (searchPlaces) ou d'un lieu enregistré, pas
+  // besoin de géocodage inverse ici contrairement à handleLocate.
+  function handleSelectPlace(pos, label) {
     setUserPos(pos);
-    savePosition(pos);
+    setUserPosLabel(label || null);
+    savePosition({ ...pos, label: label || null });
     setGeoStatus("ok");
   }
 
   async function handleLocate() {
     setGeoStatus("loading");
     try {
-      setUserPos(await locate());
+      const pos = await locate();
+      setUserPos(pos);
       setGeoStatus("ok");
+      // Le GPS ne renvoie qu'un lat/lng — géocodage inverse pour afficher un
+      // nom lisible ("Cap d'Agde, Agde") à côté du bouton, façon TGTG.
+      // Résolu après coup, sans bloquer l'affichage de la position elle-même.
+      const label = await reverseGeocode(pos.lat, pos.lng);
+      setUserPosLabel(label);
+      savePosition({ ...pos, label });
     } catch {
       setGeoStatus("denied");
     }
@@ -349,14 +363,24 @@ export default function PublicView({ user, pendingReserveBagId, onPendingReserve
   return (
     <div>
       <button className="location-picker" onClick={() => setShowLocationPicker(true)}>
-        📍 {geoStatus === "loading" ? t("filters.locating") : userPos ? t("filters.currentPosition") : t("filters.useLocation")}
+        📍{" "}
+        {geoStatus === "loading" ? (
+          t("filters.locating")
+        ) : userPos ? (
+          <>
+            <b>{t("filters.currentPosition")}</b>
+            {userPosLabel && <span className="location-picker-value">{userPosLabel}</span>}
+          </>
+        ) : (
+          t("filters.useLocation")
+        )}
         <span className="chevron">›</span>
       </button>
       {showLocationPicker &&
         createPortal(
           <LocationPicker
-            onSelect={(pos) => {
-              handleSelectPlace(pos);
+            onSelect={(pos, label) => {
+              handleSelectPlace(pos, label);
               setShowLocationPicker(false);
             }}
             onLocate={handleLocate}

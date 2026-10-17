@@ -82,6 +82,24 @@ export async function searchPlaces(query) {
   }
 }
 
+// Géocodage inverse (coordonnées → nom de lieu lisible), via le même
+// Photon que searchPlaces — sert à afficher "Cap d'Agde, Agde" façon TGTG
+// à côté du bouton "Position actuelle" après une géolocalisation GPS (qui
+// ne renvoie que des coordonnées, jamais de nom). Retourne null plutôt que
+// de planter si Photon échoue — le bouton retombe alors sur le libellé
+// générique existant.
+export async function reverseGeocode(lat, lng) {
+  try {
+    const res = await fetch(`https://photon.komoot.io/reverse?lon=${lng}&lat=${lat}&lang=fr`);
+    const data = await res.json();
+    const p = data.features?.[0]?.properties;
+    if (!p) return null;
+    return [p.name, p.name !== p.city ? p.city : null].filter(Boolean).join(", ") || null;
+  } catch {
+    return null;
+  }
+}
+
 export function locate() {
   return new Promise((resolve, reject) => {
     if (!navigator.geolocation) {

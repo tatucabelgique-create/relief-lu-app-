@@ -622,6 +622,7 @@ body { padding-bottom: 78px; }
   font-size: 13px; font-weight: 600; padding: 0; margin-top: 20px;
 }
 .location-picker .chevron { color: var(--paper-dim); font-size: 16px; }
+.location-picker-value { color: var(--paper-dim); font-weight: 500; margin-left: 2px; }
 
 /* Rangée horizontale défilante, façon "Découvrir" TGTG — vient s'ajouter
    au-dessus de la grille filtrable complète, sans la remplacer. */

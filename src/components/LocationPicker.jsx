@@ -45,7 +45,7 @@ export default function LocationPicker({ onSelect, onLocate, onClose }) {
       setResults([]);
       return;
     }
-    onSelect({ lat: place.lat, lng: place.lng });
+    onSelect({ lat: place.lat, lng: place.lng }, place.label);
   }
 
   function handleAddSlot(slot) {
@@ -61,7 +61,7 @@ export default function LocationPicker({ onSelect, onLocate, onClose }) {
       handleAddSlot(slot);
       return;
     }
-    onSelect({ lat: place.lat, lng: place.lng });
+    onSelect({ lat: place.lat, lng: place.lng }, place.label);
   }
 
   return (
