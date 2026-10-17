@@ -352,16 +352,18 @@ export default function PublicView({ user, pendingReserveBagId, onPendingReserve
         📍 {geoStatus === "loading" ? t("filters.locating") : userPos ? t("filters.currentPosition") : t("filters.useLocation")}
         <span className="chevron">›</span>
       </button>
-      {showLocationPicker && (
-        <LocationPicker
-          onSelect={(pos) => {
-            handleSelectPlace(pos);
-            setShowLocationPicker(false);
-          }}
-          onLocate={handleLocate}
-          onClose={() => setShowLocationPicker(false)}
-        />
-      )}
+      {showLocationPicker &&
+        createPortal(
+          <LocationPicker
+            onSelect={(pos) => {
+              handleSelectPlace(pos);
+              setShowLocationPicker(false);
+            }}
+            onLocate={handleLocate}
+            onClose={() => setShowLocationPicker(false)}
+          />,
+          document.body
+        )}
       {!compact && (
         <>
           <h1 className="page-title">{t("public.title")}</h1>
