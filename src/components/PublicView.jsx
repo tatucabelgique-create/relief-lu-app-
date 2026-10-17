@@ -12,6 +12,7 @@ import BagDetail from "./BagDetail.jsx";
 import MerchantProfile from "./MerchantProfile.jsx";
 import ReserveModal from "./ReserveModal.jsx";
 import FiltersBar from "./FiltersBar.jsx";
+import CategoryIconRow from "./CategoryIconRow.jsx";
 import MapView from "./MapView.jsx";
 import ImpactBanner from "./ImpactBanner.jsx";
 import MissionIntro from "./MissionIntro.jsx";
@@ -346,6 +347,7 @@ export default function PublicView({ user, pendingReserveBagId, onPendingReserve
           <p className="page-sub">{t("public.sub")}</p>
 
           <ImpactBanner />
+          <CategoryIconRow category={category} setCategory={setCategory} />
         </>
       )}
 
