@@ -163,6 +163,16 @@ export default function PublicView({ user, pendingReserveBagId, onPendingReserve
     }
   }
 
+  // Catégories réellement représentées parmi les sachets actifs en ce
+  // moment — sert à CategoryIconRow pour ne pas proposer une catégorie qui
+  // ne mènerait à aucun résultat. Sur les bags bruts (pas "filtered", déjà
+  // réduit par la catégorie sélectionnée).
+  const availableCategories = useMemo(() => {
+    const set = new Set();
+    (bags ?? []).forEach((b) => b.category && set.add(b.category));
+    return set;
+  }, [bags]);
+
   const filtered = useMemo(() => {
     if (!bags) return [];
     let list = bags.map((b) => ({
@@ -394,7 +404,7 @@ export default function PublicView({ user, pendingReserveBagId, onPendingReserve
           <p className="page-sub">{t("public.sub")}</p>
 
           <ImpactBanner />
-          <CategoryIconRow category={category} setCategory={setCategory} />
+          <CategoryIconRow category={category} setCategory={setCategory} availableCategories={availableCategories} />
         </>
       )}
 

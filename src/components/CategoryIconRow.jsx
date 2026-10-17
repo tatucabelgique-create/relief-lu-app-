@@ -17,8 +17,16 @@ const CATEGORIES = [
 // FiltersBar.jsx (état partagé, pas de logique dupliquée). Un deuxième clic
 // sur la catégorie déjà sélectionnée la désélectionne (toggle), comme sur
 // TGTG.
-export default function CategoryIconRow({ category, setCategory }) {
+//
+// `availableCategories` (Set des clés présentes dans les sachets actifs,
+// calculé par PublicView.jsx) filtre la rangée : proposer une catégorie
+// qui ne mène à aucun résultat serait trompeur, surtout tant que relief.lu
+// a peu de sachets en ligne — mieux vaut n'afficher que ce qui existe
+// vraiment maintenant, quitte à ce que la rangée soit courte.
+export default function CategoryIconRow({ category, setCategory, availableCategories }) {
   const { t } = useI18n();
+  const visibleCategories = CATEGORIES.filter((c) => availableCategories?.has(c.key));
+  if (!visibleCategories.length) return null;
 
   function handleClick(key) {
     const selecting = category !== key;
@@ -34,7 +42,7 @@ export default function CategoryIconRow({ category, setCategory }) {
 
   return (
     <div className="category-icon-row">
-      {CATEGORIES.map((c) => (
+      {visibleCategories.map((c) => (
         <button
           key={c.key}
           className={`category-icon-item ${category === c.key ? "active" : ""}`}
