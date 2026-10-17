@@ -27,6 +27,7 @@ const emptyForm = {
   bagProvided: false,
   vegetarian: false,
   vegan: false,
+  snack: false,
 };
 
 export default function MerchantDashboard({ user, merchant, onMerchantChanged }) {
@@ -178,6 +179,7 @@ export default function MerchantDashboard({ user, merchant, onMerchantChanged })
         bag_provided: form.bagProvided,
         vegetarian: form.vegetarian,
         vegan: form.vegan,
+        snack: form.snack,
         image_url,
       });
       notifyNewBag(newBag);
@@ -341,6 +343,11 @@ export default function MerchantDashboard({ user, merchant, onMerchantChanged })
         <label className="checkbox-field">
           <input type="checkbox" checked={form.vegan} onChange={(e) => setVegan(e.target.checked)} />
           <span>{t("merchant.f.vegan")}</span>
+        </label>
+
+        <label className="checkbox-field">
+          <input type="checkbox" checked={form.snack} onChange={(e) => set("snack", e.target.checked)} />
+          <span>{t("merchant.f.snack")}</span>
         </label>
 
         <div className="field">

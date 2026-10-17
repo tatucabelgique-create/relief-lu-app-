@@ -33,6 +33,9 @@ export default function PublicView({ user, pendingReserveBagId, onPendingReserve
   const [search, setSearch] = useState(() => new URLSearchParams(window.location.search).get("city") || "");
   const [diet, setDiet] = useState("");
   const [pickupTime, setPickupTime] = useState("");
+  // Puce "Snacks sucrés & salés" de CategoryIconRow — pas de filtre
+  // existant à réutiliser comme pour diet/pickupTime, donc état dédié.
+  const [snackOnly, setSnackOnly] = useState(false);
   const [viewMode, setViewMode] = useState(initialViewMode);
   const [userPos, setUserPos] = useState(() => loadSavedPosition());
   // Nom lisible du lieu courant ("Cap d'Agde, Agde" façon TGTG), affiché à
@@ -175,6 +178,7 @@ export default function PublicView({ user, pendingReserveBagId, onPendingReserve
     else if (diet === "vegan") list = list.filter((b) => b.vegan);
     if (pickupTime === "today") list = list.filter((b) => isToday(b.pickup_start));
     else if (pickupTime === "tomorrow") list = list.filter((b) => isTomorrow(b.pickup_start));
+    if (snackOnly) list = list.filter((b) => b.snack);
     if (search.trim()) {
       const q = search.trim().toLowerCase();
       list = list.filter((b) => {
@@ -202,7 +206,7 @@ export default function PublicView({ user, pendingReserveBagId, onPendingReserve
     else list = [...list].sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
 
     return list;
-  }, [bags, category, diet, pickupTime, search, sort, userPos]);
+  }, [bags, category, diet, pickupTime, snackOnly, search, sort, userPos]);
 
   // Sous-ensemble trié par urgence de retrait — reprend le pattern "À sauver
   // avant qu'il ne soit trop tard" façon TGTG. Affiché seulement s'il reste
@@ -401,6 +405,8 @@ export default function PublicView({ user, pendingReserveBagId, onPendingReserve
             setDiet={setDiet}
             pickupTime={pickupTime}
             setPickupTime={setPickupTime}
+            snackOnly={snackOnly}
+            setSnackOnly={setSnackOnly}
             bags={bags}
           />
         </>
