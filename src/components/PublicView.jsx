@@ -4,7 +4,7 @@ import { useI18n } from "../lib/i18n.jsx";
 import { supabase } from "../lib/supabase";
 import { loadActiveBags, loadSoldOutToday, loadNewMerchantsWithoutBags } from "../lib/bags";
 import { getMerchantOrNull } from "../lib/merchants";
-import { haversineKm, loadSavedPosition, locate } from "../lib/geolocation";
+import { haversineKm, loadSavedPosition, locate, savePosition } from "../lib/geolocation";
 import { useFavorites } from "../lib/favorites";
 import { getMerchantRatings } from "../lib/reviews";
 import BagCard, { isToday, isTomorrow } from "./BagCard.jsx";
@@ -13,6 +13,7 @@ import MerchantProfile from "./MerchantProfile.jsx";
 import ReserveModal from "./ReserveModal.jsx";
 import FiltersBar from "./FiltersBar.jsx";
 import CategoryIconRow from "./CategoryIconRow.jsx";
+import LocationPicker from "./LocationPicker.jsx";
 import MapView from "./MapView.jsx";
 import ImpactBanner from "./ImpactBanner.jsx";
 import MissionIntro from "./MissionIntro.jsx";
@@ -35,6 +36,7 @@ export default function PublicView({ user, pendingReserveBagId, onPendingReserve
   const [viewMode, setViewMode] = useState(initialViewMode);
   const [userPos, setUserPos] = useState(() => loadSavedPosition());
   const [geoStatus, setGeoStatus] = useState("idle");
+  const [showLocationPicker, setShowLocationPicker] = useState(false);
   const { favoriteIds, toggleFavorite } = useFavorites(user);
   const [ratings, setRatings] = useState({});
   const [soldOutToday, setSoldOutToday] = useState([]);
@@ -127,6 +129,15 @@ export default function PublicView({ user, pendingReserveBagId, onPendingReserve
     if (bag) setReserving(bag);
     onPendingReserveHandled?.();
   }, [pendingReserveBagId, bags]);
+
+  // Choix depuis LocationPicker (recherche libre ou emplacement enregistré,
+  // Domicile/Travail/Autre) — même état que la géolocalisation GPS
+  // (userPos), pour que tri par distance et carte réagissent pareil.
+  function handleSelectPlace(pos) {
+    setUserPos(pos);
+    savePosition(pos);
+    setGeoStatus("ok");
+  }
 
   async function handleLocate() {
     setGeoStatus("loading");
@@ -337,10 +348,20 @@ export default function PublicView({ user, pendingReserveBagId, onPendingReserve
 
   return (
     <div>
-      <button className="location-picker" onClick={handleLocate}>
+      <button className="location-picker" onClick={() => setShowLocationPicker(true)}>
         📍 {geoStatus === "loading" ? t("filters.locating") : userPos ? t("filters.currentPosition") : t("filters.useLocation")}
         <span className="chevron">›</span>
       </button>
+      {showLocationPicker && (
+        <LocationPicker
+          onSelect={(pos) => {
+            handleSelectPlace(pos);
+            setShowLocationPicker(false);
+          }}
+          onLocate={handleLocate}
+          onClose={() => setShowLocationPicker(false)}
+        />
+      )}
       {!compact && (
         <>
           <h1 className="page-title">{t("public.title")}</h1>

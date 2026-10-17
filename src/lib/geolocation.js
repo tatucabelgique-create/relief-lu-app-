@@ -50,6 +50,38 @@ export async function geocodeAddress(address, city) {
   }
 }
 
+// Géocodage via Photon (komoot.io, données OpenStreetMap) plutôt que
+// Nominatim — CORS activé pour un appel direct depuis le navigateur, contrairement
+// à Nominatim (utilisé ci-dessus pour geocodeAddress, un usage serveur-side
+// différent : géocoder l'adresse d'un commerçant à l'inscription). Biaisé sur
+// le Luxembourg (lat/lon de centrage) sans filtre strict de pays. Dédié au
+// sélecteur de lieu (LocationPicker.jsx) — ne pas réutiliser pour la
+// recherche mots-clés de l'onglet Parcourir, qui reste un filtre texte simple.
+export async function searchPlaces(query) {
+  if (!query?.trim()) return [];
+  try {
+    const res = await fetch(
+      `https://photon.komoot.io/api/?limit=6&lat=49.75&lon=6.15&zoom=10&lang=fr&q=${encodeURIComponent(query)}`
+    );
+    const data = await res.json();
+    const seen = new Set();
+    return (data.features || [])
+      .map((f) => {
+        const [lng, lat] = f.geometry.coordinates;
+        const p = f.properties || {};
+        const label = [p.name, p.name !== p.city ? p.city : null].filter(Boolean).join(", ");
+        return label ? { label, lat, lng } : null;
+      })
+      .filter((s) => {
+        if (!s || seen.has(s.label)) return false;
+        seen.add(s.label);
+        return true;
+      });
+  } catch {
+    return [];
+  }
+}
+
 export function locate() {
   return new Promise((resolve, reject) => {
     if (!navigator.geolocation) {
