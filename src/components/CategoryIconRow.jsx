@@ -1,55 +1,63 @@
 import { useI18n } from "../lib/i18n.jsx";
+import { isToday } from "./BagCard.jsx";
 
-// Émojis plutôt que des photos : cohérent avec le reste de l'app (🥡 en
-// repli sur les fiches sans image, 📍 pour la position...) et pas de vraies
-// photos de catégories à disposition sans en générer/choisir pour chacune.
-const CATEGORIES = [
-  { key: "boulangerie", emoji: "🥐" },
-  { key: "restaurant", emoji: "🍽️" },
-  { key: "epicerie", emoji: "🥬" },
-  { key: "supermarche", emoji: "🛒" },
-  { key: "traiteur", emoji: "🍱" },
-  { key: "autre", emoji: "📦" },
+// Chaque entrée cible une dimension de filtre différente — pas toutes
+// "category" au sens strict de bags.category. "Repas" et "Épicerie"/
+// "Boulangerie" filtrent par category ; "À récupérer maintenant" réutilise
+// le filtre pickupTime existant (créneau du jour) ; "Végétarien" réutilise
+// le filtre diet existant. Façon TGTG, qui mélange aussi type de commerce,
+// type de contenu et urgence dans une même rangée visuelle.
+const ITEMS = [
+  { key: "repas", emoji: "🍽️", labelKey: "discover.repas", filter: "category", value: "restaurant" },
+  { key: "boulangerie", emoji: "🥐", labelKey: "merchant.category.boulangerie", filter: "category", value: "boulangerie" },
+  { key: "epicerie", emoji: "🥬", labelKey: "merchant.category.epicerie", filter: "category", value: "epicerie" },
+  { key: "pickupNow", emoji: "⏳", labelKey: "discover.pickupNow", filter: "pickup", value: "today" },
+  { key: "vegetarien", emoji: "🌱", labelKey: "diet.vegetarian", filter: "diet", value: "vegetarian" },
 ];
 
-// Rangée de catégories façon TGTG, en haut de l'onglet Découvrir — raccourci
-// visuel vers le même filtre "category" que le menu déroulant de
-// FiltersBar.jsx (état partagé, pas de logique dupliquée). Un deuxième clic
-// sur la catégorie déjà sélectionnée la désélectionne (toggle), comme sur
-// TGTG.
-//
-// `availableCategories` (Set des clés présentes dans les sachets actifs,
-// calculé par PublicView.jsx) filtre la rangée : proposer une catégorie
-// qui ne mène à aucun résultat serait trompeur, surtout tant que relief.lu
-// a peu de sachets en ligne — mieux vaut n'afficher que ce qui existe
-// vraiment maintenant, quitte à ce que la rangée soit courte.
-export default function CategoryIconRow({ category, setCategory, availableCategories }) {
-  const { t } = useI18n();
-  const visibleCategories = CATEGORIES.filter((c) => availableCategories?.has(c.key));
-  if (!visibleCategories.length) return null;
+function isAvailable(item, bags) {
+  if (item.filter === "category") return bags.some((b) => b.category === item.value);
+  if (item.filter === "diet") return bags.some((b) => b.vegetarian);
+  if (item.filter === "pickup") return bags.some((b) => isToday(b.pickup_start));
+  return false;
+}
 
-  function handleClick(key) {
-    const selecting = category !== key;
-    setCategory(selecting ? key : "");
-    // Choisir une catégorie n'a d'effet visible qu'une fois scrollé jusqu'à
-    // la grille filtrée, plus bas sous les carrousels éditoriaux — sans ce
-    // scroll, le clic paraît ne rien faire. Pas de scroll en désélectionnant
-    // (l'utilisateur reste où il était).
-    if (selecting) {
+function isActive(item, { category, diet, pickupTime }) {
+  if (item.filter === "category") return category === item.value;
+  if (item.filter === "diet") return diet === item.value;
+  if (item.filter === "pickup") return pickupTime === item.value;
+  return false;
+}
+
+// Rangée de catégories façon TGTG, en haut de l'onglet Découvrir. Un
+// deuxième clic sur l'item déjà actif le désélectionne (toggle), comme sur
+// TGTG. Ne propose que les items ayant au moins un sachet actif
+// correspondant maintenant (voir isAvailable) — plutôt que de toujours
+// afficher les 5, ce qui mènerait parfois vers une liste vide et trompeuse.
+export default function CategoryIconRow({ category, setCategory, diet, setDiet, pickupTime, setPickupTime, bags }) {
+  const { t } = useI18n();
+  const visibleItems = ITEMS.filter((item) => isAvailable(item, bags ?? []));
+  if (!visibleItems.length) return null;
+
+  function handleClick(item) {
+    const active = isActive(item, { category, diet, pickupTime });
+    const setters = { category: setCategory, diet: setDiet, pickup: setPickupTime };
+    setters[item.filter](active ? "" : item.value);
+    if (!active) {
       document.getElementById("discover-results")?.scrollIntoView({ behavior: "smooth", block: "start" });
     }
   }
 
   return (
     <div className="category-icon-row">
-      {visibleCategories.map((c) => (
+      {visibleItems.map((item) => (
         <button
-          key={c.key}
-          className={`category-icon-item ${category === c.key ? "active" : ""}`}
-          onClick={() => handleClick(c.key)}
+          key={item.key}
+          className={`category-icon-item ${isActive(item, { category, diet, pickupTime }) ? "active" : ""}`}
+          onClick={() => handleClick(item)}
         >
-          <span className="category-icon-circle">{c.emoji}</span>
-          <span className="category-icon-label">{t(`merchant.category.${c.key}`)}</span>
+          <span className="category-icon-circle">{item.emoji}</span>
+          <span className="category-icon-label">{t(item.labelKey)}</span>
         </button>
       ))}
     </div>
