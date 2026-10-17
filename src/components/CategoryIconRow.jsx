@@ -19,13 +19,26 @@ const CATEGORIES = [
 // TGTG.
 export default function CategoryIconRow({ category, setCategory }) {
   const { t } = useI18n();
+
+  function handleClick(key) {
+    const selecting = category !== key;
+    setCategory(selecting ? key : "");
+    // Choisir une catégorie n'a d'effet visible qu'une fois scrollé jusqu'à
+    // la grille filtrée, plus bas sous les carrousels éditoriaux — sans ce
+    // scroll, le clic paraît ne rien faire. Pas de scroll en désélectionnant
+    // (l'utilisateur reste où il était).
+    if (selecting) {
+      document.getElementById("discover-results")?.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+  }
+
   return (
     <div className="category-icon-row">
       {CATEGORIES.map((c) => (
         <button
           key={c.key}
           className={`category-icon-item ${category === c.key ? "active" : ""}`}
-          onClick={() => setCategory(category === c.key ? "" : c.key)}
+          onClick={() => handleClick(c.key)}
         >
           <span className="category-icon-circle">{c.emoji}</span>
           <span className="category-icon-label">{t(`merchant.category.${c.key}`)}</span>

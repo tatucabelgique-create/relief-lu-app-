@@ -412,18 +412,20 @@ export default function PublicView({ user, pendingReserveBagId, onPendingReserve
       {!compact && bags !== null && bags.length === 0 && <MissionIntro />}
 
       {bags !== null && bags.length > 0 && (
-        <FiltersBar
-          category={category}
-          setCategory={setCategory}
-          sort={sort}
-          setSort={setSort}
-          search={search}
-          setSearch={setSearch}
-          onLocate={handleLocate}
-          geoStatus={geoStatus}
-          viewMode={viewMode}
-          setViewMode={setViewMode}
-        />
+        <div id="discover-results">
+          <FiltersBar
+            category={category}
+            setCategory={setCategory}
+            sort={sort}
+            setSort={setSort}
+            search={search}
+            setSearch={setSearch}
+            onLocate={handleLocate}
+            geoStatus={geoStatus}
+            viewMode={viewMode}
+            setViewMode={setViewMode}
+          />
+        </div>
       )}
 
       {viewMode === "map" && bags && bags.length > 0 && <MapView bags={filtered} userPos={userPos} />}
