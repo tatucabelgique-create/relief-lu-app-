@@ -36,8 +36,8 @@ export function savePosition(pos) {
 // avec les tuiles OSM déjà utilisées pour les cartes. Retourne null si
 // aucune correspondance (le commerçant garde alors juste son adresse texte,
 // sans coordonnées — pas bloquant pour publier des sachets).
-export async function geocodeAddress(address, city) {
-  const query = [address, city].filter(Boolean).join(", ");
+export async function geocodeAddress(address, postalCode, city) {
+  const query = [address, [postalCode, city].filter(Boolean).join(" ")].filter(Boolean).join(", ");
   if (!query) return null;
   const url = `https://nominatim.openstreetmap.org/search?format=json&limit=1&q=${encodeURIComponent(query)}`;
   try {

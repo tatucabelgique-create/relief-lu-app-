@@ -9,6 +9,7 @@ export default function MerchantRegistrationForm({ user, merchant, onDone }) {
   const [form, setForm] = useState({
     business_name: merchant?.business_name || "",
     address: merchant?.address || "",
+    postal_code: merchant?.postal_code || "",
     city: merchant?.city || "",
     phone: merchant?.phone || "",
     registration_number: merchant?.registration_number || "",
@@ -23,15 +24,30 @@ export default function MerchantRegistrationForm({ user, merchant, onDone }) {
 
   async function handleSubmit() {
     setMsg(null);
-    if (!form.business_name.trim() || !form.address.trim() || !form.city.trim()) {
+    // Tous les champs obligatoires sauf le seuil de prix dynamique, qui est
+    // une option opt-in par nature (chaîne vide = désactivé, voir plus bas)
+    // — le rendre obligatoire forcerait chaque commerçant dans le prix
+    // dynamique dès son inscription.
+    if (
+      !form.business_name.trim() ||
+      !form.address.trim() ||
+      !form.postal_code.trim() ||
+      !form.city.trim() ||
+      !form.phone.trim() ||
+      !form.registration_number.trim()
+    ) {
       setMsg({ type: "error", text: t("merchant.reg.required") });
+      return;
+    }
+    if (!/^L-\d{4}$/.test(form.postal_code.trim())) {
+      setMsg({ type: "error", text: t("merchant.reg.postalCodeFormat") });
       return;
     }
     setSaving(true);
     try {
       // Géocode l'adresse tapée en coordonnées GPS automatiquement — le
       // commerçant n'a plus besoin de positionner un repère sur une carte.
-      const coords = await geocodeAddress(form.address, form.city);
+      const coords = await geocodeAddress(form.address, form.postal_code, form.city);
       await updateMerchantProfile(user.id, {
         ...form,
         email: user.email,
@@ -58,10 +74,18 @@ export default function MerchantRegistrationForm({ user, merchant, onDone }) {
         <label>{t("merchant.reg.businessName")}</label>
         <input value={form.business_name} onChange={(e) => set("business_name", e.target.value)} placeholder="Boulangerie Dupont" />
       </div>
+      <div className="field">
+        <label>{t("merchant.reg.address")}</label>
+        <input value={form.address} onChange={(e) => set("address", e.target.value)} placeholder="12 rue de la Gare" />
+      </div>
       <div className="two-col">
         <div className="field">
-          <label>{t("merchant.reg.address")}</label>
-          <input value={form.address} onChange={(e) => set("address", e.target.value)} placeholder="12 rue de la Gare" />
+          <label>{t("merchant.reg.postalCode")}</label>
+          <input
+            value={form.postal_code}
+            onChange={(e) => set("postal_code", e.target.value)}
+            placeholder={t("merchant.reg.postalCodePlaceholder")}
+          />
         </div>
         <div className="field">
           <label>{t("merchant.reg.city")}</label>

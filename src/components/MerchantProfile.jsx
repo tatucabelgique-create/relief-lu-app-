@@ -10,7 +10,7 @@ export default function MerchantProfile({ merchant, bags, rating, distanceKm, on
   const { lang, t } = useI18n();
   if (!merchant) return null;
 
-  const address = [merchant.address, merchant.city].filter(Boolean).join(", ");
+  const address = [merchant.address, [merchant.postal_code, merchant.city].filter(Boolean).join(" ")].filter(Boolean).join(", ");
   const hasCoords = merchant.lat != null && merchant.lng != null;
   const directionsUrl = hasCoords ? `https://www.google.com/maps/dir/?api=1&destination=${merchant.lat},${merchant.lng}` : null;
 

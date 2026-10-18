@@ -24,6 +24,7 @@ export async function updateMerchantProfile(userId, profile) {
     id: userId,
     business_name: profile.business_name,
     address: profile.address,
+    postal_code: profile.postal_code,
     city: profile.city,
     phone: profile.phone,
     registration_number: profile.registration_number,

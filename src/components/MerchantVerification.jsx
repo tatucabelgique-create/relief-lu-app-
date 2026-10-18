@@ -51,7 +51,7 @@ export default function MerchantVerification() {
             <strong>{m.business_name}</strong>
           </div>
           <p className="page-sub" style={{ margin: "4px 0" }}>
-            {[m.address, m.city].filter(Boolean).join(", ")}
+            {[m.address, [m.postal_code, m.city].filter(Boolean).join(" ")].filter(Boolean).join(", ")}
           </p>
           <p className="page-sub" style={{ margin: "4px 0" }}>
             {m.phone || "Pas de téléphone"} — {m.registration_number || "Pas de n° RCS"}
@@ -75,7 +75,7 @@ export default function MerchantVerification() {
         <div key={m.id} style={{ borderTop: "1px solid rgba(239,230,211,0.12)", padding: "14px 0" }}>
           <strong>{m.business_name}</strong>
           <p className="page-sub" style={{ margin: "4px 0" }}>
-            {[m.address, m.city].filter(Boolean).join(", ")}
+            {[m.address, [m.postal_code, m.city].filter(Boolean).join(" ")].filter(Boolean).join(", ")}
           </p>
           <p className="page-sub" style={{ margin: "4px 0", color: m.stripe_account_id ? "var(--sage)" : "var(--honey)" }}>
             {m.stripe_account_id ? "✓ Compte Stripe connecté" : "⚠ Pas encore de compte Stripe — ventes non reversées automatiquement"}

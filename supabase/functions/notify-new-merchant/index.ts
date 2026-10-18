@@ -94,7 +94,7 @@ Deno.serve(async (req) => {
   const notification = JSON.stringify({
     title: "Nouveau commerçant",
     body: merchant.business_name
-      ? `${merchant.business_name} — ${[merchant.address, merchant.city].filter(Boolean).join(", ")}`
+      ? `${merchant.business_name} — ${[merchant.address, [merchant.postal_code, merchant.city].filter(Boolean).join(" ")].filter(Boolean).join(", ")}`
       : "Un commerçant vient de s'inscrire",
     url: "./app.html?view=admin",
   });
