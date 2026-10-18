@@ -301,10 +301,13 @@ h1.page-title {
 }
 .browse-locate-btn:active { transform: scale(0.9); }
 .browse-chip-row { display: flex; gap: 8px; overflow-x: auto; }
-.browse-chip-row select {
+.browse-chip-row select,
+.browse-chip-row .chip-btn {
   background: var(--navy-2); color: var(--paper); border: none; border-radius: 100px;
   padding: 8px 14px; font-size: 13px; font-weight: 600; white-space: nowrap;
 }
+.browse-chip-row .chip-btn { cursor: pointer; }
+.browse-chip-row .chip-btn.active { background: rgba(232,163,61,0.16); color: var(--honey); }
 /* flex-basis:0 + min-height : la carte reçoit tout l'espace restant après
    la feuille en priorité, sans jamais tomber à 0px — auparavant la feuille
    (flex-shrink:0, max-height en % de la PAGE entière) pouvait à elle seule
@@ -709,6 +712,26 @@ body { padding-bottom: 78px; }
   margin-top: 12px; background: none; border: none; color: var(--paper-dim);
   font-size: 14px; font-weight: 600; padding: 10px; text-align: center;
 }
+
+/* Feuille "Catégorie" (CategoryPicker.jsx) — même coquille que .location-sheet,
+   grille de pills 2 colonnes façon TGTG plutôt qu'une liste de lignes. */
+.category-sheet-grid {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 12px;
+  padding: 4px 0 20px;
+}
+.category-sheet-item {
+  display: flex; align-items: center; gap: 10px;
+  background: var(--navy-2); border: 1.5px solid var(--navy-3);
+  border-radius: 100px; padding: 12px 14px;
+  color: var(--paper); font-weight: 600; font-size: 14px;
+  text-align: left; cursor: pointer;
+}
+.category-sheet-item.active {
+  border-color: var(--honey); background: rgba(232,163,61,0.12); color: var(--honey);
+}
+.category-sheet-icon { font-size: 20px; flex-shrink: 0; }
+.category-sheet-actions { display: flex; gap: 12px; }
+.category-sheet-actions .btn { flex: 1; }
 .new-merchant-card {
   flex: 0 0 92%; max-width: 380px; scroll-snap-align: start;
   background: var(--navy-2); border-radius: 18px; padding: 24px;

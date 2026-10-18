@@ -126,18 +126,16 @@ export default function MerchantDashboard({ user, merchant, onMerchantChanged })
     setForm((f) => ({ ...f, vegan: checked, vegetarian: checked ? true : f.vegetarian }));
   }
 
-  // Les catégories Snack et Végétarien cochent automatiquement la case
-  // correspondante (dont dépendent les filtres de Découvrir), pour que le
-  // commerçant n'ait pas à faire les deux choix séparément. Repas/Boulangerie/
-  // Épicerie n'y touchent pas : un sachet "Boulangerie" peut très bien être
-  // aussi végétarien, par exemple.
+  // Comme chez TGTG, "Snack" est une des 6 catégories au même titre que
+  // Boulangerie ou Épicerie — pas une case à cocher séparée. On synchronise
+  // donc bags.snack (dont dépend le filtre Snacks de Découvrir) sur la
+  // catégorie choisie, dans les deux sens, plutôt que de garder une case
+  // dédiée qui pourrait se retrouver en contradiction avec la catégorie.
+  // Le régime (végétarien/végan) reste lui une case indépendante : chez TGTG
+  // aussi, c'est un filtre à part de la catégorie, pas une des 6 valeurs —
+  // un sachet "Boulangerie" peut très bien être végétarien.
   function setCategory(value) {
-    setForm((f) => ({
-      ...f,
-      category: value,
-      snack: value === "snack" ? true : f.snack,
-      vegetarian: value === "vegetarien" ? true : f.vegetarian,
-    }));
+    setForm((f) => ({ ...f, category: value, snack: value === "snack" }));
   }
 
   async function handlePublish() {
@@ -279,11 +277,12 @@ export default function MerchantDashboard({ user, merchant, onMerchantChanged })
           <div className="field">
             <label>{t("merchant.f.category")}</label>
             <select value={form.category} onChange={(e) => setCategory(e.target.value)}>
-              <option value="restaurant">{t("merchant.category.restaurant")}</option>
+              <option value="plats_prepares">{t("merchant.category.plats_prepares")}</option>
               <option value="boulangerie">{t("merchant.category.boulangerie")}</option>
+              <option value="sushi">{t("merchant.category.sushi")}</option>
               <option value="epicerie">{t("merchant.category.epicerie")}</option>
               <option value="snack">{t("merchant.category.snack")}</option>
-              <option value="vegetarien">{t("merchant.category.vegetarien")}</option>
+              <option value="sandwichs">{t("merchant.category.sandwichs")}</option>
             </select>
           </div>
         </div>
@@ -356,11 +355,6 @@ export default function MerchantDashboard({ user, merchant, onMerchantChanged })
         <label className="checkbox-field">
           <input type="checkbox" checked={form.vegan} onChange={(e) => setVegan(e.target.checked)} />
           <span>{t("merchant.f.vegan")}</span>
-        </label>
-
-        <label className="checkbox-field">
-          <input type="checkbox" checked={form.snack} onChange={(e) => set("snack", e.target.checked)} />
-          <span>{t("merchant.f.snack")}</span>
         </label>
 
         <div className="field">

@@ -14,6 +14,7 @@ import ReserveModal from "./ReserveModal.jsx";
 import FiltersBar from "./FiltersBar.jsx";
 import CategoryIconRow from "./CategoryIconRow.jsx";
 import LocationPicker from "./LocationPicker.jsx";
+import CategoryPicker from "./CategoryPicker.jsx";
 import MapView from "./MapView.jsx";
 import ImpactBanner from "./ImpactBanner.jsx";
 import MissionIntro from "./MissionIntro.jsx";
@@ -44,6 +45,7 @@ export default function PublicView({ user, pendingReserveBagId, onPendingReserve
   const [userPosLabel, setUserPosLabel] = useState(() => loadSavedPosition()?.label || null);
   const [geoStatus, setGeoStatus] = useState("idle");
   const [showLocationPicker, setShowLocationPicker] = useState(false);
+  const [showCategoryPicker, setShowCategoryPicker] = useState(false);
   const { favoriteIds, toggleFavorite } = useFavorites(user);
   const [ratings, setRatings] = useState({});
   const [soldOutToday, setSoldOutToday] = useState([]);
@@ -260,6 +262,9 @@ export default function PublicView({ user, pendingReserveBagId, onPendingReserve
         />
       )}
       <ReserveModal bag={reserving} user={user} onClose={() => setReserving(null)} onReserved={refresh} />
+      {showCategoryPicker && (
+        <CategoryPicker category={category} setCategory={setCategory} onClose={() => setShowCategoryPicker(false)} />
+      )}
     </>
   );
 
@@ -292,14 +297,9 @@ export default function PublicView({ user, pendingReserveBagId, onPendingReserve
             </button>
           </div>
           <div className="browse-chip-row">
-            <select value={category} onChange={(e) => setCategory(e.target.value)}>
-              <option value="">{t("filters.allCategories")}</option>
-              {["boulangerie", "restaurant", "epicerie", "supermarche", "traiteur", "autre"].map((c) => (
-                <option key={c} value={c}>
-                  {t(`merchant.category.${c}`)}
-                </option>
-              ))}
-            </select>
+            <button className={`chip-btn ${category ? "active" : ""}`} onClick={() => setShowCategoryPicker(true)}>
+              {category ? t(`merchant.category.${category}`) : t("filters.allCategories")} ⌄
+            </button>
             <select value={sort} onChange={(e) => setSort(e.target.value)}>
               <option value="recent">{t("filters.sortRecent")}</option>
               <option value="price">{t("filters.sortPrice")}</option>

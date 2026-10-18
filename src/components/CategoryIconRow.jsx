@@ -1,18 +1,18 @@
 import { useI18n } from "../lib/i18n.jsx";
 import { isToday } from "./BagCard.jsx";
 
-// Chaque entrée cible une dimension de filtre différente — pas toutes
-// "category" au sens strict de bags.category. "Repas" et "Épicerie"/
-// "Boulangerie" filtrent par category ; "À récupérer maintenant" réutilise
-// le filtre pickupTime existant (créneau du jour) ; "Végétarien" réutilise
-// le filtre diet existant ; "Snacks" a son propre booléen dédié
-// (bags.snack, v30) faute de filtre existant à réutiliser. Façon TGTG, qui
-// mélange aussi type de commerce, type de contenu et urgence dans une même
-// rangée visuelle.
+// Reprend les 6 catégories TGTG (menu "Catégorie" de Parcourir, sans Fleurs
+// & plantes qui n'a pas d'équivalent chez relief) + 2 dimensions à part :
+// "À récupérer maintenant" réutilise le filtre pickupTime existant (créneau
+// du jour, calculé en direct — jamais une valeur figée en base) ; chez TGTG
+// comme ici, le régime (végétarien) est un filtre indépendant de la
+// catégorie, pas une des 6 valeurs.
 const ITEMS = [
-  { key: "repas", emoji: "🍽️", labelKey: "discover.repas", filter: "category", value: "restaurant" },
+  { key: "repas", emoji: "🍲", labelKey: "discover.repas", filter: "category", value: "plats_prepares" },
   { key: "boulangerie", emoji: "🥐", labelKey: "merchant.category.boulangerie", filter: "category", value: "boulangerie" },
+  { key: "sushi", emoji: "🍣", labelKey: "discover.sushi", filter: "category", value: "sushi" },
   { key: "epicerie", emoji: "🥬", labelKey: "merchant.category.epicerie", filter: "category", value: "epicerie" },
+  { key: "sandwichs", emoji: "🥪", labelKey: "discover.sandwichs", filter: "category", value: "sandwichs" },
   { key: "pickupNow", emoji: "⏳", labelKey: "discover.pickupNow", filter: "pickup", value: "today" },
   { key: "snacks", emoji: "🍫", labelKey: "discover.snacks", filter: "snack" },
   { key: "vegetarien", emoji: "🌱", labelKey: "diet.vegetarian", filter: "diet", value: "vegetarian" },
