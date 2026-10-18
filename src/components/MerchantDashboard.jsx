@@ -126,6 +126,20 @@ export default function MerchantDashboard({ user, merchant, onMerchantChanged })
     setForm((f) => ({ ...f, vegan: checked, vegetarian: checked ? true : f.vegetarian }));
   }
 
+  // Les catégories Snack et Végétarien cochent automatiquement la case
+  // correspondante (dont dépendent les filtres de Découvrir), pour que le
+  // commerçant n'ait pas à faire les deux choix séparément. Repas/Boulangerie/
+  // Épicerie n'y touchent pas : un sachet "Boulangerie" peut très bien être
+  // aussi végétarien, par exemple.
+  function setCategory(value) {
+    setForm((f) => ({
+      ...f,
+      category: value,
+      snack: value === "snack" ? true : f.snack,
+      vegetarian: value === "vegetarien" ? true : f.vegetarian,
+    }));
+  }
+
   async function handlePublish() {
     setMsg(null);
     if (!form.title || !form.start || !form.end) {
@@ -264,13 +278,12 @@ export default function MerchantDashboard({ user, merchant, onMerchantChanged })
           </div>
           <div className="field">
             <label>{t("merchant.f.category")}</label>
-            <select value={form.category} onChange={(e) => set("category", e.target.value)}>
-              <option value="boulangerie">Boulangerie</option>
-              <option value="restaurant">Restaurant</option>
-              <option value="epicerie">Épicerie</option>
-              <option value="supermarche">Supermarché</option>
-              <option value="traiteur">Traiteur / cantine</option>
-              <option value="autre">Autre</option>
+            <select value={form.category} onChange={(e) => setCategory(e.target.value)}>
+              <option value="restaurant">{t("merchant.category.restaurant")}</option>
+              <option value="boulangerie">{t("merchant.category.boulangerie")}</option>
+              <option value="epicerie">{t("merchant.category.epicerie")}</option>
+              <option value="snack">{t("merchant.category.snack")}</option>
+              <option value="vegetarien">{t("merchant.category.vegetarien")}</option>
             </select>
           </div>
         </div>
