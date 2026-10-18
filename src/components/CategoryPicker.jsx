@@ -22,8 +22,14 @@ const CATEGORIES = [
 export default function CategoryPicker({ categories, setCategories, onClose }) {
   const { t } = useI18n();
 
+  // Forme fonctionnelle indispensable ici : deux taps rapprochés sur deux
+  // pills différentes peuvent être batchés par React dans le même cycle de
+  // rendu — avec `categories` fermé sur l'état d'avant le premier clic, le
+  // second taggait sur un tableau déjà périmé et "effaçait" le premier choix
+  // (confirmé en testant deux clics scriptés à la suite : seul le dernier
+  // restait actif).
   function toggle(value) {
-    setCategories(categories.includes(value) ? categories.filter((c) => c !== value) : [...categories, value]);
+    setCategories((prev) => (prev.includes(value) ? prev.filter((c) => c !== value) : [...prev, value]));
   }
 
   return (
