@@ -25,7 +25,14 @@ export default function PublicView({ user, pendingReserveBagId, onPendingReserve
   const [reserving, setReserving] = useState(null);
   const [viewingDetail, setViewingDetail] = useState(null);
   const [viewingMerchant, setViewingMerchant] = useState(null);
-  const [category, setCategory] = useState("");
+  // Tableau, pas une simple string : Parcourir permet de cocher plusieurs
+  // catégories à la fois (OU logique, comme chez TGTG) via CategoryPicker.
+  // Découvrir (CategoryIconRow, FiltersBar) reste volontairement en
+  // sélection unique — chacun garde sa propre UX, les deux lisent/écrivent
+  // ce même tableau via les adaptateurs `category`/`setCategory` ci-dessous.
+  const [categories, setCategories] = useState([]);
+  const category = categories[0] || "";
+  const setCategory = (value) => setCategories(value ? [value] : []);
   const [sort, setSort] = useState("recent");
   // Préremplie depuis ?city=... (liens "Villes" du footer de la landing) —
   // réutilise la recherche texte existante plutôt qu'un filtre à part,
@@ -175,7 +182,7 @@ export default function PublicView({ user, pendingReserveBagId, onPendingReserve
       distanceKm: userPos && b.merchants?.lat != null ? haversineKm(userPos.lat, userPos.lng, b.merchants.lat, b.merchants.lng) : null,
     }));
 
-    if (category) list = list.filter((b) => b.category === category);
+    if (categories.length) list = list.filter((b) => categories.includes(b.category));
     if (diet === "vegetarian") list = list.filter((b) => b.vegetarian);
     else if (diet === "vegan") list = list.filter((b) => b.vegan);
     if (pickupTime === "today") list = list.filter((b) => isToday(b.pickup_start));
@@ -208,7 +215,7 @@ export default function PublicView({ user, pendingReserveBagId, onPendingReserve
     else list = [...list].sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
 
     return list;
-  }, [bags, category, diet, pickupTime, snackOnly, search, sort, userPos]);
+  }, [bags, categories, diet, pickupTime, snackOnly, search, sort, userPos]);
 
   // Sous-ensemble trié par urgence de retrait — reprend le pattern "À sauver
   // avant qu'il ne soit trop tard" façon TGTG. Affiché seulement s'il reste
@@ -218,7 +225,7 @@ export default function PublicView({ user, pendingReserveBagId, onPendingReserve
   const closingSoon = useMemo(() => {
     return [...filtered].sort((a, b) => new Date(a.pickup_end) - new Date(b.pickup_end)).slice(0, 8);
   }, [filtered]);
-  const showCarousel = !search.trim() && !category && closingSoon.length > 1 && filtered.length > closingSoon.length;
+  const showCarousel = !search.trim() && !categories.length && closingSoon.length > 1 && filtered.length > closingSoon.length;
 
   const soldOutTodayWithDistance = useMemo(() => {
     return soldOutToday.map((b) => ({
@@ -263,7 +270,7 @@ export default function PublicView({ user, pendingReserveBagId, onPendingReserve
       )}
       <ReserveModal bag={reserving} user={user} onClose={() => setReserving(null)} onReserved={refresh} />
       {showCategoryPicker && (
-        <CategoryPicker category={category} setCategory={setCategory} onClose={() => setShowCategoryPicker(false)} />
+        <CategoryPicker categories={categories} setCategories={setCategories} onClose={() => setShowCategoryPicker(false)} />
       )}
     </>
   );
@@ -297,8 +304,11 @@ export default function PublicView({ user, pendingReserveBagId, onPendingReserve
             </button>
           </div>
           <div className="browse-chip-row">
-            <button className={`chip-btn ${category ? "active" : ""}`} onClick={() => setShowCategoryPicker(true)}>
-              {category ? t(`merchant.category.${category}`) : t("filters.allCategories")} ⌄
+            <button className={`chip-btn ${categories.length ? "active" : ""}`} onClick={() => setShowCategoryPicker(true)}>
+              {categories.length === 0 && t("filters.allCategories")}
+              {categories.length === 1 && t(`merchant.category.${categories[0]}`)}
+              {categories.length > 1 && `${categories.length} ${t("filters.categoriesCount")}`}
+              {" "}⌄
             </button>
             <select value={sort} onChange={(e) => setSort(e.target.value)}>
               <option value="recent">{t("filters.sortRecent")}</option>

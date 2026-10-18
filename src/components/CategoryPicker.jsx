@@ -14,11 +14,18 @@ const CATEGORIES = [
 ];
 
 // Feuille "Catégorie" façon TGTG, ouverte depuis le chip "Catégorie" de
-// Parcourir. Sélection unique (un sachet n'a qu'une catégorie) : un nouveau
-// tap sur l'item déjà actif le désélectionne. "Appliquer" ferme la feuille,
-// "Effacer les filtres" retire le filtre et ferme.
-export default function CategoryPicker({ category, setCategory, onClose }) {
+// Parcourir. Multi-sélection (OU logique) comme chez TGTG : on peut cocher
+// plusieurs catégories pour voir les sachets de l'une OU l'autre — un
+// sachet donné n'a toujours qu'une seule catégorie, mais le FILTRE peut en
+// couvrir plusieurs à la fois. "Appliquer" ferme la feuille, "Effacer les
+// filtres" retire toute sélection et ferme.
+export default function CategoryPicker({ categories, setCategories, onClose }) {
   const { t } = useI18n();
+
+  function toggle(value) {
+    setCategories(categories.includes(value) ? categories.filter((c) => c !== value) : [...categories, value]);
+  }
+
   return (
     <div className="location-sheet-overlay" onClick={onClose}>
       <div className="location-sheet" onClick={(e) => e.stopPropagation()}>
@@ -29,8 +36,8 @@ export default function CategoryPicker({ category, setCategory, onClose }) {
           {CATEGORIES.map((c) => (
             <button
               key={c.value}
-              className={`category-sheet-item ${category === c.value ? "active" : ""}`}
-              onClick={() => setCategory(category === c.value ? "" : c.value)}
+              className={`category-sheet-item ${categories.includes(c.value) ? "active" : ""}`}
+              onClick={() => toggle(c.value)}
             >
               <span className="category-sheet-icon">{c.emoji}</span>
               <span>{t(`merchant.category.${c.value}`)}</span>
@@ -42,7 +49,7 @@ export default function CategoryPicker({ category, setCategory, onClose }) {
           <button
             className="btn secondary"
             onClick={() => {
-              setCategory("");
+              setCategories([]);
               onClose();
             }}
           >
