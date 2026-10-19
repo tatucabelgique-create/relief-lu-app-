@@ -13,6 +13,12 @@
 //   de son propre sachet, voir cancelBag côté client) ;
 // - l'admin (ADMIN_EMAIL), sans limite de temps.
 //
+// Pas de notification Web Push ici volontairement : stripe.refunds.create()
+// déclenche l'événement Stripe charge.refunded quel que soit l'appelant
+// (API ou Dashboard), et c'est stripe-webhook/index.ts qui notifie le client
+// sur cet événement — une seule source de vérité, pour ne jamais envoyer
+// deux notifications pour un seul remboursement.
+//
 // Secrets requis : STRIPE_SECRET_KEY, SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY.
 import Stripe from "npm:stripe@17";
 import { createClient } from "npm:@supabase/supabase-js@2";
@@ -95,7 +101,9 @@ Deno.serve(async (req) => {
 
     // Même fonction que le webhook (charge.refunded) pour resynchroniser la
     // base — une seule source de vérité pour "que se passe-t-il quand une
-    // réservation payée est remboursée" (remise en stock incluse).
+    // réservation payée est remboursée" (remise en stock incluse). Le
+    // webhook, déclenché par l'événement Stripe ci-dessus, se charge aussi
+    // de notifier le client par Web Push (voir ce fichier).
     await supabase.rpc("refund_reservation_by_intent", { p_payment_intent_id: reservation.stripe_payment_intent_id });
 
     return new Response(JSON.stringify({ ok: true }), {

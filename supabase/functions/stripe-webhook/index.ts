@@ -128,6 +128,61 @@ async function notifyMerchantOfPaidReservation(reservationId: string) {
   }
 }
 
+// Même logique que notifyMerchantOfPaidReservation ci-dessus, mais côté
+// client. Volontairement ici et nulle part ailleurs : charge.refunded se
+// déclenche pour TOUT remboursement, qu'il vienne de refund-reservation/
+// index.ts (annulation client/commerçant/admin dans l'app) ou d'une action
+// manuelle dans le Dashboard Stripe — une seule source de vérité, jamais
+// deux notifications pour un seul remboursement. Le client est notifié même
+// s'il a annulé lui-même : confirmation utile, pas un doublon gênant.
+async function notifyCustomerOfRefund(paymentIntentId: string) {
+  try {
+    const appServer = await getAppServer();
+    const { data: reservation } = await supabase
+      .from("reservations")
+      .select("user_id, bags(title, merchants(business_name))")
+      .eq("stripe_payment_intent_id", paymentIntentId)
+      .single();
+
+    const bag = reservation?.bags as { title: string; merchants: { business_name: string } | null } | null;
+    if (!reservation || !bag) return;
+
+    const { data: subs } = await supabase
+      .from("push_subscriptions")
+      .select("id, endpoint, p256dh, auth")
+      .eq("user_id", reservation.user_id);
+
+    if (!subs?.length) return;
+
+    const notification = JSON.stringify({
+      title: "Réservation remboursée",
+      body: `${bag.merchants?.business_name ?? "relief.lu"} — ${bag.title} : ta réservation a été annulée et intégralement remboursée.`,
+      url: "./app.html?view=account",
+    });
+
+    const staleIds: string[] = [];
+    await Promise.all(
+      subs.map(async (sub) => {
+        try {
+          const subscriber = appServer.subscribe({
+            endpoint: sub.endpoint,
+            keys: { p256dh: sub.p256dh, auth: sub.auth },
+          });
+          await subscriber.pushTextMessage(notification, {});
+        } catch (err) {
+          const status = err?.response?.status;
+          if (status === 404 || status === 410) staleIds.push(sub.id);
+        }
+      })
+    );
+    if (staleIds.length) {
+      await supabase.from("push_subscriptions").delete().in("id", staleIds);
+    }
+  } catch {
+    // silencieux, voir commentaire sur notifyMerchantOfPaidReservation
+  }
+}
+
 Deno.serve(async (req) => {
   const signature = req.headers.get("stripe-signature");
   const body = await req.text();
@@ -155,15 +210,17 @@ Deno.serve(async (req) => {
     }
   }
 
-  // Filet de sécurité : si un remboursement est fait depuis le Dashboard
-  // Stripe directement (plutôt que via refund-reservation/index.ts), la base
-  // relief.lu doit quand même se resynchroniser — sinon la réservation reste
-  // "payée" pour toujours et le sachet n'est jamais remis en stock.
+  // Se déclenche pour TOUT remboursement (API via refund-reservation/
+  // index.ts ou action manuelle dans le Dashboard Stripe) — resynchronise la
+  // base (sinon la réservation resterait "payée" pour toujours et le sachet
+  // ne serait jamais remis en stock) et notifie le client (voir
+  // notifyCustomerOfRefund ci-dessus).
   if (event.type === "charge.refunded") {
     const charge = event.data.object as Stripe.Charge;
     const paymentIntentId = typeof charge.payment_intent === "string" ? charge.payment_intent : charge.payment_intent?.id;
     if (paymentIntentId) {
       await supabase.rpc("refund_reservation_by_intent", { p_payment_intent_id: paymentIntentId });
+      await notifyCustomerOfRefund(paymentIntentId);
     }
   }
 
