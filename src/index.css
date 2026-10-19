@@ -511,6 +511,7 @@ body { padding-bottom: 78px; }
 .payment-chip-paid { border-color: rgba(127,168,140,0.4); color: var(--sage); }
 .payment-chip-pending { border-color: rgba(232,163,61,0.4); color: var(--honey); }
 .payment-chip-failed { border-color: rgba(217,105,79,0.4); color: var(--red); }
+.payment-chip-refunded { border-color: rgba(183,171,140,0.4); color: var(--paper-dim); }
 .bag-detail-availability-banner {
   background: rgba(232,163,61,0.14); color: var(--honey); font-weight: 700; font-size: 13px;
   text-align: center; padding: 8px; border-radius: 8px; margin: 12px 0 4px;

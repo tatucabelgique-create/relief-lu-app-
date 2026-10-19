@@ -1,9 +1,10 @@
 // Reçoit les événements Stripe (paiement réussi / session expirée / compte
-// Connect mis à jour) et met à jour la réservation ou le commerçant en
-// conséquence. À configurer dans le Dashboard Stripe (Developers → Webhooks
-// → Add endpoint) une fois l'URL de cette fonction déployée :
-// .../functions/v1/stripe-webhook, événements à cocher :
-// checkout.session.completed, checkout.session.expired, account.updated.
+// Connect mis à jour / remboursement) et met à jour la réservation ou le
+// commerçant en conséquence. À configurer dans le Dashboard Stripe
+// (Developers → Webhooks → Add endpoint) une fois l'URL de cette fonction
+// déployée : .../functions/v1/stripe-webhook, événements à cocher :
+// checkout.session.completed, checkout.session.expired, account.updated,
+// charge.refunded.
 // Secrets requis : STRIPE_SECRET_KEY, STRIPE_WEBHOOK_SECRET (donné par Stripe
 // au moment de créer le endpoint), SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY,
 // VAPID_PUBLIC_KEY, VAPID_PRIVATE_KEY (mêmes clés que notify-new-bag, pour
@@ -142,8 +143,27 @@ Deno.serve(async (req) => {
     const session = event.data.object as Stripe.Checkout.Session;
     const reservationId = session.metadata?.reservation_id;
     if (reservationId) {
-      await supabase.from("reservations").update({ payment_status: "paid" }).eq("id", reservationId);
+      // payment_intent stocké ici (pas seulement stripe_session_id) : c'est
+      // ce que refund-reservation/index.ts doit passer à
+      // stripe.refunds.create() — sans ça, aucune réservation payée avant ce
+      // changement ne serait remboursable par l'app (voir schema-v33).
+      await supabase
+        .from("reservations")
+        .update({ payment_status: "paid", stripe_payment_intent_id: session.payment_intent as string })
+        .eq("id", reservationId);
       await notifyMerchantOfPaidReservation(reservationId);
+    }
+  }
+
+  // Filet de sécurité : si un remboursement est fait depuis le Dashboard
+  // Stripe directement (plutôt que via refund-reservation/index.ts), la base
+  // relief.lu doit quand même se resynchroniser — sinon la réservation reste
+  // "payée" pour toujours et le sachet n'est jamais remis en stock.
+  if (event.type === "charge.refunded") {
+    const charge = event.data.object as Stripe.Charge;
+    const paymentIntentId = typeof charge.payment_intent === "string" ? charge.payment_intent : charge.payment_intent?.id;
+    if (paymentIntentId) {
+      await supabase.rpc("refund_reservation_by_intent", { p_payment_intent_id: paymentIntentId });
     }
   }
 

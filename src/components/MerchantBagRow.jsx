@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useI18n } from "../lib/i18n.jsx";
 import { cancelBag, stopRecurring, updateBagPrice } from "../lib/bags";
-import { getReservationsForBag, updateReservationStatus } from "../lib/reservations";
+import { getReservationsForBag, updateReservationStatus, requestRefund } from "../lib/reservations";
 
 const MIN_PRICE = 3.99;
 
@@ -13,6 +13,9 @@ export default function MerchantBagRow({ bag, onChanged }) {
   const [priceInput, setPriceInput] = useState((bag.price_cents / 100).toFixed(2));
   const [priceError, setPriceError] = useState(null);
   const [savingPrice, setSavingPrice] = useState(false);
+  const [cancellingBag, setCancellingBag] = useState(false);
+  const [refundingId, setRefundingId] = useState(null);
+  const [actionError, setActionError] = useState(null);
 
   // Réservé aux sachets encore à quantité pleine — voir le commentaire dans
   // updateBagPrice() : on évite tout risque de changer ce que paie un client
@@ -47,9 +50,46 @@ export default function MerchantBagRow({ bag, onChanged }) {
     onChanged();
   }
 
+  // Annuler un sachet ne doit jamais laisser ses clients déjà payés de côté
+  // — façon TGTG ("si le commerçant annule, pas besoin de demander un
+  // remboursement") : on rembourse automatiquement chaque réservation payée
+  // avant d'annuler le sachet lui-même, après confirmation du commerçant
+  // s'il y en a au moins une (il doit savoir que ça va se produire).
   async function handleCancelBag() {
-    await cancelBag(bag.id);
-    onChanged();
+    setActionError(null);
+    const current = reservations ?? (await getReservationsForBag(bag.id));
+    const paid = current.filter((r) => r.payment_status === "paid" && r.status === "confirmed");
+
+    if (paid.length && !window.confirm(`${paid.length} ${t("merchant.cancelBagConfirmPaid")}`)) return;
+    if (!paid.length && !window.confirm(t("merchant.cancelBagConfirm"))) return;
+
+    setCancellingBag(true);
+    try {
+      for (const r of paid) {
+        await requestRefund(r.id);
+      }
+      await cancelBag(bag.id);
+      onChanged();
+    } catch (err) {
+      setActionError(err.message);
+    } finally {
+      setCancellingBag(false);
+    }
+  }
+
+  async function handleRefund(reservationId) {
+    if (!window.confirm(t("merchant.refundConfirm"))) return;
+    setActionError(null);
+    setRefundingId(reservationId);
+    try {
+      await requestRefund(reservationId);
+      setReservations(await getReservationsForBag(bag.id));
+      onChanged();
+    } catch (err) {
+      setActionError(err.message);
+    } finally {
+      setRefundingId(null);
+    }
   }
 
   async function handleStopRecurring() {
@@ -112,12 +152,13 @@ export default function MerchantBagRow({ bag, onChanged }) {
             </button>
           )}
           {bag.status !== "cancelled" && (
-            <button className="btn secondary small" onClick={handleCancelBag}>
-              {t("merchant.cancelBag")}
+            <button className="btn secondary small" onClick={handleCancelBag} disabled={cancellingBag}>
+              {cancellingBag ? t("merchant.cancelling") : t("merchant.cancelBag")}
             </button>
           )}
         </div>
       </div>
+      {actionError && <span className="error-msg">{actionError}</span>}
       {open && (
         <div style={{ marginTop: 10 }}>
           {!reservations?.length ? (
@@ -138,12 +179,15 @@ export default function MerchantBagRow({ bag, onChanged }) {
                   </span>
                 </div>
                 {r.status === "confirmed" && r.payment_status === "paid" && (
-                  <div style={{ display: "flex", gap: 6 }}>
+                  <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
                     <button className="btn small" onClick={() => setStatus(r.id, "picked_up")}>
                       {t("merchant.markPickedUp")}
                     </button>
                     <button className="btn secondary small" onClick={() => setStatus(r.id, "no_show")}>
                       {t("merchant.markNoShow")}
+                    </button>
+                    <button className="btn secondary small" onClick={() => handleRefund(r.id)} disabled={refundingId === r.id}>
+                      {refundingId === r.id ? t("merchant.refunding") : t("merchant.refund")}
                     </button>
                   </div>
                 )}

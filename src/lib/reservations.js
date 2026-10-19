@@ -1,5 +1,11 @@
 import { supabase } from "./supabase";
 
+// Nom à corriger après le premier déploiement de supabase/functions/refund-reservation/
+// (Supabase donne un nom aléatoire au déploiement, voir payments.js/notify.js
+// pour le même genre de constante) — fonction pas encore déployée au moment
+// de l'écriture de ce fichier, donc pas encore de nom réel à mettre ici.
+const REFUND_FUNCTION_NAME = "refund-reservation";
+
 export async function reserveBag(bagId, quantity) {
   const { data, error } = await supabase.rpc("reserve_bag", {
     p_bag_id: bagId,
@@ -19,6 +25,29 @@ export async function reserveBag(bagId, quantity) {
 export async function releaseReservation(id) {
   const { error } = await supabase.rpc("release_reservation", { p_reservation_id: id });
   if (error) throw error;
+}
+
+// Annulation + remboursement d'une réservation déjà payée — appelle l'edge
+// function refund-reservation (vraie logique Stripe + resynchro base, voir
+// schema-v33). L'autorisation et la fenêtre de 2h avant retrait sont
+// vérifiées côté serveur, jamais seulement côté client.
+export async function requestRefund(reservationId) {
+  const {
+    data: { session },
+  } = await supabase.auth.getSession();
+
+  const res = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/${REFUND_FUNCTION_NAME}`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${session?.access_token}`,
+      apikey: import.meta.env.VITE_SUPABASE_ANON_KEY,
+    },
+    body: JSON.stringify({ reservation_id: reservationId }),
+  });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.error || "Erreur lors du remboursement.");
+  return data;
 }
 
 export async function getReservation(id) {

@@ -1,15 +1,28 @@
 import { useEffect, useState } from "react";
 import { useI18n } from "../lib/i18n.jsx";
-import { getMyReservations } from "../lib/reservations";
+import { getMyReservations, requestRefund } from "../lib/reservations";
 import { formatPickupWindow } from "./BagCard.jsx";
 import AuthPrompt from "./AuthPrompt.jsx";
 import ReviewForm from "./ReviewForm.jsx";
 import { displayPriceCents } from "../lib/pricing.js";
 
+// Même coupure que Too Good To Go : annulation en libre-service jusqu'à 2h
+// avant le début du créneau de retrait, au-delà il faut contacter le
+// commerçant directement (pas de centre d'aide à reconstruire ici).
+const CANCELLATION_CUTOFF_MS = 2 * 60 * 60 * 1000;
+
+function canCancel(r) {
+  if (r.payment_status !== "paid" || r.status !== "confirmed") return false;
+  if (!r.bags?.pickup_start) return false;
+  return new Date(r.bags.pickup_start).getTime() - Date.now() >= CANCELLATION_CUTOFF_MS;
+}
+
 export default function AccountView({ user }) {
   const { lang, t } = useI18n();
   const [reservations, setReservations] = useState(null);
   const [reviewing, setReviewing] = useState(null);
+  const [cancellingId, setCancellingId] = useState(null);
+  const [cancelError, setCancelError] = useState(null);
 
   async function refresh() {
     if (user) setReservations(await getMyReservations(user.id));
@@ -18,6 +31,20 @@ export default function AccountView({ user }) {
   useEffect(() => {
     refresh();
   }, [user]);
+
+  async function handleCancel(reservationId) {
+    if (!window.confirm(t("account.cancelConfirm"))) return;
+    setCancellingId(reservationId);
+    setCancelError(null);
+    try {
+      await requestRefund(reservationId);
+      await refresh();
+    } catch (err) {
+      setCancelError(err.message);
+    } finally {
+      setCancellingId(null);
+    }
+  }
 
   return (
     <div>
@@ -32,6 +59,7 @@ export default function AccountView({ user }) {
         <p className="page-sub">{t("account.empty")}</p>
       ) : (
         <div className="panel">
+          {cancelError && <p className="error-msg">{cancelError}</p>}
           {reservations.map((r) => {
             const existingReview = Array.isArray(r.reviews) ? r.reviews[0] : r.reviews;
             return (
@@ -49,6 +77,16 @@ export default function AccountView({ user }) {
                     <span className="page-sub" style={{ fontWeight: 700, display: "block", marginTop: 6 }}>
                       {t("reserve.codeLabel")} : {r.pickup_code}
                     </span>
+                  )}
+                  {canCancel(r) && (
+                    <button
+                      className="btn secondary small"
+                      style={{ marginTop: 8 }}
+                      disabled={cancellingId === r.id}
+                      onClick={() => handleCancel(r.id)}
+                    >
+                      {cancellingId === r.id ? t("account.cancelling") : t("account.cancelReservation")}
+                    </button>
                   )}
                   {r.payment_status === "paid" &&
                     (existingReview ? (
