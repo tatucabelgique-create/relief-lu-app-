@@ -12,6 +12,12 @@ export default function ReserveModal({ bag, user, onClose, onReserved }) {
   const [qty, setQty] = useState(1);
   const [error, setError] = useState("");
   const [redirecting, setRedirecting] = useState(false);
+  // Écran "Ce que tu dois savoir" façon TGTG, affiché à CHAQUE réservation
+  // (pas juste la première fois) — protection légale explicite juste avant
+  // le paiement, pas seulement une mention dans les CGU : renforce l'absence
+  // de garantie sur la composition/les allergènes (voir LegalModal.jsx,
+  // article 8) au moment précis où ça compte le plus pour le client.
+  const [showDisclaimer, setShowDisclaimer] = useState(false);
   // Démarre bloqué (fail-closed) : mieux vaut un très bref flash du message
   // "bientôt disponible" le temps du fetch, que risquer d'autoriser un clic
   // avant d'avoir confirmé que les paiements sont réellement en mode live.
@@ -25,6 +31,7 @@ export default function ReserveModal({ bag, user, onClose, onReserved }) {
   // d'engagement doit s'y déclencher.
   useEffect(() => {
     if (bag) notifyEngaged();
+    setShowDisclaimer(false);
   }, [bag]);
 
   // Vérifié une fois au montage (flag global, pas lié à un sachet précis) —
@@ -73,6 +80,29 @@ export default function ReserveModal({ bag, user, onClose, onReserved }) {
         </button>
         {!user ? (
           <AuthPrompt title={t("reserve.loginRequired")} view={`reserve:${bag.id}`} />
+        ) : showDisclaimer ? (
+          <div>
+            <h2>{t("reserve.disclaimerTitle")}</h2>
+            <div style={{ display: "flex", gap: 12, marginTop: 16 }}>
+              <span style={{ fontSize: 26, flexShrink: 0 }}>🛍️</span>
+              <div>
+                <b style={{ display: "block", marginBottom: 6 }}>{t("reserve.disclaimerHeading")}</b>
+                <p className="page-sub" style={{ margin: 0 }}>{t("reserve.disclaimerBody")}</p>
+              </div>
+            </div>
+            <button className="btn" style={{ marginTop: 20, width: "100%" }} onClick={handleConfirm} disabled={redirecting}>
+              {redirecting ? t("reserve.redirecting") : t("reserve.disclaimerAccept")}
+            </button>
+            <button
+              className="btn secondary"
+              style={{ marginTop: 10, width: "100%" }}
+              onClick={() => setShowDisclaimer(false)}
+              disabled={redirecting}
+            >
+              {t("reserve.disclaimerBack")}
+            </button>
+            {error && <p className="error-msg">{error}</p>}
+          </div>
         ) : (
           <div>
             <h2>{bag.title}</h2>
@@ -107,8 +137,8 @@ export default function ReserveModal({ bag, user, onClose, onReserved }) {
             </div>
 
             {paymentsLive ? (
-              <button className="btn" onClick={handleConfirm} disabled={redirecting}>
-                {redirecting ? t("reserve.redirecting") : t("reserve.confirm")}
+              <button className="btn" onClick={() => setShowDisclaimer(true)}>
+                {t("reserve.confirm")}
               </button>
             ) : (
               <p className="page-sub" style={{ textAlign: "center" }}>
