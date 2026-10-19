@@ -38,7 +38,12 @@ export default function MerchantStats({ merchantId, refreshKey }) {
         <b className="figures">{stats.revenue.toFixed(2)} €</b>
       </div>
       <div className="reserve-row">
-        <span>{t("stats.commissionHt")}</span>
+        {/* Taux affiché dynamiquement (merchants.commission_rate) — un
+            partenaire négocié (ex. 21% pour Hana Group) n'est pas à 18%,
+            un libellé figé "18% HT" mentirait sur sa propre fiche. */}
+        <span>
+          {t("stats.commissionHtLabel")} ({Math.round(stats.commissionRate * 100)}% {t("stats.commissionHtSuffix")})
+        </span>
         <span className="figures">− {stats.commissionHt.toFixed(2)} €</span>
       </div>
       <div className="reserve-row">

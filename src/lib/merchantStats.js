@@ -82,6 +82,10 @@ export async function getMerchantStats(merchantId) {
     totalReservations,
     noShowRate: totalReservations ? Math.round((noShowCount / totalReservations) * 100) : 0,
     revenue: revenueCents / 100,
+    // Renvoyé pour affichage (MerchantStats.jsx) — un taux négocié
+    // (commission_rate, v28) n'est pas forcément 18%, le libellé ne peut
+    // donc plus être un texte figé "18%" dans les traductions.
+    commissionRate: COMMISSION_RATE,
     commissionHt: commissionHtCents / 100,
     vat: vatCents / 100,
     commissionTtc: commissionTtcCents / 100,
