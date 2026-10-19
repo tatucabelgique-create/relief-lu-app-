@@ -90,7 +90,14 @@ export default function ReserveModal({ bag, user, onClose, onReserved }) {
                 <p className="page-sub" style={{ margin: 0 }}>{t("reserve.disclaimerBody")}</p>
               </div>
             </div>
-            <button className="btn" style={{ marginTop: 20, width: "100%" }} onClick={handleConfirm} disabled={redirecting}>
+            <p className="page-sub" style={{ marginTop: 16, textAlign: "center" }}>
+              {t("reserve.legalPre")}{" "}
+              <a href="?legal=cguClients" target="_blank" rel="noopener">
+                {t("reserve.legalLink")}
+              </a>
+              {t("reserve.legalPost")}
+            </p>
+            <button className="btn" style={{ marginTop: 10, width: "100%" }} onClick={handleConfirm} disabled={redirecting}>
               {redirecting ? t("reserve.redirecting") : t("reserve.disclaimerAccept")}
             </button>
             <button

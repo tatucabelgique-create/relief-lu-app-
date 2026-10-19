@@ -85,7 +85,7 @@ const CONTENT = {
         },
         {
           heading: "5. Annulation, non-disponibilité et remboursement",
-          text: "En cas d'annulation avant retrait, d'indisponibilité du sachet ou d'échec du paiement, la réservation est automatiquement annulée et aucun montant n'est débité (ou celui-ci est intégralement remboursé si le débit avait déjà eu lieu). En cas de non-retrait par l'utilisateur dans le créneau indiqué sans annulation préalable, le sachet est considéré comme retiré et le montant payé n'est pas remboursé ; relief.lu se réserve le droit de suspendre le compte concerné en cas de non-retrait répété.",
+          text: "L'utilisateur peut annuler sa réservation directement dans l'application jusqu'à 2 heures avant le début du créneau de retrait ; le montant payé lui est alors intégralement remboursé. Passé ce délai, toute annulation doit être demandée directement auprès du commerçant. En cas d'indisponibilité du sachet (annulation par le commerçant) ou d'échec du paiement, la réservation est automatiquement annulée et l'utilisateur est intégralement remboursé sans démarche de sa part. En cas de non-retrait par l'utilisateur dans le créneau indiqué sans annulation préalable, le sachet est considéré comme retiré et le montant payé n'est pas remboursé ; relief.lu se réserve le droit de suspendre le compte concerné en cas de non-retrait répété.",
         },
         {
           heading: "6. Retrait du sachet",
@@ -276,7 +276,7 @@ const CONTENT = {
         },
         {
           heading: "5. Stornierung, Nichtverfügbarkeit und Erstattung",
-          text: "Bei Stornierung vor Abholung, Nichtverfügbarkeit der Tüte oder fehlgeschlagener Zahlung wird die Reservierung automatisch storniert und kein Betrag abgebucht (bzw. vollständig erstattet, falls bereits abgebucht). Bei Nichtabholung durch den Nutzer im angegebenen Zeitfenster ohne vorherige Stornierung gilt die Tüte als abgeholt, der gezahlte Betrag wird nicht erstattet; relief.lu behält sich bei wiederholter Nichtabholung das Recht vor, das betreffende Konto zu sperren.",
+          text: "Der Nutzer kann seine Reservierung direkt in der App bis zu 2 Stunden vor Beginn des Abholzeitfensters stornieren; der gezahlte Betrag wird dann vollständig erstattet. Nach Ablauf dieser Frist ist eine Stornierung nur noch direkt beim Geschäft möglich. Bei Nichtverfügbarkeit der Tüte (Stornierung durch das Geschäft) oder fehlgeschlagener Zahlung wird die Reservierung automatisch storniert und der Nutzer ohne eigenes Zutun vollständig erstattet. Bei Nichtabholung durch den Nutzer im angegebenen Zeitfenster ohne vorherige Stornierung gilt die Tüte als abgeholt, der gezahlte Betrag wird nicht erstattet; relief.lu behält sich bei wiederholter Nichtabholung das Recht vor, das betreffende Konto zu sperren.",
         },
         {
           heading: "6. Abholung der Tüte",
@@ -467,7 +467,7 @@ const CONTENT = {
         },
         {
           heading: "5. Cancellation, unavailability and refunds",
-          text: "In case of cancellation before pickup, bag unavailability, or payment failure, the reservation is automatically cancelled and no amount is charged (or fully refunded if already charged). If the user fails to collect their reservation within the indicated window without prior cancellation, the bag is considered collected and the amount paid is not refunded; relief.lu reserves the right to suspend the account concerned in case of repeated no-shows.",
+          text: "The user may cancel their reservation directly in the app up to 2 hours before the start of the pickup window, in which case the amount paid is fully refunded. After this deadline, any cancellation must be requested directly from the merchant. In case of bag unavailability (cancellation by the merchant) or payment failure, the reservation is automatically cancelled and the user is fully refunded with no action required on their part. If the user fails to collect their reservation within the indicated window without prior cancellation, the bag is considered collected and the amount paid is not refunded; relief.lu reserves the right to suspend the account concerned in case of repeated no-shows.",
         },
         {
           heading: "6. Bag pickup",
