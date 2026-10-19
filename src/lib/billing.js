@@ -1,8 +1,12 @@
 import { supabase } from "./supabase";
 
-// Mêmes taux que src/lib/merchantStats.js (stats affichées au commerçant) —
-// à garder synchronisés, voir le commentaire là-bas pour le détail.
-const COMMISSION_RATE = 0.18;
+// Même taux par défaut que src/lib/merchantStats.js — mais ici, contrairement
+// à l'ancienne version de ce fichier, le taux RÉELLEMENT appliqué est celui
+// de chaque commerçant (merchants.commission_rate, v28), pas une constante
+// unique : cet écran calcule les montants à reverser pour de vrai, un
+// partenaire négocié (ex. 21% pour Hana Group) doit être facturé à son
+// propre taux, pas à 18% par défaut.
+const DEFAULT_COMMISSION_RATE = 0.18;
 const VAT_RATE = 0.17;
 
 // Lundi 00:00 -> dimanche 23:59:59 de la semaine complète précédant
@@ -35,7 +39,7 @@ export async function generateWeeklyInvoices(weekStart, weekEnd) {
 
   const { data: reservations, error } = await supabase
     .from("reservations")
-    .select("id, quantity, created_at, bags(title, price_cents, merchant_id, merchants(business_name))")
+    .select("id, quantity, created_at, bags(title, price_cents, merchant_id, merchants(business_name, commission_rate))")
     .eq("payment_status", "paid")
     .gte("created_at", rangeStart.toISOString())
     .lte("created_at", rangeEnd.toISOString());
@@ -49,6 +53,7 @@ export async function generateWeeklyInvoices(weekStart, weekEnd) {
       byMerchant[bag.merchant_id] = {
         merchantId: bag.merchant_id,
         businessName: bag.merchants?.business_name || "—",
+        commissionRate: bag.merchants?.commission_rate ?? DEFAULT_COMMISSION_RATE,
         reservationCount: 0,
         unitsSold: 0,
         revenueCents: 0,
@@ -69,7 +74,7 @@ export async function generateWeeklyInvoices(weekStart, weekEnd) {
 
   return Object.values(byMerchant)
     .map((m) => {
-      const commissionHtCents = Math.round(m.revenueCents * COMMISSION_RATE);
+      const commissionHtCents = Math.round(m.revenueCents * m.commissionRate);
       const vatCents = Math.round(commissionHtCents * VAT_RATE);
       const commissionTtcCents = commissionHtCents + vatCents;
       return {
@@ -87,6 +92,7 @@ export async function generateWeeklyInvoices(weekStart, weekEnd) {
 export function invoicesToCsv(invoices, weekStart, weekEnd) {
   const header = [
     "Commerçant",
+    "Taux commission",
     "Réservations",
     "Unités vendues",
     "CA brut (€)",
@@ -97,6 +103,7 @@ export function invoicesToCsv(invoices, weekStart, weekEnd) {
   ];
   const rows = invoices.map((inv) => [
     inv.businessName,
+    `${Math.round(inv.commissionRate * 100)}%`,
     inv.reservationCount,
     inv.unitsSold,
     inv.revenue.toFixed(2),

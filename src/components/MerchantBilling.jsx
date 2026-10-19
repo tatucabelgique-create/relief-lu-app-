@@ -45,8 +45,9 @@ export default function MerchantBilling() {
     <div className="panel">
       <h2>Facturation commerçants</h2>
       <p className="page-sub">
-        Calcule, pour chaque commerçant, le chiffre d'affaires payé sur la période, la commission relief.lu (18% HT +
-        TVA 17%) et le montant net à leur reverser. Usage interne — rien n'est envoyé aux commerçants.
+        Calcule, pour chaque commerçant, le chiffre d'affaires payé sur la période, la commission relief.lu (son propre
+        taux négocié, 18% par défaut, + TVA 17%) et le montant net à leur reverser. Usage interne — rien n'est envoyé
+        aux commerçants.
       </p>
 
       <div className="two-col" style={{ marginTop: 16 }}>
@@ -75,6 +76,7 @@ export default function MerchantBilling() {
                   <thead>
                     <tr style={{ textAlign: "left", borderBottom: "1px solid rgba(239,230,211,0.2)" }}>
                       <th style={{ padding: "8px 6px" }}>Commerçant</th>
+                      <th style={{ padding: "8px 6px" }}>Taux</th>
                       <th style={{ padding: "8px 6px" }}>Résa.</th>
                       <th style={{ padding: "8px 6px" }}>Unités</th>
                       <th style={{ padding: "8px 6px" }}>CA brut</th>
@@ -88,6 +90,7 @@ export default function MerchantBilling() {
                       <Fragment key={inv.merchantId}>
                         <tr style={{ borderBottom: "1px solid rgba(239,230,211,0.08)" }}>
                           <td style={{ padding: "8px 6px" }}>{inv.businessName}</td>
+                          <td style={{ padding: "8px 6px" }}>{Math.round(inv.commissionRate * 100)}%</td>
                           <td style={{ padding: "8px 6px" }}>{inv.reservationCount}</td>
                           <td style={{ padding: "8px 6px" }}>{inv.unitsSold}</td>
                           <td style={{ padding: "8px 6px" }}>{fmt(inv.revenue)} €</td>
@@ -104,7 +107,7 @@ export default function MerchantBilling() {
                         </tr>
                         {openMerchantId === inv.merchantId && (
                           <tr key={`${inv.merchantId}-details`}>
-                            <td colSpan={7} style={{ padding: "0 6px 14px" }}>
+                            <td colSpan={8} style={{ padding: "0 6px 14px" }}>
                               <table style={{ width: "100%", fontSize: 12.5, color: "var(--paper-dim)" }}>
                                 <tbody>
                                   {inv.lines.map((line, i) => (
@@ -132,7 +135,7 @@ export default function MerchantBilling() {
                   </tbody>
                   <tfoot>
                     <tr style={{ borderTop: "1px solid rgba(239,230,211,0.2)", fontWeight: 700 }}>
-                      <td style={{ padding: "8px 6px" }} colSpan={5}>
+                      <td style={{ padding: "8px 6px" }} colSpan={6}>
                         Total net à verser
                       </td>
                       <td style={{ padding: "8px 6px" }}>{fmt(totalNet)} €</td>
