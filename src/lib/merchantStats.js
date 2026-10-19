@@ -37,17 +37,10 @@ export async function getRecentSoldCount(merchantId) {
 export async function getMerchantStats(merchantId) {
   const { data: merchant, error: merchantError } = await supabase
     .from("merchants")
-    .select("commission_rate")
+    .select("commission_rate, verified")
     .eq("id", merchantId)
     .single();
   if (merchantError) throw merchantError;
-  // Le taux n'est plus censé rester NULL après validation (setMerchantVerified
-  // le fixe à 18% par défaut au moment de l'approbation) — s'il est encore
-  // NULL ici, c'est qu'il n'a pas encore été validé par l'admin, pas un oubli
-  // à masquer silencieusement derrière 18%. On garde quand même un filet pour
-  // le calcul (toujours 0€ avant validation, les sachets ne peuvent pas être
-  // publiés sans l'être), mais l'affichage (commissionRate, nullable) doit
-  // pouvoir distinguer "pas encore validé" de "18% validé".
   const COMMISSION_RATE = merchant?.commission_rate ?? DEFAULT_COMMISSION_RATE;
 
   const { data: bags, error: bagsError } = await supabase
@@ -89,10 +82,10 @@ export async function getMerchantStats(merchantId) {
     totalReservations,
     noShowRate: totalReservations ? Math.round((noShowCount / totalReservations) * 100) : 0,
     revenue: revenueCents / 100,
-    // Brut (nullable), pas COMMISSION_RATE : MerchantStats.jsx doit pouvoir
-    // afficher "en attente de validation" tant que l'admin n'a pas approuvé
-    // le commerçant, plutôt que de montrer 18% comme si c'était déjà acté.
-    commissionRate: merchant?.commission_rate ?? null,
+    // Null avant validation admin (merchant.verified) — MerchantStats.jsx
+    // affiche alors "en attente de validation" plutôt que de montrer 18%
+    // comme si le taux était déjà acté.
+    commissionRate: merchant?.verified ? COMMISSION_RATE : null,
     commissionHt: commissionHtCents / 100,
     vat: vatCents / 100,
     commissionTtc: commissionTtcCents / 100,
