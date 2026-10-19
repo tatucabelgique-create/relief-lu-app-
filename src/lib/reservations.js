@@ -1,10 +1,9 @@
 import { supabase } from "./supabase";
 
-// Nom à corriger après le premier déploiement de supabase/functions/refund-reservation/
-// (Supabase donne un nom aléatoire au déploiement, voir payments.js/notify.js
-// pour le même genre de constante) — fonction pas encore déployée au moment
-// de l'écriture de ce fichier, donc pas encore de nom réel à mettre ici.
-const REFUND_FUNCTION_NAME = "refund-reservation";
+// Nom réel de la fonction déployée dans le dashboard Supabase (voir
+// payments.js/notify.js pour le même genre de constante) — confirmé
+// 2026-10-19, source supabase/functions/refund-reservation/.
+const REFUND_FUNCTION_NAME = "smart-task";
 
 export async function reserveBag(bagId, quantity) {
   const { data, error } = await supabase.rpc("reserve_bag", {
