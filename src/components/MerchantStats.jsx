@@ -39,10 +39,15 @@ export default function MerchantStats({ merchantId, refreshKey }) {
       </div>
       <div className="reserve-row">
         {/* Taux affiché dynamiquement (merchants.commission_rate) — un
-            partenaire négocié (ex. 21% pour Hana Group) n'est pas à 18%,
-            un libellé figé "18% HT" mentirait sur sa propre fiche. */}
+            partenaire négocié (ex. 21% pour Hana Group) n'est pas à 18%, un
+            libellé figé "18% HT" mentirait sur sa propre fiche. Et tant que
+            l'admin n'a pas validé le commerçant (setMerchantVerified fixe le
+            taux à ce moment-là), il n'y a pas encore de taux officiel du
+            tout — on ne doit pas laisser deviner 18% avant cette étape. */}
         <span>
-          {t("stats.commissionHtLabel")} ({Math.round(stats.commissionRate * 100)}% {t("stats.commissionHtSuffix")})
+          {stats.commissionRate != null
+            ? `${t("stats.commissionHtLabel")} (${Math.round(stats.commissionRate * 100)}% ${t("stats.commissionHtSuffix")})`
+            : t("stats.commissionPending")}
         </span>
         <span className="figures">− {stats.commissionHt.toFixed(2)} €</span>
       </div>

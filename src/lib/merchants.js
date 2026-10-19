@@ -61,8 +61,18 @@ export async function listMerchants() {
   return data;
 }
 
+// Le taux de commission n'est plus défini d'office à l'inscription (voir
+// merchantStats.js) — il ne se fixe qu'ici, au moment où l'admin approuve
+// le commerçant, et seulement s'il n'a pas déjà un taux négocié en base
+// (ex. fixé par SQL avant validation pour un partenaire type Hana Group) —
+// approuver ne doit jamais écraser un taux déjà négocié.
 export async function setMerchantVerified(merchantId, verified) {
-  const { error } = await supabase.from("merchants").update({ verified }).eq("id", merchantId);
+  const payload = { verified };
+  if (verified) {
+    const { data: current } = await supabase.from("merchants").select("commission_rate").eq("id", merchantId).single();
+    if (current?.commission_rate == null) payload.commission_rate = 0.18;
+  }
+  const { error } = await supabase.from("merchants").update(payload).eq("id", merchantId);
   if (error) throw error;
 }
 
