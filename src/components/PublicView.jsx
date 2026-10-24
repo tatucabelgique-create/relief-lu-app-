@@ -11,7 +11,6 @@ import BagCard, { isToday, isTomorrow } from "./BagCard.jsx";
 import BagDetail from "./BagDetail.jsx";
 import MerchantProfile from "./MerchantProfile.jsx";
 import ReserveModal from "./ReserveModal.jsx";
-import FiltersBar from "./FiltersBar.jsx";
 import CategoryIconRow from "./CategoryIconRow.jsx";
 import LocationPicker from "./LocationPicker.jsx";
 import CategoryPicker from "./CategoryPicker.jsx";
@@ -19,7 +18,7 @@ import MapView from "./MapView.jsx";
 import ImpactBanner from "./ImpactBanner.jsx";
 import MissionIntro from "./MissionIntro.jsx";
 
-export default function PublicView({ user, pendingReserveBagId, onPendingReserveHandled, initialViewMode = "grid", compact = false }) {
+export default function PublicView({ user, pendingReserveBagId, onPendingReserveHandled, compact = false }) {
   const { t } = useI18n();
   const [bags, setBags] = useState(null); // null = loading
   const [reserving, setReserving] = useState(null);
@@ -44,7 +43,6 @@ export default function PublicView({ user, pendingReserveBagId, onPendingReserve
   // Puce "Snacks sucrés & salés" de CategoryIconRow — pas de filtre
   // existant à réutiliser comme pour diet/pickupTime, donc état dédié.
   const [snackOnly, setSnackOnly] = useState(false);
-  const [viewMode, setViewMode] = useState(initialViewMode);
   const [userPos, setUserPos] = useState(() => loadSavedPosition());
   // Nom lisible du lieu courant ("Cap d'Agde, Agde" façon TGTG), affiché à
   // côté du bouton position — distinct de userPos (coordonnées), car la
@@ -482,24 +480,7 @@ export default function PublicView({ user, pendingReserveBagId, onPendingReserve
 
       {!compact && bags !== null && bags.length === 0 && <MissionIntro />}
 
-      {bags !== null && bags.length > 0 && (
-        <div id="discover-results">
-          <FiltersBar
-            sort={sort}
-            setSort={setSort}
-            search={search}
-            setSearch={setSearch}
-            onLocate={handleLocate}
-            geoStatus={geoStatus}
-            viewMode={viewMode}
-            setViewMode={setViewMode}
-          />
-        </div>
-      )}
-
-      {viewMode === "map" && bags && bags.length > 0 && <MapView bags={filtered} userPos={userPos} />}
-
-      <div className="grid">
+      <div className="grid" id="discover-results">
         {bags === null ? (
           <div className="empty">{t("public.loading")}</div>
         ) : !filtered.length ? (
