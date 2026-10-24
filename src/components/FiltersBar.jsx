@@ -1,8 +1,6 @@
 import { useI18n } from "../lib/i18n.jsx";
 
-const CATEGORIES = ["boulangerie", "restaurant", "epicerie", "supermarche", "traiteur", "autre"];
-
-export default function FiltersBar({ category, setCategory, sort, setSort, search, setSearch, onLocate, geoStatus, viewMode, setViewMode }) {
+export default function FiltersBar({ sort, setSort, search, setSearch, onLocate, geoStatus, viewMode, setViewMode }) {
   const { t } = useI18n();
   return (
     <div className="filters-bar">
@@ -12,14 +10,6 @@ export default function FiltersBar({ category, setCategory, sort, setSort, searc
         value={search}
         onChange={(e) => setSearch(e.target.value)}
       />
-      <select value={category} onChange={(e) => setCategory(e.target.value)}>
-        <option value="">{t("filters.allCategories")}</option>
-        {CATEGORIES.map((c) => (
-          <option key={c} value={c}>
-            {t(`merchant.category.${c}`)}
-          </option>
-        ))}
-      </select>
       <select value={sort} onChange={(e) => setSort(e.target.value)}>
         <option value="recent">{t("filters.sortRecent")}</option>
         <option value="price">{t("filters.sortPrice")}</option>

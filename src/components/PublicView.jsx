@@ -485,8 +485,6 @@ export default function PublicView({ user, pendingReserveBagId, onPendingReserve
       {bags !== null && bags.length > 0 && (
         <div id="discover-results">
           <FiltersBar
-            category={category}
-            setCategory={setCategory}
             sort={sort}
             setSort={setSort}
             search={search}
