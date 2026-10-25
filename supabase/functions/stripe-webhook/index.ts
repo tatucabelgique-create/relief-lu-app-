@@ -9,7 +9,11 @@
 // au moment de créer le endpoint), SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY,
 // VAPID_PUBLIC_KEY, VAPID_PRIVATE_KEY (mêmes clés que notify-new-bag, pour
 // prévenir le commerçant par push qu'une réservation vient d'être payée —
-// seul moyen pour lui de le savoir sans garder le tableau de bord ouvert).
+// seul moyen pour lui de le savoir sans garder le tableau de bord ouvert),
+// RESEND_API_KEY (confirmations email client/commerçant/admin — domaine
+// relief.lu déjà vérifié sur Resend, utilisé par ailleurs pour le SMTP de
+// Supabase Auth, mais ce secret-ci est distinct : les Edge Functions n'ont
+// pas accès à la config SMTP d'Auth, il faut leur propre clé API Resend).
 import Stripe from "npm:stripe@17";
 import { createClient } from "npm:@supabase/supabase-js@2";
 import * as webpush from "jsr:@negrel/webpush@0";
@@ -21,6 +25,13 @@ const webhookSecret = Deno.env.get("STRIPE_WEBHOOK_SECRET")!;
 const VAPID_PUBLIC_KEY = Deno.env.get("VAPID_PUBLIC_KEY")!;
 const VAPID_PRIVATE_KEY = Deno.env.get("VAPID_PRIVATE_KEY")!;
 const VAPID_SUBJECT = Deno.env.get("VAPID_SUBJECT") ?? "mailto:contact@relief.lu";
+
+const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY");
+const FROM_EMAIL = "relief.lu <contact@relief.lu>";
+// Même adresse que refund-reservation/index.ts (ADMIN_EMAIL) — dupliquée ici
+// plutôt que partagée, chaque Edge Function étant déployée indépendamment
+// (pas de module commun entre fonctions dans ce projet).
+const ADMIN_EMAIL = "giovanni.ehp@gmail.com";
 
 function b64urlToBytes(b64url: string): Uint8Array {
   const b64 = b64url.replace(/-/g, "+").replace(/_/g, "/");
@@ -128,6 +139,111 @@ async function notifyMerchantOfPaidReservation(reservationId: string) {
   }
 }
 
+// Best-effort, comme les notifications push : un email raté ne doit jamais
+// faire échouer le traitement du webhook. Pas de vérification de la réponse
+// au-delà du log — si Resend refuse l'envoi (clé absente/invalide, domaine
+// non vérifié), on le voit dans les logs de la fonction plutôt que de
+// bloquer quoi que ce soit côté paiement.
+async function sendEmail(to: string, subject: string, html: string) {
+  if (!RESEND_API_KEY) return; // secret pas encore configuré — silencieux
+  try {
+    const res = await fetch("https://api.resend.com/emails", {
+      method: "POST",
+      headers: { Authorization: `Bearer ${RESEND_API_KEY}`, "Content-Type": "application/json" },
+      body: JSON.stringify({ from: FROM_EMAIL, to: [to], subject, html }),
+    });
+    if (!res.ok) console.error("Resend error", res.status, await res.text());
+  } catch (err) {
+    console.error("Resend fetch failed", err);
+  }
+}
+
+function formatPickupWindow(startIso: string, endIso: string) {
+  const fmt = new Intl.DateTimeFormat("fr-LU", { day: "numeric", month: "long", hour: "2-digit", minute: "2-digit", timeZone: "Europe/Luxembourg" });
+  const start = new Date(startIso);
+  const end = new Date(endIso);
+  const endTime = new Intl.DateTimeFormat("fr-LU", { hour: "2-digit", minute: "2-digit", timeZone: "Europe/Luxembourg" }).format(end);
+  return `${fmt.format(start)} – ${endTime}`;
+}
+
+function emailShell(bodyHtml: string) {
+  return `<div style="font-family:-apple-system,Helvetica,Arial,sans-serif;max-width:480px;margin:0 auto;padding:32px 24px;color:#16232C;">
+    <div style="font-weight:900;font-size:20px;margin-bottom:24px;">relief<span style="color:#E8A33D;">.lu</span></div>
+    ${bodyHtml}
+    <p style="margin-top:32px;font-size:12px;color:#888;">relief.lu — Luxembourg</p>
+  </div>`;
+}
+
+// Déclenché juste après notifyMerchantOfPaidReservation sur
+// checkout.session.completed — une seule requête imbriquée (reservations →
+// bags → merchants) suffit : email client et email commerçant sont déjà
+// dupliqués sur leurs tables respectives (voir schema-v23-merchant-email),
+// pas besoin d'appeler l'API Auth admin pour les récupérer.
+async function sendReservationEmails(reservationId: string, amountTotalCents: number) {
+  try {
+    const { data: reservation } = await supabase
+      .from("reservations")
+      .select("quantity, pickup_code, email, bags(title, pickup_start, pickup_end, merchants(business_name, email))")
+      .eq("id", reservationId)
+      .single();
+
+    const bag = reservation?.bags as {
+      title: string;
+      pickup_start: string;
+      pickup_end: string;
+      merchants: { business_name: string; email: string | null } | null;
+    } | null;
+    if (!reservation || !bag) return;
+
+    const merchant = bag.merchants;
+    const pickupWindow = formatPickupWindow(bag.pickup_start, bag.pickup_end);
+    const total = (amountTotalCents / 100).toFixed(2).replace(".", ",");
+
+    if (reservation.email) {
+      await sendEmail(
+        reservation.email,
+        `Réservation confirmée — ${bag.title}`,
+        emailShell(`
+          <h1 style="font-size:20px;margin:0 0 16px;">C'est réservé !</h1>
+          <p>${merchant?.business_name ?? "Ton commerçant"} — <b>${bag.title}</b> (${reservation.quantity})</p>
+          <p>Retrait : ${pickupWindow}</p>
+          <p>Total payé : <b>${total} €</b></p>
+          <div style="margin-top:20px;padding:16px;border:2px dashed #E8A33D;border-radius:12px;text-align:center;">
+            <div style="font-size:24px;font-weight:900;letter-spacing:2px;">${reservation.pickup_code}</div>
+            <div style="font-size:12px;color:#888;margin-top:4px;">Code de retrait — à montrer sur place</div>
+          </div>
+        `)
+      );
+    }
+
+    if (merchant?.email) {
+      await sendEmail(
+        merchant.email,
+        `Nouvelle réservation payée — ${bag.title}`,
+        emailShell(`
+          <h1 style="font-size:20px;margin:0 0 16px;">Nouvelle vente</h1>
+          <p>${reservation.quantity} × <b>${bag.title}</b></p>
+          <p>Retrait prévu : ${pickupWindow}</p>
+          <p>Montant total payé par le client : ${total} €</p>
+        `)
+      );
+    }
+
+    await sendEmail(
+      ADMIN_EMAIL,
+      `Vente — ${merchant?.business_name ?? "Commerçant"} — ${bag.title}`,
+      emailShell(`
+        <h1 style="font-size:20px;margin:0 0 16px;">Nouvelle vente</h1>
+        <p>${merchant?.business_name ?? "Commerçant inconnu"}</p>
+        <p>${reservation.quantity} × ${bag.title} — ${total} €</p>
+        <p>Retrait : ${pickupWindow}</p>
+      `)
+    );
+  } catch (err) {
+    console.error("sendReservationEmails failed", err);
+  }
+}
+
 // Même logique que notifyMerchantOfPaidReservation ci-dessus, mais côté
 // client. Volontairement ici et nulle part ailleurs : charge.refunded se
 // déclenche pour TOUT remboursement, qu'il vienne de refund-reservation/
@@ -207,6 +323,7 @@ Deno.serve(async (req) => {
         .update({ payment_status: "paid", stripe_payment_intent_id: session.payment_intent as string })
         .eq("id", reservationId);
       await notifyMerchantOfPaidReservation(reservationId);
+      await sendReservationEmails(reservationId, session.amount_total ?? 0);
     }
   }
 
