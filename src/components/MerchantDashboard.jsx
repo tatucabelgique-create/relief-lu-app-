@@ -78,14 +78,20 @@ export default function MerchantDashboard({ user, merchant, onMerchantChanged })
   // que PublicView.jsx, mais un simple refetch complet suffit vu la taille
   // de la liste (les sachets d'un seul commerçant), pas besoin de fusion
   // manuelle événement par événement.
+  //
+  // Filtre côté client plutôt que le `filter: merchant_id=eq...` côté
+  // serveur de postgres_changes — ce dernier s'est révélé peu fiable en
+  // pratique (silencieux, aucune erreur, mais aucun événement reçu), alors
+  // que l'abonnement sans filtre fonctionne de façon confirmée dans
+  // PublicView.jsx. On reçoit donc les changements de tous les commerçants
+  // et on ignore ceux qui ne nous concernent pas.
   useEffect(() => {
     const channel = supabase
       .channel(`merchant-bags-${user.id}`)
-      .on(
-        "postgres_changes",
-        { event: "*", schema: "public", table: "bags", filter: `merchant_id=eq.${user.id}` },
-        () => refreshMyBags()
-      )
+      .on("postgres_changes", { event: "*", schema: "public", table: "bags" }, (payload) => {
+        const row = payload.new?.id ? payload.new : payload.old;
+        if (row?.merchant_id === user.id) refreshMyBags();
+      })
       .subscribe();
 
     return () => supabase.removeChannel(channel);
