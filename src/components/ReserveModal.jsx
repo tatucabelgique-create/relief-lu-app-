@@ -112,16 +112,16 @@ export default function ReserveModal({ bag, user, onClose, onReserved }) {
           </div>
         ) : (
           <div>
-            <h2>{bag.title}</h2>
-            {bag.merchants?.business_name && (
-              <p className="desc" style={{ marginTop: -8 }}>
-                {bag.merchants.business_name}
-              </p>
-            )}
+            <div className="reserve-header">
+              {bag.merchants?.logo_url && <img className="reserve-logo" src={bag.merchants.logo_url} alt="" />}
+              <h2>{bag.title}</h2>
+              {bag.merchants?.business_name && <p className="desc">{bag.merchants.business_name}</p>}
+            </div>
 
             <div className="reserve-time-row">
-              {isToday(bag.pickup_start) && <span className="pill-base chip-pill-outline">{t("bagDetail.today")}</span>}
-              {isTomorrow(bag.pickup_start) && <span className="pill-base chip-pill-outline">{t("bagDetail.tomorrow")}</span>}
+              <span className="reserve-time-label">
+                {isToday(bag.pickup_start) ? t("bagDetail.today") : isTomorrow(bag.pickup_start) ? t("bagDetail.tomorrow") : t("reserve.pickup")}
+              </span>
               <span className="reserve-time-badge figures">{formatPickupWindow(bag.pickup_start, bag.pickup_end, lang)}</span>
             </div>
 
