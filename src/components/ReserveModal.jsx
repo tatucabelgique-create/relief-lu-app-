@@ -72,6 +72,45 @@ export default function ReserveModal({ bag, user, onClose, onReserved }) {
     }
   }
 
+  // Feuille ancrée en bas (même coquille que LocationPicker/CategoryPicker)
+  // plutôt que la carte centrée des autres écrans de ce composant — imite le
+  // rendu TGTG pour cet écran précis (bottom sheet qui monte depuis le bas),
+  // le reste de ReserveModal gardant la carte centrée du système existant.
+  if (user && showDisclaimer) {
+    return (
+      <div className="location-sheet-overlay" onClick={(e) => e.target === e.currentTarget && setShowDisclaimer(false)}>
+        <div className="location-sheet reserve-disclaimer-sheet">
+          <div className="location-sheet-handle" />
+          <button className="close" onClick={onClose}>
+            ✕
+          </button>
+          <h2>{t("reserve.disclaimerTitle")}</h2>
+          <div style={{ display: "flex", gap: 12, marginTop: 16 }}>
+            <span className="disclaimer-icon">🛍️</span>
+            <div>
+              <b style={{ display: "block", marginBottom: 6 }}>{t("reserve.disclaimerHeading")}</b>
+              <p className="page-sub" style={{ margin: 0 }}>{t("reserve.disclaimerBody")}</p>
+            </div>
+          </div>
+          <p className="page-sub" style={{ marginTop: 16, textAlign: "center" }}>
+            {t("reserve.legalPre")}{" "}
+            <a href="?legal=cguClients" target="_blank" rel="noopener">
+              {t("reserve.legalLink")}
+            </a>
+            {t("reserve.legalPost")}
+          </p>
+          <button className="btn" style={{ marginTop: 10, width: "100%" }} onClick={handleConfirm} disabled={redirecting}>
+            {redirecting ? t("reserve.redirecting") : t("reserve.disclaimerAccept")}
+          </button>
+          <button className="location-sheet-close" onClick={() => setShowDisclaimer(false)} disabled={redirecting}>
+            {t("reserve.disclaimerBack")}
+          </button>
+          {error && <p className="error-msg">{error}</p>}
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="overlay open" onClick={(e) => e.target === e.currentTarget && onClose()}>
       <div className="modal">
@@ -80,36 +119,6 @@ export default function ReserveModal({ bag, user, onClose, onReserved }) {
         </button>
         {!user ? (
           <AuthPrompt title={t("reserve.loginRequired")} view={`reserve:${bag.id}`} />
-        ) : showDisclaimer ? (
-          <div>
-            <h2>{t("reserve.disclaimerTitle")}</h2>
-            <div style={{ display: "flex", gap: 12, marginTop: 16 }}>
-              <span style={{ fontSize: 26, flexShrink: 0 }}>🛍️</span>
-              <div>
-                <b style={{ display: "block", marginBottom: 6 }}>{t("reserve.disclaimerHeading")}</b>
-                <p className="page-sub" style={{ margin: 0 }}>{t("reserve.disclaimerBody")}</p>
-              </div>
-            </div>
-            <p className="page-sub" style={{ marginTop: 16, textAlign: "center" }}>
-              {t("reserve.legalPre")}{" "}
-              <a href="?legal=cguClients" target="_blank" rel="noopener">
-                {t("reserve.legalLink")}
-              </a>
-              {t("reserve.legalPost")}
-            </p>
-            <button className="btn" style={{ marginTop: 10, width: "100%" }} onClick={handleConfirm} disabled={redirecting}>
-              {redirecting ? t("reserve.redirecting") : t("reserve.disclaimerAccept")}
-            </button>
-            <button
-              className="btn secondary"
-              style={{ marginTop: 10, width: "100%" }}
-              onClick={() => setShowDisclaimer(false)}
-              disabled={redirecting}
-            >
-              {t("reserve.disclaimerBack")}
-            </button>
-            {error && <p className="error-msg">{error}</p>}
-          </div>
         ) : (
           <div>
             <div className="reserve-header">
