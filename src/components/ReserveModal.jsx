@@ -7,7 +7,7 @@ import AuthPrompt from "./AuthPrompt.jsx";
 import { notifyEngaged } from "./InstallPrompt.jsx";
 import { displayPriceCents } from "../lib/pricing.js";
 
-export default function ReserveModal({ bag, user, onClose, onReserved }) {
+export default function ReserveModal({ bag, user, onClose, onReserved, onOpenLegal }) {
   const { lang, t } = useI18n();
   const [qty, setQty] = useState(1);
   const [error, setError] = useState("");
@@ -94,9 +94,9 @@ export default function ReserveModal({ bag, user, onClose, onReserved }) {
           </div>
           <p className="page-sub" style={{ marginTop: 16, textAlign: "center" }}>
             {t("reserve.legalPre")}{" "}
-            <a href="?legal=cguClients" target="_blank" rel="noopener">
+            <button type="button" className="link-btn" onClick={() => onOpenLegal?.("cguClients")}>
               {t("reserve.legalLink")}
-            </a>
+            </button>
             {t("reserve.legalPost")}
           </p>
           <button className="btn" style={{ marginTop: 10, width: "100%" }} onClick={handleConfirm} disabled={redirecting}>

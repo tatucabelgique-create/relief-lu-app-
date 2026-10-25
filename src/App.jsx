@@ -155,13 +155,19 @@ export default function App() {
           </div>
         )}
         {view === "public" && (
-          <PublicView user={user} pendingReserveBagId={pendingReserveBagId} onPendingReserveHandled={() => setPendingReserveBagId(null)} />
+          <PublicView
+            user={user}
+            pendingReserveBagId={pendingReserveBagId}
+            onPendingReserveHandled={() => setPendingReserveBagId(null)}
+            onOpenLegal={setLegalModal}
+          />
         )}
         {view === "browse" && (
           <PublicView
             user={user}
             pendingReserveBagId={pendingReserveBagId}
             onPendingReserveHandled={() => setPendingReserveBagId(null)}
+            onOpenLegal={setLegalModal}
             compact
           />
         )}

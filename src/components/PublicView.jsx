@@ -18,7 +18,7 @@ import MapView from "./MapView.jsx";
 import ImpactBanner from "./ImpactBanner.jsx";
 import MissionIntro from "./MissionIntro.jsx";
 
-export default function PublicView({ user, pendingReserveBagId, onPendingReserveHandled, compact = false }) {
+export default function PublicView({ user, pendingReserveBagId, onPendingReserveHandled, onOpenLegal, compact = false }) {
   const { t } = useI18n();
   const [bags, setBags] = useState(null); // null = loading
   const [reserving, setReserving] = useState(null);
@@ -266,7 +266,7 @@ export default function PublicView({ user, pendingReserveBagId, onPendingReserve
           }}
         />
       )}
-      <ReserveModal bag={reserving} user={user} onClose={() => setReserving(null)} onReserved={refresh} />
+      <ReserveModal bag={reserving} user={user} onClose={() => setReserving(null)} onReserved={refresh} onOpenLegal={onOpenLegal} />
       {showCategoryPicker && (
         <CategoryPicker categories={categories} setCategories={setCategories} onClose={() => setShowCategoryPicker(false)} />
       )}
