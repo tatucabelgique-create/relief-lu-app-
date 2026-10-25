@@ -166,12 +166,18 @@ function formatPickupWindow(startIso: string, endIso: string) {
   return `${fmt.format(start)} – ${endTime}`;
 }
 
+// Même gabarit que le template "Magic Link" de Supabase Auth (Dashboard →
+// Authentication → Email Templates) — repris tel quel pour que toutes les
+// emails relief.lu, qu'elles viennent d'Auth ou d'ici, se ressemblent.
 function emailShell(bodyHtml: string) {
-  return `<div style="font-family:-apple-system,Helvetica,Arial,sans-serif;max-width:480px;margin:0 auto;padding:32px 24px;color:#16232C;">
-    <div style="font-weight:900;font-size:20px;margin-bottom:24px;">relief<span style="color:#E8A33D;">.lu</span></div>
-    ${bodyHtml}
-    <p style="margin-top:32px;font-size:12px;color:#888;">relief.lu — Luxembourg</p>
-  </div>`;
+  return `<div style="background:#EFE6D3;padding:32px 16px;font-family:Helvetica,Arial,sans-serif;">
+<div style="max-width:480px;margin:0 auto;background:#fff;border-radius:12px;overflow:hidden;">
+<div style="background:#16232C;padding:20px;text-align:center;font-size:22px;font-weight:bold;color:#EFE6D3;">relief<span style="color:#E8A33D;">.lu</span></div>
+<div style="padding:24px 28px;color:#16232C;font-size:15px;line-height:1.5;">
+${bodyHtml}
+</div>
+</div>
+</div>`;
 }
 
 // Déclenché juste après notifyMerchantOfPaidReservation sur
@@ -204,14 +210,11 @@ async function sendReservationEmails(reservationId: string, amountTotalCents: nu
         reservation.email,
         `Réservation confirmée — ${bag.title}`,
         emailShell(`
-          <h1 style="font-size:20px;margin:0 0 16px;">C'est réservé !</h1>
-          <p>${merchant?.business_name ?? "Ton commerçant"} — <b>${bag.title}</b> (${reservation.quantity})</p>
-          <p>Retrait : ${pickupWindow}</p>
-          <p>Total payé : <b>${total} €</b></p>
-          <div style="margin-top:20px;padding:16px;border:2px dashed #E8A33D;border-radius:12px;text-align:center;">
-            <div style="font-size:24px;font-weight:900;letter-spacing:2px;">${reservation.pickup_code}</div>
-            <div style="font-size:12px;color:#888;margin-top:4px;">Code de retrait — à montrer sur place</div>
-          </div>
+          <p>Bonjour,</p>
+          <p>C'est réservé ! ${merchant?.business_name ?? "Ton commerçant"} — <b>${bag.title}</b> (${reservation.quantity})</p>
+          <p>Retrait : ${pickupWindow}<br>Total payé : <b>${total} €</b></p>
+          <p style="background:#EFE6D3;border-radius:8px;padding:10px 18px;display:inline-block;font-family:monospace;font-size:22px;font-weight:bold;letter-spacing:5px;">${reservation.pickup_code}</p>
+          <p style="font-size:13px;color:#6B6455;">Code de retrait — à montrer sur place.</p>
         `)
       );
     }
@@ -221,10 +224,9 @@ async function sendReservationEmails(reservationId: string, amountTotalCents: nu
         merchant.email,
         `Nouvelle réservation payée — ${bag.title}`,
         emailShell(`
-          <h1 style="font-size:20px;margin:0 0 16px;">Nouvelle vente</h1>
-          <p>${reservation.quantity} × <b>${bag.title}</b></p>
-          <p>Retrait prévu : ${pickupWindow}</p>
-          <p>Montant total payé par le client : ${total} €</p>
+          <p>Bonjour,</p>
+          <p>Nouvelle vente : ${reservation.quantity} × <b>${bag.title}</b></p>
+          <p>Retrait prévu : ${pickupWindow}<br>Montant total payé par le client : ${total} €</p>
         `)
       );
     }
@@ -233,7 +235,6 @@ async function sendReservationEmails(reservationId: string, amountTotalCents: nu
       ADMIN_EMAIL,
       `Vente — ${merchant?.business_name ?? "Commerçant"} — ${bag.title}`,
       emailShell(`
-        <h1 style="font-size:20px;margin:0 0 16px;">Nouvelle vente</h1>
         <p>${merchant?.business_name ?? "Commerçant inconnu"}</p>
         <p>${reservation.quantity} × ${bag.title} — ${total} €</p>
         <p>Retrait : ${pickupWindow}</p>
