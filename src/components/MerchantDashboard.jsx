@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useI18n } from "../lib/i18n.jsx";
+import { supabase } from "../lib/supabase";
 import { loadMerchantBags, publishBag, uploadBagPhoto } from "../lib/bags";
 import { getRecentSoldCount } from "../lib/merchantStats";
 import { notifyNewBag } from "../lib/notify";
@@ -71,6 +72,24 @@ export default function MerchantDashboard({ user, merchant, onMerchantChanged })
         .catch(() => {}); // best-effort : le prix conseillé retombe sur -70% par défaut si l'appel échoue
     }
   }, [user.id, merchant?.dynamic_pricing_threshold]);
+
+  // Sans ça, une réservation client (qui décrémente quantity_left) ne se
+  // reflétait ici qu'après un rechargement manuel de la page — même pattern
+  // que PublicView.jsx, mais un simple refetch complet suffit vu la taille
+  // de la liste (les sachets d'un seul commerçant), pas besoin de fusion
+  // manuelle événement par événement.
+  useEffect(() => {
+    const channel = supabase
+      .channel(`merchant-bags-${user.id}`)
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "bags", filter: `merchant_id=eq.${user.id}` },
+        () => refreshMyBags()
+      )
+      .subscribe();
+
+    return () => supabase.removeChannel(channel);
+  }, [user.id]);
 
   function set(field, value) {
     setForm((f) => ({ ...f, [field]: value }));
