@@ -158,6 +158,19 @@ async function sendEmail(to: string, subject: string, html: string) {
   }
 }
 
+// Les emails interpolent des valeurs saisies par le commerçant (titre du
+// sachet, nom du commerce) directement dans du HTML — sans ça, un titre
+// contenant des balises (volontaire ou non) s'afficherait tel quel dans
+// l'email envoyé au client/admin au lieu d'un texte brut.
+function escapeHtml(value: string) {
+  return value
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+}
+
 function formatPickupWindow(startIso: string, endIso: string) {
   const fmt = new Intl.DateTimeFormat("fr-LU", { day: "numeric", month: "long", hour: "2-digit", minute: "2-digit", timeZone: "Europe/Luxembourg" });
   const start = new Date(startIso);
@@ -204,6 +217,11 @@ async function sendReservationEmails(reservationId: string, amountTotalCents: nu
     const merchant = bag.merchants;
     const pickupWindow = formatPickupWindow(bag.pickup_start, bag.pickup_end);
     const total = (amountTotalCents / 100).toFixed(2).replace(".", ",");
+    // Échappés une fois ici : ce sont les deux seules valeurs de ce bloc
+    // saisies librement par un commerçant plutôt que générées par le
+    // système (pickup_code, dates, montants).
+    const title = escapeHtml(bag.title);
+    const businessName = escapeHtml(merchant?.business_name ?? "");
 
     if (reservation.email) {
       await sendEmail(
@@ -211,7 +229,7 @@ async function sendReservationEmails(reservationId: string, amountTotalCents: nu
         `Réservation confirmée — ${bag.title}`,
         emailShell(`
           <p>Bonjour,</p>
-          <p>C'est réservé ! ${merchant?.business_name ?? "Ton commerçant"} — <b>${bag.title}</b> (${reservation.quantity})</p>
+          <p>C'est réservé ! ${businessName || "Ton commerçant"} — <b>${title}</b> (${reservation.quantity})</p>
           <p>Retrait : ${pickupWindow}<br>Total payé : <b>${total} €</b></p>
           <p style="background:#EFE6D3;border-radius:8px;padding:10px 18px;display:inline-block;font-family:monospace;font-size:22px;font-weight:bold;letter-spacing:5px;">${reservation.pickup_code}</p>
           <p style="font-size:13px;color:#6B6455;">Code de retrait — à montrer sur place.</p>
@@ -225,7 +243,7 @@ async function sendReservationEmails(reservationId: string, amountTotalCents: nu
         `Nouvelle réservation payée — ${bag.title}`,
         emailShell(`
           <p>Bonjour,</p>
-          <p>Nouvelle vente : ${reservation.quantity} × <b>${bag.title}</b></p>
+          <p>Nouvelle vente : ${reservation.quantity} × <b>${title}</b></p>
           <p>Retrait prévu : ${pickupWindow}<br>Montant total payé par le client : ${total} €</p>
         `)
       );
@@ -235,8 +253,8 @@ async function sendReservationEmails(reservationId: string, amountTotalCents: nu
       ADMIN_EMAIL,
       `Vente — ${merchant?.business_name ?? "Commerçant"} — ${bag.title}`,
       emailShell(`
-        <p>${merchant?.business_name ?? "Commerçant inconnu"}</p>
-        <p>${reservation.quantity} × ${bag.title} — ${total} €</p>
+        <p>${businessName || "Commerçant inconnu"}</p>
+        <p>${reservation.quantity} × ${title} — ${total} €</p>
         <p>Retrait : ${pickupWindow}</p>
       `)
     );
