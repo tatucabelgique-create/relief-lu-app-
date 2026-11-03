@@ -76,9 +76,31 @@ function renderOfferBlock(bag, rating) {
   const discountPct = hasDiscount ? Math.round((1 - bag.price_cents / bag.original_price_cents) * 100) : null;
   const categoryLabel = CATEGORY_LABELS[bag.category] || CATEGORY_LABELS.autre;
 
+  const dietTags = [bag.vegetarian && "Végétarien", bag.vegan && "Végan"].filter(Boolean);
+  const dietHtml = dietTags.length
+    ? `<div class="diet-tags">${dietTags.map((tag) => `<span class="diet-tag">${tag}</span>`).join("")}</div>`
+    : "";
+
+  // Même texte que bagDetail.packaging.info* (src/lib/i18n.jsx) — reformulé
+  // au "vous" pour coller au reste de cette page statique (le reste de
+  // l'app tutoie, voir BagDetail.jsx, mais cette page vouvoie déjà).
+  let packagingText;
+  if (bag.container_provided && bag.bag_provided) packagingText = "Le commerçant fournit le contenant et le sac.";
+  else if (bag.container_provided) packagingText = "Le commerçant fournit le contenant. Apportez votre sac.";
+  else if (bag.bag_provided) packagingText = "Le commerçant fournit le sac. Apportez votre contenant.";
+  else packagingText = "Apportez votre propre contenant et votre sac.";
+
+  // "Ingrédients & Allergènes" est un texte générique fixe côté app (pas de
+  // donnée par sachet, voir BagDetail.jsx/schema-v6) — même principe ici,
+  // affiché derrière un lien plutôt qu'en permanence pour ne pas surcharger
+  // la page.
+  const allergensText =
+    "On ne peut jamais dire à l'avance ce que contiendra exactement un panier surprise — le commerçant le remplit avec ses invendus du jour. Pour toute question sur les allergènes ou la composition, demandez directement au commerçant lors du retrait.";
+
   return `
     <div class="offer">
       <span class="offer-category">${escapeHtml(categoryLabel)}</span>
+      ${dietHtml}
       <p class="offer-title">${escapeHtml(bag.title)}</p>
       <div class="offer-price">
         ${hasDiscount ? `<span class="price-old">${formatPrice(bag.original_price_cents)}</span>` : ""}
@@ -86,6 +108,11 @@ function renderOfferBlock(bag, rating) {
         ${discountPct ? `<span class="discount-badge">-${discountPct}%</span>` : ""}
       </div>
       ${ratingHtml}
+      <p class="practical-info">📦 ${escapeHtml(packagingText)}</p>
+      <details class="allergens">
+        <summary>Ingrédients &amp; allergènes</summary>
+        <p>${escapeHtml(allergensText)}</p>
+      </details>
     </div>`;
 }
 
@@ -147,6 +174,12 @@ function renderPage(merchant, slug, bag, rating) {
   .offer-empty-msg{margin:0;color:var(--paper-dim);font-size:16px;}
   .rating{margin-top:14px;color:var(--honey);font-weight:700;font-size:15px;}
   .rating span{color:var(--paper-dim);font-weight:400;}
+  .diet-tags{display:inline-flex;gap:6px;margin-left:8px;}
+  .diet-tag{font-size:12px;font-weight:700;color:var(--navy);background:var(--paper-dim);padding:2px 8px;border-radius:100px;}
+  .practical-info{margin:14px 0 0;font-size:15px;color:var(--paper-dim);}
+  .allergens{margin-top:12px;}
+  .allergens summary{cursor:pointer;color:var(--paper);font-size:15px;font-weight:700;text-decoration:underline;}
+  .allergens p{margin:10px 0 0;font-size:15px;}
 </style>
 </head>
 <body>
@@ -191,7 +224,7 @@ async function main() {
   if (merchantIds.length) {
     const { data: bags, error: bagsError } = await supabase
       .from("bags")
-      .select("merchant_id, title, category, price_cents, original_price_cents, quantity_left, pickup_end, status")
+      .select("merchant_id, title, category, price_cents, original_price_cents, quantity_left, pickup_end, status, container_provided, bag_provided, vegetarian, vegan")
       .in("merchant_id", merchantIds)
       .eq("status", "active")
       .gt("quantity_left", 0)
