@@ -92,9 +92,9 @@ function renderPage(merchant, slug) {
     <h1>${name}</h1>
     ${address ? `<p class="addr">${address}</p>` : ""}
     <p>${name} lutte contre le gaspillage alimentaire au Luxembourg en proposant ses invendus à prix réduit sur relief.lu. Réservez en ligne et récupérez votre panier directement sur place.</p>
-    <a class="cta" href="${appUrl}">Voir les paniers disponibles →</a>
+    <a class="cta" href="${appUrl}" rel="nofollow">Voir les paniers disponibles →</a>
     <br>
-    <a class="back" href="${SITE}/app.html">← Tous les commerçants relief.lu</a>
+    <a class="back" href="${SITE}/app.html" rel="nofollow">← Tous les commerçants relief.lu</a>
   </div>
 </body>
 </html>`;
