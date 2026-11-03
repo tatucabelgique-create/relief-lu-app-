@@ -10,6 +10,7 @@ import MerchantLogoUpload from "./MerchantLogoUpload.jsx";
 import MerchantBannerUpload from "./MerchantBannerUpload.jsx";
 import MerchantStats from "./MerchantStats.jsx";
 import MerchantBagRow from "./MerchantBagRow.jsx";
+import PickupCodeLookup from "./PickupCodeLookup.jsx";
 import MerchantRegistrationForm from "./MerchantRegistrationForm.jsx";
 import NotificationToggle from "./NotificationToggle.jsx";
 import StripeConnectPanel from "./StripeConnectPanel.jsx";
@@ -391,6 +392,12 @@ export default function MerchantDashboard({ user, merchant, onMerchantChanged })
         </button>
         {msg && <p className={msg.type === "error" ? "error-msg" : "success-msg"}>{msg.text}</p>}
       </div>
+      )}
+
+      {merchant?.verified && (
+        <div className="panel">
+          <PickupCodeLookup onChanged={refreshMyBags} />
+        </div>
       )}
 
       <div className="panel">

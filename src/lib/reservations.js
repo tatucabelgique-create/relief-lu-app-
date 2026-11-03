@@ -59,6 +59,26 @@ export async function getReservation(id) {
   return data;
 }
 
+// Recherche globale par code de retrait, tous sachets du commerçant
+// confondus — le commerçant au comptoir ne sait pas toujours de quel sachet
+// vient le code, lui demander de d'abord retrouver la bonne fiche sachet
+// serait plus lent que l'ancien défilement visuel qu'on cherche justement à
+// remplacer. La policy RLS "merchants can read reservations on their own
+// bags" (schema-app.sql) filtre déjà aux sachets du commerçant connecté —
+// un code appartenant à un autre commerçant renvoie simplement "aucune
+// ligne", jamais une erreur ni les données d'un tiers.
+export async function findReservationByCode(code) {
+  const normalized = code.trim().toUpperCase();
+  if (!normalized) return null;
+  const { data, error } = await supabase
+    .from("reservations")
+    .select("*, bags(title)")
+    .eq("pickup_code", normalized)
+    .maybeSingle();
+  if (error) throw error;
+  return data;
+}
+
 export async function getReservationsForBag(bagId) {
   const { data, error } = await supabase
     .from("reservations")
