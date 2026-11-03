@@ -6,6 +6,7 @@
 // construction (HTML statique généré ici, pas de JS nécessaire pour lire
 // le contenu).
 import { createClient } from "@supabase/supabase-js";
+import QRCode from "qrcode";
 import { WebSocket } from "ws";
 import { mkdirSync, writeFileSync } from "node:fs";
 import { resolve, dirname } from "node:path";
@@ -116,7 +117,7 @@ function renderOfferBlock(bag, rating) {
     </div>`;
 }
 
-function renderPage(merchant, slug, bag, rating) {
+function renderPage(merchant, slug, bag, rating, qrSvg) {
   const name = escapeHtml(merchant.business_name);
   const city = escapeHtml(merchant.city || "");
   const address = escapeHtml([merchant.address, merchant.city].filter(Boolean).join(", "));
@@ -180,6 +181,9 @@ function renderPage(merchant, slug, bag, rating) {
   .allergens{margin-top:12px;}
   .allergens summary{cursor:pointer;color:var(--paper);font-size:15px;font-weight:700;text-decoration:underline;}
   .allergens p{margin:10px 0 0;font-size:15px;}
+  .qr-card{margin-top:24px;display:flex;align-items:center;gap:16px;padding:16px 20px;border-radius:16px;background:#FFFFFF;}
+  .qr-card svg{display:block;width:88px;height:88px;flex-shrink:0;}
+  .qr-label{margin:0;color:var(--navy);font-size:15px;font-weight:700;line-height:1.4;}
 </style>
 </head>
 <body>
@@ -189,6 +193,10 @@ function renderPage(merchant, slug, bag, rating) {
     ${address ? `<p class="addr">${address}</p>` : ""}
     <p>${name} lutte contre le gaspillage alimentaire au Luxembourg en proposant ses invendus à prix réduit sur relief.lu. Réservez en ligne et récupérez votre panier directement sur place.</p>
     ${renderOfferBlock(bag, rating)}
+    <div class="qr-card">
+      ${qrSvg}
+      <p class="qr-label">Scannez pour continuer sur votre mobile</p>
+    </div>
     <br>
     <a class="cta" href="${appUrl}" rel="nofollow">Voir les paniers disponibles →</a>
     <br>
@@ -273,7 +281,15 @@ async function main() {
     mkdirSync(dir, { recursive: true });
     const bag = bagByMerchant.get(merchant.id) || null;
     const rating = ratingByMerchant.get(merchant.id) || null;
-    writeFileSync(resolve(dir, "index.html"), renderPage(merchant, slug, bag, rating));
+    // SVG inline (pas de fichier image à part) : scanner ce QR depuis le
+    // même lien "Voir les paniers disponibles" fait basculer un visiteur
+    // desktop directement vers l'app sur son mobile, sans taper d'URL.
+    const qrSvg = await QRCode.toString(`${SITE}/app.html?merchant=${merchant.id}`, {
+      type: "svg",
+      margin: 0,
+      color: { dark: "#16232C", light: "#FFFFFF" },
+    });
+    writeFileSync(resolve(dir, "index.html"), renderPage(merchant, slug, bag, rating, qrSvg));
     urls.push(`${SITE}/commercant/${slug}/`);
   }
 
