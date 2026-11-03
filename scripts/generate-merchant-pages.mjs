@@ -37,7 +37,59 @@ function escapeHtml(str) {
   return String(str ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
 }
 
-function renderPage(merchant, slug) {
+// Mêmes libellés que merchant.category.* dans src/lib/i18n.jsx (FR) — cette
+// page statique n'a qu'une seule langue, pas besoin du système i18n complet.
+const CATEGORY_LABELS = {
+  boulangerie: "Boulangerie",
+  restaurant: "Repas",
+  plats_prepares: "Plats préparés",
+  sushi: "Poké bowls & sushis",
+  sandwichs: "Sandwichs & salades",
+  epicerie: "Épicerie",
+  snack: "Snack sucré/salé",
+  traiteur: "Traiteur / cantine",
+  supermarche: "Supermarché",
+  autre: "Autre",
+};
+
+function formatPrice(cents) {
+  return `${(cents / 100).toFixed(2).replace(".", ",")} €`;
+}
+
+// `bag` : le sachet actif le plus récent de ce commerçant (ou null si aucun,
+// cf. main()). `rating` : { avg, count } agrégé depuis `reviews`, ou null si
+// ce commerçant n'a encore aucun avis.
+function renderOfferBlock(bag, rating) {
+  const ratingHtml = rating && rating.count > 0
+    ? `<div class="rating">★ ${rating.avg.toFixed(1)} <span>(${rating.count} avis)</span></div>`
+    : "";
+
+  if (!bag) {
+    return `
+    <div class="offer offer-empty">
+      <p class="offer-empty-msg">Épuisé pour le moment — vérifiez à nouveau plus tard.</p>
+      ${ratingHtml}
+    </div>`;
+  }
+
+  const hasDiscount = bag.original_price_cents && bag.original_price_cents > bag.price_cents;
+  const discountPct = hasDiscount ? Math.round((1 - bag.price_cents / bag.original_price_cents) * 100) : null;
+  const categoryLabel = CATEGORY_LABELS[bag.category] || CATEGORY_LABELS.autre;
+
+  return `
+    <div class="offer">
+      <span class="offer-category">${escapeHtml(categoryLabel)}</span>
+      <p class="offer-title">${escapeHtml(bag.title)}</p>
+      <div class="offer-price">
+        ${hasDiscount ? `<span class="price-old">${formatPrice(bag.original_price_cents)}</span>` : ""}
+        <span class="price-new">${formatPrice(bag.price_cents)}</span>
+        ${discountPct ? `<span class="discount-badge">-${discountPct}%</span>` : ""}
+      </div>
+      ${ratingHtml}
+    </div>`;
+}
+
+function renderPage(merchant, slug, bag, rating) {
   const name = escapeHtml(merchant.business_name);
   const city = escapeHtml(merchant.city || "");
   const address = escapeHtml([merchant.address, merchant.city].filter(Boolean).join(", "));
@@ -54,6 +106,7 @@ function renderPage(merchant, slug) {
     ...(merchant.address && { address: { "@type": "PostalAddress", streetAddress: merchant.address, addressLocality: merchant.city || "", addressCountry: "LU" } }),
     ...(merchant.lat != null && merchant.lng != null && { geo: { "@type": "GeoCoordinates", latitude: merchant.lat, longitude: merchant.lng } }),
     ...(merchant.logo_url && { image: merchant.logo_url }),
+    ...(rating && rating.count > 0 && { aggregateRating: { "@type": "AggregateRating", ratingValue: rating.avg.toFixed(1), reviewCount: rating.count } }),
   };
 
   return `<!DOCTYPE html>
@@ -84,6 +137,16 @@ function renderPage(merchant, slug) {
   p{font-size:17px;line-height:1.6;color:var(--paper-dim);}
   .cta{display:inline-block;margin-top:24px;background:var(--honey);color:var(--navy);font-weight:700;text-decoration:none;padding:16px 28px;border-radius:100px;}
   .back{display:inline-block;margin-top:40px;color:var(--paper-dim);text-decoration:none;font-size:15px;}
+  .offer{margin-top:28px;padding:20px 24px;border:1px solid var(--navy-2);border-radius:16px;background:var(--navy-2);}
+  .offer-category{display:inline-block;font-size:13px;font-weight:700;letter-spacing:.02em;text-transform:uppercase;color:var(--honey);}
+  .offer-title{margin:6px 0 14px;font-size:19px;font-weight:700;color:var(--paper);}
+  .offer-price{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;}
+  .price-old{color:var(--paper-dim);text-decoration:line-through;font-size:16px;}
+  .price-new{color:var(--paper);font-size:24px;font-weight:700;}
+  .discount-badge{background:var(--honey);color:var(--navy);font-weight:700;font-size:13px;padding:3px 10px;border-radius:100px;}
+  .offer-empty-msg{margin:0;color:var(--paper-dim);font-size:16px;}
+  .rating{margin-top:14px;color:var(--honey);font-weight:700;font-size:15px;}
+  .rating span{color:var(--paper-dim);font-weight:400;}
 </style>
 </head>
 <body>
@@ -92,6 +155,8 @@ function renderPage(merchant, slug) {
     <h1>${name}</h1>
     ${address ? `<p class="addr">${address}</p>` : ""}
     <p>${name} lutte contre le gaspillage alimentaire au Luxembourg en proposant ses invendus à prix réduit sur relief.lu. Réservez en ligne et récupérez votre panier directement sur place.</p>
+    ${renderOfferBlock(bag, rating)}
+    <br>
     <a class="cta" href="${appUrl}" rel="nofollow">Voir les paniers disponibles →</a>
     <br>
     <a class="back" href="${SITE}/app.html" rel="nofollow">← Tous les commerçants relief.lu</a>
@@ -118,6 +183,51 @@ async function main() {
     return;
   }
 
+  const merchantIds = (merchants || []).map((m) => m.id);
+
+  // Un seul sachet actif "en vedette" par commerçant (le plus récent) — même
+  // logique de disponibilité que loadActiveBags() dans src/lib/bags.js.
+  const bagByMerchant = new Map();
+  if (merchantIds.length) {
+    const { data: bags, error: bagsError } = await supabase
+      .from("bags")
+      .select("merchant_id, title, category, price_cents, original_price_cents, quantity_left, pickup_end, status")
+      .in("merchant_id", merchantIds)
+      .eq("status", "active")
+      .gt("quantity_left", 0)
+      .gt("pickup_end", new Date().toISOString())
+      .order("created_at", { ascending: false });
+    if (bagsError) {
+      console.error("[generate-merchant-pages] Erreur Supabase (bags):", bagsError.message);
+    } else {
+      for (const bag of bags || []) {
+        if (!bagByMerchant.has(bag.merchant_id)) bagByMerchant.set(bag.merchant_id, bag);
+      }
+    }
+  }
+
+  // Même agrégation que getMerchantRatings() (src/lib/reviews.js), limitée
+  // aux commerçants de cette page et sans le détail par critère.
+  const ratingByMerchant = new Map();
+  if (merchantIds.length) {
+    const { data: reviews, error: reviewsError } = await supabase
+      .from("reviews")
+      .select("merchant_id, rating")
+      .in("merchant_id", merchantIds);
+    if (reviewsError) {
+      console.error("[generate-merchant-pages] Erreur Supabase (reviews):", reviewsError.message);
+    } else {
+      const totals = new Map();
+      for (const r of reviews || []) {
+        const agg = totals.get(r.merchant_id) || { sum: 0, count: 0 };
+        agg.sum += r.rating;
+        agg.count += 1;
+        totals.set(r.merchant_id, agg);
+      }
+      for (const [id, agg] of totals) ratingByMerchant.set(id, { avg: agg.sum / agg.count, count: agg.count });
+    }
+  }
+
   const usedSlugs = new Set();
   const urls = [`${SITE}/`];
 
@@ -128,7 +238,9 @@ async function main() {
 
     const dir = resolve(DIST, "commercant", slug);
     mkdirSync(dir, { recursive: true });
-    writeFileSync(resolve(dir, "index.html"), renderPage(merchant, slug));
+    const bag = bagByMerchant.get(merchant.id) || null;
+    const rating = ratingByMerchant.get(merchant.id) || null;
+    writeFileSync(resolve(dir, "index.html"), renderPage(merchant, slug, bag, rating));
     urls.push(`${SITE}/commercant/${slug}/`);
   }
 
