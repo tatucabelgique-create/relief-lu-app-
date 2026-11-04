@@ -15,7 +15,7 @@ export default function SocialLinks() {
 
   return (
     <div style={{ display: "flex", gap: 12, alignItems: "center" }}>
-      <a href="#" aria-label="LinkedIn" style={linkStyle}>
+      <a href="https://www.linkedin.com/in/relief-luxembourg-12155b442/" target="_blank" rel="noreferrer" aria-label="LinkedIn" style={linkStyle}>
         <svg {...iconProps}>
           <rect x="3" y="3" width="42" height="42" rx="12" />
           <circle cx="18" cy="16.5" r="1.4" fill="currentColor" stroke="none" />
