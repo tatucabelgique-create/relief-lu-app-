@@ -447,6 +447,27 @@
   @media (max-width:720px){
     .merchant-steps{grid-template-columns:1fr;}
   }
+
+  /* bandeau de logos commerçants, défilement infini */
+  .merchant-logowall{margin-top:40px; -webkit-mask-image:linear-gradient(90deg,transparent,#000 8%,#000 92%,transparent); mask-image:linear-gradient(90deg,transparent,#000 8%,#000 92%,transparent);}
+  .merchant-logowall-label{
+    font-family:'IBM Plex Mono', monospace; font-size:12px; color:var(--paper-dim);
+    text-transform:uppercase; letter-spacing:1.2px; margin-bottom:16px; text-align:center;
+  }
+  .merchant-logowall-track{
+    display:flex; align-items:center; gap:48px; width:max-content;
+    animation:logowall-scroll 22s linear infinite;
+  }
+  .merchant-logowall:hover .merchant-logowall-track{animation-play-state:paused;}
+  .merchant-logowall-track a{display:flex; flex-shrink:0; text-decoration:none;}
+  .merchant-logowall-track img{
+    height:40px; width:auto; max-width:120px; object-fit:contain;
+    border-radius:8px; opacity:0.85; filter:grayscale(0.2);
+  }
+  @keyframes logowall-scroll{
+    from{transform:translateX(0);}
+    to{transform:translateX(-50%);}
+  }
   /* mockups téléphone — mêmes écrans que l'app réelle, en miniature */
   .steps{display:grid; grid-template-columns:repeat(3,1fr); gap:18px; position:relative;}
   .steps-connector{
@@ -849,6 +870,22 @@
         </div>
       </div>
 
+      <div class="merchant-logowall">
+        <div class="merchant-logowall-label" data-i18n="merchantLogowall.label">Ils sont déjà sur relief.lu</div>
+        <div class="merchant-logowall-track">
+          <a href="/commercant/izakaya-pommerloch-pommerloch/"><img src="https://ucxsqregeorfjakgomaj.supabase.co/storage/v1/object/public/bag-photos/64a049f0-8cba-4c78-a846-3ff186061ec6/logo-1794419755182-logo%20izakaya%20new.png" alt="Izakaya Pommerloch" loading="lazy"></a>
+          <a href="/commercant/jour-restaurants-luxembourg-ville/"><img src="https://ucxsqregeorfjakgomaj.supabase.co/storage/v1/object/public/bag-photos/c6f41c28-510f-4cab-8293-dd9ea1068385/logo-1792316921859-logo%20jour.jpeg" alt="Jour restaurants" loading="lazy"></a>
+          <a href="/commercant/golden-bean-belval-esch-sur-alzette/"><img src="https://ucxsqregeorfjakgomaj.supabase.co/storage/v1/object/public/bag-photos/347e7268-a2f2-40f2-b6c6-26ebf8dabb72/logo-1794513984526-logo%20golden%20bean.jpeg" alt="Golden Bean Belval" loading="lazy"></a>
+          <a href="/commercant/cake-go-differdange/"><img src="https://ucxsqregeorfjakgomaj.supabase.co/storage/v1/object/public/bag-photos/38fc891f-dfa2-4959-9ff5-f08ab0e743f2/logo-1790853394537-IMG_3557.jpeg" alt="Cake&Go" loading="lazy"></a>
+          <a href="/commercant/exki-luxembourg-luxembourg-ville/"><img src="https://ucxsqregeorfjakgomaj.supabase.co/storage/v1/object/public/bag-photos/8252de18-180c-47a3-ac30-95fca75ef83b/logo-1792155257154-Exki_logo.png" alt="EXKi Luxembourg" loading="lazy"></a>
+          <a href="/commercant/izakaya-pommerloch-pommerloch/" tabindex="-1" aria-hidden="true"><img src="https://ucxsqregeorfjakgomaj.supabase.co/storage/v1/object/public/bag-photos/64a049f0-8cba-4c78-a846-3ff186061ec6/logo-1794419755182-logo%20izakaya%20new.png" alt="" loading="lazy"></a>
+          <a href="/commercant/jour-restaurants-luxembourg-ville/" tabindex="-1" aria-hidden="true"><img src="https://ucxsqregeorfjakgomaj.supabase.co/storage/v1/object/public/bag-photos/c6f41c28-510f-4cab-8293-dd9ea1068385/logo-1792316921859-logo%20jour.jpeg" alt="" loading="lazy"></a>
+          <a href="/commercant/golden-bean-belval-esch-sur-alzette/" tabindex="-1" aria-hidden="true"><img src="https://ucxsqregeorfjakgomaj.supabase.co/storage/v1/object/public/bag-photos/347e7268-a2f2-40f2-b6c6-26ebf8dabb72/logo-1794513984526-logo%20golden%20bean.jpeg" alt="" loading="lazy"></a>
+          <a href="/commercant/cake-go-differdange/" tabindex="-1" aria-hidden="true"><img src="https://ucxsqregeorfjakgomaj.supabase.co/storage/v1/object/public/bag-photos/38fc891f-dfa2-4959-9ff5-f08ab0e743f2/logo-1790853394537-IMG_3557.jpeg" alt="" loading="lazy"></a>
+          <a href="/commercant/exki-luxembourg-luxembourg-ville/" tabindex="-1" aria-hidden="true"><img src="https://ucxsqregeorfjakgomaj.supabase.co/storage/v1/object/public/bag-photos/8252de18-180c-47a3-ac30-95fca75ef83b/logo-1792155257154-Exki_logo.png" alt="" loading="lazy"></a>
+        </div>
+      </div>
+
       <a href="app.html?view=merchant" class="btn-cta secondary" data-i18n="nav.merchant" style="margin-top:32px; display:inline-block;">Inscrivez votre commerce</a>
 
       <div class="merchant-faq">
@@ -1089,6 +1126,7 @@
       "merchantFaq.a3": "Vous avez le choix. Vous précisez simplement pour chaque sachet si vous fournissez le sac ou si le client doit apporter le sien.",
       "merchantFaq.q4": "Comment s'assurer qu'il s'agit du bon client ?",
       "merchantFaq.a4": "Le client vous montre son code de retrait. Vous le renseignez dans votre espace partenaire et l'application affiche immédiatement sa réservation correspondante, sans aucun risque de confusion.",
+      "merchantLogowall.label": "Ils sont déjà sur relief.lu",
       "how.eyebrow": "Comment ça marche",
       "how.hook": "Trois clics vous séparent d'une très bonne affaire.",
       "how.sub": "Parcourez. Réservez. Récupérez. Jusqu'à -70%, moins de déchets, et le repas réglé en trois clics.",
@@ -1203,6 +1241,7 @@
       "merchantFaq.a3": "Der Behälter wird immer gestellt. Bei der Tasche entscheidest du — pro Beutel angegeben.",
       "merchantFaq.q4": "Woher weiß ich, dass es der richtige Kunde ist?",
       "merchantFaq.a4": "Er zeigt dir einen Code. Du gibst ihn ein, die App findet seine Reservierung.",
+      "merchantLogowall.label": "Bereits auf relief.lu",
       "how.eyebrow": "So funktioniert's",
       "how.hook": "Drei Klicks trennen dich von einem richtig guten Deal.",
       "how.sub": "Durchstöbern. Reservieren. Abholen. Bis zu -70%, weniger Verschwendung, und das Essen ist in drei Klicks gesichert.",
@@ -1317,6 +1356,7 @@
       "merchantFaq.a3": "The container is always provided. For the bag, it's up to you — set per listing.",
       "merchantFaq.q4": "How do I know it's the right customer?",
       "merchantFaq.a4": "They show you a code. You type it in, the app finds their reservation.",
+      "merchantLogowall.label": "Already on relief.lu",
       "how.eyebrow": "How it works",
       "how.hook": "Three taps between you and a really good deal.",
       "how.sub": "Browse. Reserve. Collect. Up to 70% off, less landfill, and dinner sorted in three taps.",
