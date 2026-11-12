@@ -418,6 +418,35 @@
   .how-sub{
     color:var(--paper-dim); font-size:16px; line-height:1.6; max-width:56ch; margin:0 0 32px;
   }
+
+  /* 3 étapes + FAQ commerçant */
+  .merchant-steps{display:grid; grid-template-columns:repeat(3,1fr); gap:24px; margin-top:36px;}
+  .merchant-step{background:var(--navy-2); border:1px solid rgba(239,230,211,0.12); border-radius:16px; padding:24px;}
+  .merchant-step-num{
+    font-family:'Fraunces', serif; font-weight:700; font-size:22px; color:var(--honey);
+    width:40px; height:40px; border-radius:50%; border:2px solid var(--honey);
+    display:flex; align-items:center; justify-content:center; margin-bottom:16px;
+  }
+  .merchant-step h3{font-family:'Fraunces', serif; font-weight:600; font-size:18px; margin:0 0 8px;}
+  .merchant-step p{color:var(--paper-dim); font-size:15px; line-height:1.55; margin:0;}
+
+  .merchant-faq{margin-top:48px; max-width:720px;}
+  .merchant-faq details{
+    border-top:1px solid rgba(239,230,211,0.14); padding:18px 0;
+  }
+  .merchant-faq details:last-child{border-bottom:1px solid rgba(239,230,211,0.14);}
+  .merchant-faq summary{
+    font-family:'Fraunces', serif; font-weight:600; font-size:17px; cursor:pointer;
+    list-style:none; display:flex; align-items:center; justify-content:space-between; gap:12px;
+  }
+  .merchant-faq summary::-webkit-details-marker{display:none;}
+  .merchant-faq summary::after{content:"+"; color:var(--honey); font-size:22px; flex-shrink:0;}
+  .merchant-faq details[open] summary::after{content:"–";}
+  .merchant-faq p{color:var(--paper-dim); font-size:15px; line-height:1.6; margin:12px 0 0;}
+
+  @media (max-width:720px){
+    .merchant-steps{grid-template-columns:1fr;}
+  }
   /* mockups téléphone — mêmes écrans que l'app réelle, en miniature */
   .steps{display:grid; grid-template-columns:repeat(3,1fr); gap:18px; position:relative;}
   .steps-connector{
@@ -799,10 +828,77 @@
 
     <section class="mission merchants-seo">
       <div class="how-eyebrow" data-i18n="merchantSeo.eyebrow">Pour les commerçants</div>
-      <h2 data-i18n="merchantSeo.title">Vendez vos invendus, ne les jetez plus</h2>
-      <p data-i18n="merchantSeo.text">Boulangerie, restaurant, épicerie, traiteur : chaque jour, des produits encore bons finissent à la poubelle. Avec relief.lu, proposez-les à prix réduit aux habitants du quartier plutôt que de les jeter — un revenu supplémentaire sur ce qui partait déjà en perte, sans production ni stock en plus, publié en moins d'une minute depuis votre téléphone.</p>
-      <a href="app.html?view=merchant" class="btn-cta secondary" data-i18n="nav.merchant" style="margin-top:20px; display:inline-block;">Inscrivez votre commerce</a>
+      <h2 data-i18n="merchantSeo.title">Rentabilisez votre commerce, éliminez le gaspillage.</h2>
+      <p data-i18n="merchantSeo.text">Transformez vos surplus du jour en revenus supplémentaires, directement via relief.lu.</p>
+
+      <div class="merchant-steps">
+        <div class="merchant-step">
+          <div class="merchant-step-num">1</div>
+          <h3 data-i18n="merchantSteps.s1title">Publiez</h3>
+          <p data-i18n="merchantSteps.s1text">Mettez un sachet en ligne en moins d'une minute.</p>
+        </div>
+        <div class="merchant-step">
+          <div class="merchant-step-num">2</div>
+          <h3 data-i18n="merchantSteps.s2title">Le client réserve</h3>
+          <p data-i18n="merchantSteps.s2text">Il réserve, il paie en ligne. C'est vendu.</p>
+        </div>
+        <div class="merchant-step">
+          <div class="merchant-step-num">3</div>
+          <h3 data-i18n="merchantSteps.s3title">Il vient le récupérer</h3>
+          <p data-i18n="merchantSteps.s3text">Il vous montre un code. Vous le vérifiez, vous lui remettez son sachet.</p>
+        </div>
+      </div>
+
+      <a href="app.html?view=merchant" class="btn-cta secondary" data-i18n="nav.merchant" style="margin-top:32px; display:inline-block;">Inscrivez votre commerce</a>
+
+      <div class="merchant-faq">
+        <details>
+          <summary data-i18n="merchantFaq.q1">Cela va-t-il représenter une charge de travail supplémentaire pour moi ?</summary>
+          <p data-i18n="merchantFaq.a1">Non, aucune charge supplémentaire. Mettre un sachet en ligne prend moins d'une minute. Zéro gestion de stock, zéro production dédiée : vous vendez uniquement vos surplus déjà disponibles.</p>
+        </details>
+        <details>
+          <summary data-i18n="merchantFaq.q2">Comment vais-je percevoir mes revenus ?</summary>
+          <p data-i18n="merchantFaq.a2">Vous êtes réglé directement par virement bancaire via un compte connecté. Contrairement à d'autres plateformes qui imposent des paiements mensuels groupés, vous percevez vos revenus au fur et à mesure de vos ventes.</p>
+        </details>
+        <details>
+          <summary data-i18n="merchantFaq.q3">Dois-je fournir l'emballage ?</summary>
+          <p data-i18n="merchantFaq.a3">Vous avez le choix. Vous précisez simplement pour chaque sachet si vous fournissez le sac ou si le client doit apporter le sien.</p>
+        </details>
+        <details>
+          <summary data-i18n="merchantFaq.q4">Comment s'assurer qu'il s'agit du bon client ?</summary>
+          <p data-i18n="merchantFaq.a4">Le client vous montre son code de retrait. Vous le renseignez dans votre espace partenaire et l'application affiche immédiatement sa réservation correspondante, sans aucun risque de confusion.</p>
+        </details>
+      </div>
     </section>
+
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "Est-ce que vendre ses invendus sur relief.lu crée du travail supplémentaire ?",
+          "acceptedAnswer": { "@type": "Answer", "text": "Non. Publier un sachet prend moins d'une minute. Pas de stock à gérer, pas de production dédiée — le commerçant vend ce qu'il a déjà en trop." }
+        },
+        {
+          "@type": "Question",
+          "name": "Comment un commerçant est-il payé sur relief.lu ?",
+          "acceptedAnswer": { "@type": "Answer", "text": "Directement par virement Stripe, au rythme des ventes — pas de lot mensuel à attendre." }
+        },
+        {
+          "@type": "Question",
+          "name": "Le commerçant doit-il fournir l'emballage des sachets anti-gaspi ?",
+          "acceptedAnswer": { "@type": "Answer", "text": "C'est au choix du commerçant, précisé sachet par sachet : contenant, sac, les deux, ou ni l'un ni l'autre." }
+        },
+        {
+          "@type": "Question",
+          "name": "Comment fonctionne la vérification du retrait d'un sachet ?",
+          "acceptedAnswer": { "@type": "Answer", "text": "Le client montre un code de retrait, que le commerçant saisit dans son dashboard pour retrouver exactement sa réservation." }
+        }
+      ]
+    }
+    </script>
 
     <section class="closing-cta">
       <h2 data-i18n="closing.title">Rejoins le mouvement anti-gaspillage au Luxembourg</h2>
@@ -977,8 +1073,22 @@
       "mission.title": "On ne parle pas de climat. On parle de ceux pour qui chaque course compte.",
       "mission.text": "Chaque jour, des entreprises et des commerces luxembourgeois jettent de la nourriture encore bonne. Relief la remet en circulation, à prix réduit, pour celles et ceux qui en ont vraiment besoin — sans discours, sans jugement, juste un coup de pouce concret.",
       "merchantSeo.eyebrow": "Pour les commerçants",
-      "merchantSeo.title": "Vendez vos invendus, ne les jetez plus",
-      "merchantSeo.text": "Boulangerie, restaurant, épicerie, traiteur : chaque jour, des produits encore bons finissent à la poubelle. Avec relief.lu, proposez-les à prix réduit aux habitants du quartier plutôt que de les jeter — un revenu supplémentaire sur ce qui partait déjà en perte, sans production ni stock en plus, publié en moins d'une minute depuis votre téléphone.",
+      "merchantSeo.title": "Rentabilisez votre commerce, éliminez le gaspillage.",
+      "merchantSeo.text": "Transformez vos surplus du jour en revenus supplémentaires, directement via relief.lu.",
+      "merchantSteps.s1title": "Publiez",
+      "merchantSteps.s1text": "Mettez un sachet en ligne en moins d'une minute.",
+      "merchantSteps.s2title": "Le client réserve",
+      "merchantSteps.s2text": "Il réserve, il paie en ligne. C'est vendu.",
+      "merchantSteps.s3title": "Il vient le récupérer",
+      "merchantSteps.s3text": "Il vous montre un code. Vous le vérifiez, vous lui remettez son sachet.",
+      "merchantFaq.q1": "Cela va-t-il représenter une charge de travail supplémentaire pour moi ?",
+      "merchantFaq.a1": "Non, aucune charge supplémentaire. Mettre un sachet en ligne prend moins d'une minute. Zéro gestion de stock, zéro production dédiée : vous vendez uniquement vos surplus déjà disponibles.",
+      "merchantFaq.q2": "Comment vais-je percevoir mes revenus ?",
+      "merchantFaq.a2": "Vous êtes réglé directement par virement bancaire via un compte connecté. Contrairement à d'autres plateformes qui imposent des paiements mensuels groupés, vous percevez vos revenus au fur et à mesure de vos ventes.",
+      "merchantFaq.q3": "Dois-je fournir l'emballage ?",
+      "merchantFaq.a3": "Vous avez le choix. Vous précisez simplement pour chaque sachet si vous fournissez le sac ou si le client doit apporter le sien.",
+      "merchantFaq.q4": "Comment s'assurer qu'il s'agit du bon client ?",
+      "merchantFaq.a4": "Le client vous montre son code de retrait. Vous le renseignez dans votre espace partenaire et l'application affiche immédiatement sa réservation correspondante, sans aucun risque de confusion.",
       "how.eyebrow": "Comment ça marche",
       "how.hook": "Trois clics vous séparent d'une très bonne affaire.",
       "how.sub": "Parcourez. Réservez. Récupérez. Jusqu'à -70%, moins de déchets, et le repas réglé en trois clics.",
@@ -1077,8 +1187,22 @@
       "mission.title": "Wir reden nicht über das Klima. Wir reden über die, für die jeder Einkauf zählt.",
       "mission.text": "Jeden Tag werfen luxemburgische Unternehmen und Geschäfte noch genießbare Lebensmittel weg. Relief bringt sie zu reduzierten Preisen zurück in Umlauf, für alle, die es wirklich brauchen — ohne Vortrag, ohne Urteil, einfach eine konkrete Hilfe.",
       "merchantSeo.eyebrow": "Für Geschäfte",
-      "merchantSeo.title": "Verkaufen Sie Ihre Überschüsse, statt sie wegzuwerfen",
-      "merchantSeo.text": "Bäckerei, Restaurant, Lebensmittelgeschäft, Caterer: Jeden Tag landen noch genießbare Produkte im Müll. Mit relief.lu bieten Sie sie zu reduzierten Preisen den Menschen in Ihrer Nachbarschaft an, statt sie wegzuwerfen — ein zusätzliches Einkommen aus dem, was ohnehin verloren gegangen wäre, ohne zusätzliche Produktion oder Lagerbestand, veröffentlicht in weniger als einer Minute vom Handy aus.",
+      "merchantSeo.title": "Steigern Sie die Rentabilität, beseitigen Sie Lebensmittelverschwendung.",
+      "merchantSeo.text": "Verwandeln Sie Ihre Tagesüberschüsse in zusätzliches Einkommen, direkt über relief.lu.",
+      "merchantSteps.s1title": "Veröffentlichen",
+      "merchantSteps.s1text": "Ein Beutel online in weniger als einer Minute.",
+      "merchantSteps.s2title": "Der Kunde reserviert",
+      "merchantSteps.s2text": "Er reserviert, er zahlt. Verkauft.",
+      "merchantSteps.s3title": "Er holt ihn ab",
+      "merchantSteps.s3text": "Er zeigt dir einen Code. Du prüfst ihn, du gibst ihm seinen Beutel.",
+      "merchantFaq.q1": "Bedeutet das mehr Arbeit für mich?",
+      "merchantFaq.a1": "Nein. Eine Minute zum Veröffentlichen. Kein Lager, keine Überproduktion.",
+      "merchantFaq.q2": "Wie werde ich bezahlt?",
+      "merchantFaq.a2": "Per Stripe-Überweisung, direkt. Kein Warten bis Monatsende.",
+      "merchantFaq.q3": "Muss ich die Verpackung selbst stellen?",
+      "merchantFaq.a3": "Der Behälter wird immer gestellt. Bei der Tasche entscheidest du — pro Beutel angegeben.",
+      "merchantFaq.q4": "Woher weiß ich, dass es der richtige Kunde ist?",
+      "merchantFaq.a4": "Er zeigt dir einen Code. Du gibst ihn ein, die App findet seine Reservierung.",
       "how.eyebrow": "So funktioniert's",
       "how.hook": "Drei Klicks trennen dich von einem richtig guten Deal.",
       "how.sub": "Durchstöbern. Reservieren. Abholen. Bis zu -70%, weniger Verschwendung, und das Essen ist in drei Klicks gesichert.",
@@ -1177,8 +1301,22 @@
       "mission.title": "We're not talking about climate. We're talking about people for whom every grocery run counts.",
       "mission.text": "Every day, Luxembourg businesses and shops throw away food that's still good. Relief brings it back into circulation, at a reduced price, for those who really need it — no lecture, no judgment, just concrete help.",
       "merchantSeo.eyebrow": "For merchants",
-      "merchantSeo.title": "Sell your surplus food, stop throwing it away",
-      "merchantSeo.text": "Bakery, restaurant, grocery store, caterer: every day, perfectly good products end up in the trash. With relief.lu, offer them at a reduced price to people nearby instead of throwing them away — extra revenue on what was already a loss, with no added production or stock, published in under a minute from your phone.",
+      "merchantSeo.title": "Make your business more profitable. Eliminate food waste.",
+      "merchantSeo.text": "Turn today's surplus into extra revenue, directly through relief.lu.",
+      "merchantSteps.s1title": "Publish",
+      "merchantSteps.s1text": "A bag online in under a minute.",
+      "merchantSteps.s2title": "The customer books it",
+      "merchantSteps.s2text": "They book it, they pay. Sold.",
+      "merchantSteps.s3title": "They pick it up",
+      "merchantSteps.s3text": "They show you a code. You check it, you hand over their bag.",
+      "merchantFaq.q1": "Does this mean extra work for me?",
+      "merchantFaq.a1": "No. One minute to publish. No stock, no overproduction.",
+      "merchantFaq.q2": "How do I get paid?",
+      "merchantFaq.a2": "By Stripe transfer, direct. No waiting until month-end.",
+      "merchantFaq.q3": "Do I need to provide my own packaging?",
+      "merchantFaq.a3": "The container is always provided. For the bag, it's up to you — set per listing.",
+      "merchantFaq.q4": "How do I know it's the right customer?",
+      "merchantFaq.a4": "They show you a code. You type it in, the app finds their reservation.",
       "how.eyebrow": "How it works",
       "how.hook": "Three taps between you and a really good deal.",
       "how.sub": "Browse. Reserve. Collect. Up to 70% off, less landfill, and dinner sorted in three taps.",
