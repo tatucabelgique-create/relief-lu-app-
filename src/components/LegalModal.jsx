@@ -130,7 +130,7 @@ const CONTENT = {
         },
         {
           heading: "3. Obligations du commerçant",
-          text: "Le commerçant est seul responsable du contenu de ses annonces (description, quantité, prix, créneau de retrait) et garantit être légalement habilité à vendre les denrées proposées, dans le respect intégral de la réglementation applicable en matière d'hygiène et de sécurité alimentaire. Il s'engage notamment à indiquer, lorsque la réglementation européenne relative à l'information des consommateurs sur les denrées alimentaires l'exige, la présence des substances allergènes à déclaration obligatoire. Le commerçant s'engage à honorer chaque réservation payée dans le créneau annoncé.",
+          text: "Le commerçant est seul responsable du contenu de ses annonces (description, quantité, prix, créneau de retrait) et garantit être légalement habilité à vendre les denrées proposées, dans le respect intégral de la réglementation applicable en matière d'hygiène et de sécurité alimentaire. Il s'engage notamment à indiquer, lorsque la réglementation européenne relative à l'information des consommateurs sur les denrées alimentaires l'exige, la présence des substances allergènes à déclaration obligatoire. En particulier, aucune denrée dont la Date Limite de Consommation (DLC, \"à consommer jusqu'au\") est dépassée ne peut être proposée à la vente sur relief.lu, quelle que soit sa nature, y compris pour les produits secs ou non périssables. Seules les denrées dont la Date de Durabilité Minimale (DDM, \"à consommer de préférence avant\") est dépassée peuvent être commercialisées sur la plateforme. Le commerçant s'engage à honorer chaque réservation payée dans le créneau annoncé.",
         },
         {
           heading: "4. Non-exclusivité",
@@ -321,7 +321,7 @@ const CONTENT = {
         },
         {
           heading: "3. Pflichten des Geschäfts",
-          text: "Das Geschäft ist allein verantwortlich für den Inhalt seiner Angebote (Beschreibung, Menge, Preis, Abholzeitraum) und garantiert, im vollen Einklang mit den geltenden Hygiene- und Lebensmittelsicherheitsvorschriften zum Verkauf berechtigt zu sein. Es verpflichtet sich insbesondere, gemäß der europäischen Verordnung zur Information der Verbraucher über Lebensmittel die kennzeichnungspflichtigen Allergene anzugeben, sofern erforderlich. Das Geschäft verpflichtet sich, jede bezahlte Reservierung im angekündigten Zeitfenster zu erfüllen.",
+          text: "Das Geschäft ist allein verantwortlich für den Inhalt seiner Angebote (Beschreibung, Menge, Preis, Abholzeitraum) und garantiert, im vollen Einklang mit den geltenden Hygiene- und Lebensmittelsicherheitsvorschriften zum Verkauf berechtigt zu sein. Es verpflichtet sich insbesondere, gemäß der europäischen Verordnung zur Information der Verbraucher über Lebensmittel die kennzeichnungspflichtigen Allergene anzugeben, sofern erforderlich. Insbesondere darf kein Lebensmittel, dessen Verbrauchsdatum (\"zu verbrauchen bis\") überschritten ist, auf relief.lu zum Verkauf angeboten werden, unabhängig von seiner Art, auch nicht bei trockenen oder nicht verderblichen Produkten. Nur Lebensmittel, deren Mindesthaltbarkeitsdatum (\"mindestens haltbar bis\") überschritten ist, dürfen auf der Plattform verkauft werden. Das Geschäft verpflichtet sich, jede bezahlte Reservierung im angekündigten Zeitfenster zu erfüllen.",
         },
         {
           heading: "4. Keine Exklusivität",
@@ -512,7 +512,7 @@ const CONTENT = {
         },
         {
           heading: "3. Merchant obligations",
-          text: "The merchant is solely responsible for the content of their listings (description, quantity, price, pickup window) and guarantees they are legally entitled to sell the food offered, in full compliance with applicable hygiene and food safety regulations. In particular, the merchant agrees to indicate mandatory allergen information where required under EU food information regulations. The merchant agrees to honor every paid reservation within the announced window.",
+          text: "The merchant is solely responsible for the content of their listings (description, quantity, price, pickup window) and guarantees they are legally entitled to sell the food offered, in full compliance with applicable hygiene and food safety regulations. In particular, the merchant agrees to indicate mandatory allergen information where required under EU food information regulations. No food item past its \"use by\" date (Date Limite de Consommation) may be offered for sale on relief.lu, regardless of its nature, including dry or non-perishable goods. Only food items past their \"best before\" date (Date de Durabilité Minimale) may be sold on the platform. The merchant agrees to honor every paid reservation within the announced window.",
         },
         {
           heading: "4. No exclusivity",
