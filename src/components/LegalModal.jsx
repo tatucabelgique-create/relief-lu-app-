@@ -5,6 +5,25 @@ const CONTACT = "contact@relief.lu";
 const COMPANY = "RELIEF.LU SARL-S";
 const ADDRESS = "2, rue Dr. Elvire Engel, L-8346 Grass, Luxembourg";
 
+// Rend cliquables les quelques URL externes citées en toutes lettres dans les
+// CGU (ODR européen, ALVA luxembourgeoise) — liste explicite plutôt qu'une
+// regex générique de détection d'URL, pour ne jamais transformer "relief.lu"
+// lui-même (répété des dizaines de fois comme nom de marque dans le texte)
+// en lien cliquable.
+const LINKABLE_URLS = ["ec.europa.eu/consumers/odr", "securite-alimentaire.public.lu"];
+const LINK_SPLIT_REGEX = new RegExp(`(${LINKABLE_URLS.map((u) => u.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")).join("|")})`, "g");
+function linkify(text) {
+  return text.split(LINK_SPLIT_REGEX).map((part, i) =>
+    LINKABLE_URLS.includes(part) ? (
+      <a key={i} href={`https://${part}`} target="_blank" rel="noopener noreferrer">
+        {part}
+      </a>
+    ) : (
+      part
+    )
+  );
+}
+
 const CONTENT = {
   fr: {
     mentions: {
@@ -622,12 +641,12 @@ export default function LegalModal({ type, onClose }) {
           {content.paragraphs.map((p, i) =>
             typeof p === "string" ? (
               <p key={i} className="desc">
-                {p}
+                {linkify(p)}
               </p>
             ) : (
               <div key={i} style={{ marginTop: 14 }}>
                 <p style={{ fontWeight: 700, marginBottom: 4 }}>{p.heading}</p>
-                {p.text && <p className="desc">{p.text}</p>}
+                {p.text && <p className="desc">{linkify(p.text)}</p>}
               </div>
             )
           )}
