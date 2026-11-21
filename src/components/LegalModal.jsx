@@ -97,7 +97,7 @@ const CONTENT = {
         },
         {
           heading: "8. Responsabilité",
-          text: "relief.lu ne garantit pas la qualité, la fraîcheur, la composition exacte ou l'innocuité des produits proposés — cette responsabilité incombe exclusivement au commerçant. La responsabilité de relief.lu, en tant qu'intermédiaire technique, ne saurait être engagée au titre du contenu des annonces, de la qualité des produits ou de l'exécution de la transaction entre commerçant et utilisateur, sauf faute propre et directe de relief.lu dans le fonctionnement de la plateforme.",
+          text: "relief.lu ne garantit pas la qualité, la fraîcheur, la composition exacte ou l'innocuité des produits proposés — cette responsabilité incombe exclusivement au commerçant. Les sachets peuvent contenir des denrées dont la Date de Durabilité Minimale (DDM, \"à consommer de préférence avant\") est dépassée : cela n'affecte que leurs qualités gustatives optimales, pas leur sécurité. En revanche, aucune denrée dont la Date Limite de Consommation (DLC, \"à consommer jusqu'au\") est dépassée ne peut légalement être vendue sur relief.lu, quelle que soit sa nature. La responsabilité de relief.lu, en tant qu'intermédiaire technique, ne saurait être engagée au titre du contenu des annonces, de la qualité des produits ou de l'exécution de la transaction entre commerçant et utilisateur, sauf faute propre et directe de relief.lu dans le fonctionnement de la plateforme.",
         },
         {
           heading: "9. Réclamations et résolution des litiges",
@@ -288,7 +288,7 @@ const CONTENT = {
         },
         {
           heading: "8. Haftung",
-          text: "relief.lu übernimmt keine Garantie für Qualität, Frische, genaue Zusammensetzung oder Unbedenklichkeit der angebotenen Produkte — diese Verantwortung liegt ausschließlich beim Geschäft. Die Haftung von relief.lu als technischem Vermittler ist ausgeschlossen für Inhalt der Angebote, Produktqualität oder Durchführung der Transaktion zwischen Geschäft und Nutzer, außer bei eigenem, unmittelbarem Verschulden von relief.lu beim Betrieb der Plattform.",
+          text: "relief.lu übernimmt keine Garantie für Qualität, Frische, genaue Zusammensetzung oder Unbedenklichkeit der angebotenen Produkte — diese Verantwortung liegt ausschließlich beim Geschäft. Die Sachets können Lebensmittel enthalten, deren Mindesthaltbarkeitsdatum (\"mindestens haltbar bis\") überschritten ist: Dies beeinträchtigt nur die optimale Geschmacksqualität, nicht die Sicherheit. Lebensmittel, deren Verbrauchsdatum (\"zu verbrauchen bis\") überschritten ist, dürfen dagegen unabhängig von ihrer Art nicht legal über relief.lu verkauft werden. Die Haftung von relief.lu als technischem Vermittler ist ausgeschlossen für Inhalt der Angebote, Produktqualität oder Durchführung der Transaktion zwischen Geschäft und Nutzer, außer bei eigenem, unmittelbarem Verschulden von relief.lu beim Betrieb der Plattform.",
         },
         {
           heading: "9. Beschwerden und Streitbeilegung",
@@ -479,7 +479,7 @@ const CONTENT = {
         },
         {
           heading: "8. Liability",
-          text: "relief.lu does not guarantee the quality, freshness, exact composition, or safety of the products offered — this responsibility lies solely with the merchant. relief.lu's liability, as a technical intermediary, cannot be engaged for the content of listings, product quality, or the execution of the transaction between merchant and user, except for relief.lu's own direct fault in the operation of the platform.",
+          text: "relief.lu does not guarantee the quality, freshness, exact composition, or safety of the products offered — this responsibility lies solely with the merchant. Bags may contain food past its \"best before\" date (Date de Durabilité Minimale): this only affects optimal taste quality, not safety. Food past its \"use by\" date (Date Limite de Consommation), however, may not legally be sold on relief.lu regardless of its nature. relief.lu's liability, as a technical intermediary, cannot be engaged for the content of listings, product quality, or the execution of the transaction between merchant and user, except for relief.lu's own direct fault in the operation of the platform.",
         },
         {
           heading: "9. Complaints and dispute resolution",
