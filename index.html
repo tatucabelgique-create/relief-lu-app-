@@ -458,10 +458,16 @@
     display:flex; align-items:center; gap:48px; width:max-content;
     animation:logowall-scroll 22s linear infinite;
   }
-  .merchant-logowall-track a{display:flex; flex-shrink:0; text-decoration:none;}
+  .merchant-logowall-track a, .merchant-logowall-track .logowall-item{display:flex; flex-shrink:0; text-decoration:none; position:relative;}
   .merchant-logowall-track img{
     height:40px; width:auto; max-width:120px; object-fit:contain;
     border-radius:8px; opacity:0.85; filter:grayscale(0.2);
+  }
+  .logowall-soon-badge{
+    position:absolute; bottom:-10px; left:50%; transform:translateX(-50%);
+    background:var(--honey); color:var(--navy); font-family:'IBM Plex Mono', monospace;
+    font-size:9px; font-weight:600; letter-spacing:0.6px; text-transform:uppercase;
+    padding:2px 7px; border-radius:999px; white-space:nowrap;
   }
   @keyframes logowall-scroll{
     from{transform:translateX(0);}
@@ -877,11 +883,13 @@
           <a href="/commercant/golden-bean-belval-esch-sur-alzette/"><img src="https://ucxsqregeorfjakgomaj.supabase.co/storage/v1/object/public/bag-photos/347e7268-a2f2-40f2-b6c6-26ebf8dabb72/logo-1794513984526-logo%20golden%20bean.jpeg" alt="Golden Bean Belval"></a>
           <a href="/commercant/cake-go-differdange/"><img src="https://ucxsqregeorfjakgomaj.supabase.co/storage/v1/object/public/bag-photos/38fc891f-dfa2-4959-9ff5-f08ab0e743f2/logo-1790853394537-IMG_3557.jpeg" alt="Cake&amp;Go"></a>
           <a href="/commercant/exki-luxembourg-luxembourg-ville/"><img src="https://ucxsqregeorfjakgomaj.supabase.co/storage/v1/object/public/bag-photos/8252de18-180c-47a3-ac30-95fca75ef83b/logo-1792155257154-Exki_logo.png" alt="EXKi Luxembourg"></a>
+          <div class="logowall-item"><img src="/img/logo-epicerie-de-berdorf.jpeg" alt="L'Épicerie de Berdorf"><span class="logowall-soon-badge" data-i18n="merchantLogowall.soon">Bientôt</span></div>
           <a href="/commercant/izakaya-pommerloch-pommerloch/" tabindex="-1" aria-hidden="true"><img src="https://ucxsqregeorfjakgomaj.supabase.co/storage/v1/object/public/bag-photos/64a049f0-8cba-4c78-a846-3ff186061ec6/logo-1794419755182-logo%20izakaya%20new.png" alt=""></a>
           <a href="/commercant/jour-restaurants-luxembourg-ville/" tabindex="-1" aria-hidden="true"><img src="https://ucxsqregeorfjakgomaj.supabase.co/storage/v1/object/public/bag-photos/c6f41c28-510f-4cab-8293-dd9ea1068385/logo-1792316921859-logo%20jour.jpeg" alt=""></a>
           <a href="/commercant/golden-bean-belval-esch-sur-alzette/" tabindex="-1" aria-hidden="true"><img src="https://ucxsqregeorfjakgomaj.supabase.co/storage/v1/object/public/bag-photos/347e7268-a2f2-40f2-b6c6-26ebf8dabb72/logo-1794513984526-logo%20golden%20bean.jpeg" alt=""></a>
           <a href="/commercant/cake-go-differdange/" tabindex="-1" aria-hidden="true"><img src="https://ucxsqregeorfjakgomaj.supabase.co/storage/v1/object/public/bag-photos/38fc891f-dfa2-4959-9ff5-f08ab0e743f2/logo-1790853394537-IMG_3557.jpeg" alt=""></a>
           <a href="/commercant/exki-luxembourg-luxembourg-ville/" tabindex="-1" aria-hidden="true"><img src="https://ucxsqregeorfjakgomaj.supabase.co/storage/v1/object/public/bag-photos/8252de18-180c-47a3-ac30-95fca75ef83b/logo-1792155257154-Exki_logo.png" alt=""></a>
+          <div class="logowall-item" aria-hidden="true"><img src="/img/logo-epicerie-de-berdorf.jpeg" alt=""><span class="logowall-soon-badge">Bientôt</span></div>
         </div>
       </div>
 
@@ -1126,6 +1134,7 @@
       "merchantFaq.q4": "Comment s'assurer qu'il s'agit du bon client ?",
       "merchantFaq.a4": "Le client vous montre son code de retrait. Vous le renseignez dans votre espace partenaire et l'application affiche immédiatement sa réservation correspondante, sans aucun risque de confusion.",
       "merchantLogowall.label": "Ils sont déjà sur relief.lu",
+      "merchantLogowall.soon": "Bientôt",
       "how.eyebrow": "Comment ça marche",
       "how.hook": "Trois clics vous séparent d'une très bonne affaire.",
       "how.sub": "Parcourez. Réservez. Récupérez. Jusqu'à -70%, moins de déchets, et le repas réglé en trois clics.",
@@ -1241,6 +1250,7 @@
       "merchantFaq.q4": "Woher weiß ich, dass es der richtige Kunde ist?",
       "merchantFaq.a4": "Er zeigt dir einen Code. Du gibst ihn ein, die App findet seine Reservierung.",
       "merchantLogowall.label": "Bereits auf relief.lu",
+      "merchantLogowall.soon": "Demnächst",
       "how.eyebrow": "So funktioniert's",
       "how.hook": "Drei Klicks trennen dich von einem richtig guten Deal.",
       "how.sub": "Durchstöbern. Reservieren. Abholen. Bis zu -70%, weniger Verschwendung, und das Essen ist in drei Klicks gesichert.",
@@ -1356,6 +1366,7 @@
       "merchantFaq.q4": "How do I know it's the right customer?",
       "merchantFaq.a4": "They show you a code. You type it in, the app finds their reservation.",
       "merchantLogowall.label": "Already on relief.lu",
+      "merchantLogowall.soon": "Coming soon",
       "how.eyebrow": "How it works",
       "how.hook": "Three taps between you and a really good deal.",
       "how.sub": "Browse. Reserve. Collect. Up to 70% off, less landfill, and dinner sorted in three taps.",
