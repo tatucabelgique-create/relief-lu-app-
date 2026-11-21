@@ -9,13 +9,18 @@ const ADDRESS = "2, rue Dr. Elvire Engel, L-8346 Grass, Luxembourg";
 // CGU (ODR européen, ALVA luxembourgeoise) — liste explicite plutôt qu'une
 // regex générique de détection d'URL, pour ne jamais transformer "relief.lu"
 // lui-même (répété des dizaines de fois comme nom de marque dans le texte)
-// en lien cliquable.
-const LINKABLE_URLS = ["ec.europa.eu/consumers/odr", "securite-alimentaire.public.lu"];
-const LINK_SPLIT_REGEX = new RegExp(`(${LINKABLE_URLS.map((u) => u.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")).join("|")})`, "g");
+// en lien cliquable. Texte affiché (le domaine, tel qu'écrit dans la prose)
+// et href (page précise) peuvent différer — ex. l'ALVA pointe directement
+// vers leur fiche DLC/DDM, pas juste leur page d'accueil.
+const LINKABLE_URLS = {
+  "ec.europa.eu/consumers/odr": "https://ec.europa.eu/consumers/odr",
+  "securite-alimentaire.public.lu": "https://securite-alimentaire.public.lu/fr/publications/conseils/ddm-mhd-carte.html",
+};
+const LINK_SPLIT_REGEX = new RegExp(`(${Object.keys(LINKABLE_URLS).map((u) => u.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")).join("|")})`, "g");
 function linkify(text) {
   return text.split(LINK_SPLIT_REGEX).map((part, i) =>
-    LINKABLE_URLS.includes(part) ? (
-      <a key={i} href={`https://${part}`} target="_blank" rel="noopener noreferrer">
+    LINKABLE_URLS[part] ? (
+      <a key={i} href={LINKABLE_URLS[part]} target="_blank" rel="noopener noreferrer">
         {part}
       </a>
     ) : (
