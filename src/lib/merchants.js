@@ -66,6 +66,29 @@ export async function setMerchantVerified(merchantId, verified) {
   if (error) throw error;
 }
 
+// Admin uniquement (policy "admin can update any merchant", schema-v14) —
+// contrairement à updateMerchantProfile (upsert réservé à l'auto-édition du
+// commerçant), ceci fait un update ciblé sur une fiche existante et couvre
+// aussi les champs que le commerçant ne peut pas éditer lui-même
+// (commission_rate, waive_service_fee). "verified" reste exclu : il a son
+// propre flux dédié (setMerchantVerified) protégé par trigger.
+export async function updateMerchantAsAdmin(merchantId, patch) {
+  const row = {
+    business_name: patch.business_name,
+    address: patch.address,
+    postal_code: patch.postal_code,
+    city: patch.city,
+    phone: patch.phone,
+    registration_number: patch.registration_number,
+    email: patch.email,
+    commission_rate: patch.commission_rate,
+    waive_service_fee: patch.waive_service_fee,
+    dynamic_pricing_threshold: patch.dynamic_pricing_threshold,
+  };
+  const { error } = await supabase.from("merchants").update(row).eq("id", merchantId);
+  if (error) throw error;
+}
+
 // Réutilise le bucket "bag-photos" (déjà public, déjà autorisé en écriture
 // pour les commerçants connectés) plutôt que d'en créer un dédié.
 export async function uploadMerchantLogo(userId, file) {

@@ -1,10 +1,12 @@
 import { useEffect, useState } from "react";
 import { listMerchants, setMerchantVerified } from "../lib/merchants";
+import EditMerchantModal from "./EditMerchantModal.jsx";
 
 export default function MerchantVerification() {
   const [merchants, setMerchants] = useState(null);
   const [busyId, setBusyId] = useState(null);
   const [error, setError] = useState("");
+  const [editing, setEditing] = useState(null);
 
   async function refresh() {
     try {
@@ -63,9 +65,14 @@ export default function MerchantVerification() {
           <p className="page-sub" style={{ margin: "4px 0", color: m.lat != null && m.lng != null ? "var(--sage)" : "var(--honey)" }}>
             {m.lat != null && m.lng != null ? "✓ Positionné sur la carte" : "⚠ Pas de position GPS — n'apparaîtra pas sur la carte"}
           </p>
-          <button className="btn small" disabled={busyId === m.id} onClick={() => toggle(m.id, true)}>
-            {busyId === m.id ? "…" : "Approuver"}
-          </button>
+          <div style={{ display: "flex", gap: 8 }}>
+            <button className="btn small" disabled={busyId === m.id} onClick={() => toggle(m.id, true)}>
+              {busyId === m.id ? "…" : "Approuver"}
+            </button>
+            <button className="btn secondary small" onClick={() => setEditing(m)}>
+              Modifier
+            </button>
+          </div>
         </div>
       ))}
 
@@ -80,13 +87,29 @@ export default function MerchantVerification() {
           <p className="page-sub" style={{ margin: "4px 0", color: m.stripe_account_id ? "var(--sage)" : "var(--honey)" }}>
             {m.stripe_account_id ? "✓ Compte Stripe connecté" : "⚠ Pas encore de compte Stripe — ventes non reversées automatiquement"}
           </p>
-          <button className="btn secondary small" disabled={busyId === m.id} onClick={() => toggle(m.id, false)}>
-            {busyId === m.id ? "…" : "Suspendre"}
-          </button>
+          <div style={{ display: "flex", gap: 8 }}>
+            <button className="btn secondary small" disabled={busyId === m.id} onClick={() => toggle(m.id, false)}>
+              {busyId === m.id ? "…" : "Suspendre"}
+            </button>
+            <button className="btn secondary small" onClick={() => setEditing(m)}>
+              Modifier
+            </button>
+          </div>
         </div>
       ))}
 
       {error && <p className="error-msg">{error}</p>}
+
+      {editing && (
+        <EditMerchantModal
+          merchant={editing}
+          onClose={() => setEditing(null)}
+          onSaved={() => {
+            setEditing(null);
+            refresh();
+          }}
+        />
+      )}
     </div>
   );
 }
