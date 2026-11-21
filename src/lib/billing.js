@@ -4,9 +4,9 @@ import { supabase } from "./supabase";
 // à l'ancienne version de ce fichier, le taux RÉELLEMENT appliqué est celui
 // de chaque commerçant (merchants.commission_rate, v28), pas une constante
 // unique : cet écran calcule les montants à reverser pour de vrai, un
-// partenaire négocié (ex. 21% pour Hana Group) doit être facturé à son
-// propre taux, pas à 18% par défaut.
-const DEFAULT_COMMISSION_RATE = 0.18;
+// partenaire avec un taux différent doit être facturé à son propre taux,
+// pas au taux par défaut.
+const DEFAULT_COMMISSION_RATE = 0.21;
 const VAT_RATE = 0.17;
 
 // Lundi 00:00 -> dimanche 23:59:59 de la semaine complète précédant

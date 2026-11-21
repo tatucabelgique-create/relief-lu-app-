@@ -46,7 +46,7 @@ export default function MerchantBilling() {
       <h2>Facturation commerçants</h2>
       <p className="page-sub">
         Calcule, pour chaque commerçant, le chiffre d'affaires payé sur la période, la commission relief.lu (son propre
-        taux négocié, 18% par défaut, + TVA 17%) et le montant net à leur reverser. Usage interne — rien n'est envoyé
+        taux négocié, 21% par défaut, + TVA 17%) et le montant net à leur reverser. Usage interne — rien n'est envoyé
         aux commerçants.
       </p>
 

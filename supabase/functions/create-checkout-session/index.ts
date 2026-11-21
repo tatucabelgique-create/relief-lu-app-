@@ -53,17 +53,16 @@ Deno.serve(async (req) => {
     const base = (return_base || "https://relief.lu/").replace(/\/+$/, "");
 
     // Mêmes taux que merchantStats.js/billing.js — à garder synchronisés.
-    // Commission redescendue à 18% (depuis 20%) en complément du nouveau
-    // SERVICE_FEE_CENTS côté acheteur, qui couvre les frais Stripe que la
-    // commission seule ne suffisait pas à absorber sur les petits paniers.
-    // Un commerçant avec un taux négocié (merchants.commission_rate, v28)
-    // remplace ce défaut — NULL garde le taux standard.
+    // SERVICE_FEE_CENTS côté acheteur couvre les frais Stripe séparément,
+    // indépendamment de cette commission. Un commerçant avec un taux négocié
+    // (merchants.commission_rate, v28) remplace ce défaut — NULL garde le
+    // taux standard.
     const merchantRow = reservation.bags.merchants as {
       stripe_account_id: string | null;
       commission_rate: number | null;
       waive_service_fee: boolean | null;
     } | null;
-    const COMMISSION_RATE = merchantRow?.commission_rate ?? 0.18;
+    const COMMISSION_RATE = merchantRow?.commission_rate ?? 0.21;
     const VAT_RATE = 0.17;
     // Frais de service par sachet, intégrés directement dans le prix affiché
     // au client (voir src/lib/pricing.js, à garder synchronisé avec les

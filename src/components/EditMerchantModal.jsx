@@ -64,7 +64,7 @@ export default function EditMerchantModal({ merchant, onClose, onSaved }) {
       await updateMerchantAsAdmin(merchant.id, {
         ...form,
         // Commission saisie en % (ex. 21) -> fraction stockée en base (0.21).
-        // Champ vide = NULL = taux par défaut (18%), pas 0%.
+        // Champ vide = NULL = taux par défaut (21%), pas 0%.
         commission_rate: form.commission_rate === "" ? null : Number(form.commission_rate) / 100,
         dynamic_pricing_threshold: form.dynamic_pricing_threshold === "" ? null : parseInt(form.dynamic_pricing_threshold, 10),
       });
@@ -125,7 +125,7 @@ export default function EditMerchantModal({ merchant, onClose, onSaved }) {
               max="100"
               value={form.commission_rate}
               onChange={(e) => set("commission_rate", e.target.value)}
-              placeholder="18 (par défaut)"
+              placeholder="21 (par défaut)"
             />
           </div>
           <div className="field">

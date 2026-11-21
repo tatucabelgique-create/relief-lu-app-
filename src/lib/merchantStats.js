@@ -2,13 +2,12 @@ import { supabase } from "./supabase";
 
 // Taux appliqués sur le chiffre d'affaires encaissé (réservations payées
 // uniquement — pending/failed/refunded ne comptent pas comme vente réelle) :
-// commission de 18% hors TVA par défaut, TVA luxembourgeoise standard de 17%
-// dessus. Redescendue à 18% (depuis 20%) une fois les frais de service
-// acheteur introduits (voir SERVICE_FEE_CENTS dans
-// create-checkout-session/index.ts) — ce sont eux, pas la commission, qui
-// couvrent désormais les frais Stripe. Un commerçant avec un taux négocié
+// commission de 21% hors TVA par défaut, TVA luxembourgeoise standard de 17%
+// dessus. Les frais de service acheteur (voir SERVICE_FEE_CENTS dans
+// create-checkout-session/index.ts) couvrent les frais Stripe séparément,
+// indépendamment de ce taux. Un commerçant avec un taux négocié
 // (merchants.commission_rate, v28) remplace ce défaut — voir getMerchantStats.
-const DEFAULT_COMMISSION_RATE = 0.18;
+const DEFAULT_COMMISSION_RATE = 0.21;
 const VAT_RATE = 0.17;
 
 // Nombre de sachets vendus (payés) sur les 28 derniers jours glissants — sert
@@ -83,7 +82,7 @@ export async function getMerchantStats(merchantId) {
     noShowRate: totalReservations ? Math.round((noShowCount / totalReservations) * 100) : 0,
     revenue: revenueCents / 100,
     // Null avant validation admin (merchant.verified) — MerchantStats.jsx
-    // affiche alors "en attente de validation" plutôt que de montrer 18%
+    // affiche alors "en attente de validation" plutôt que de montrer 21%
     // comme si le taux était déjà acté.
     commissionRate: merchant?.verified ? COMMISSION_RATE : null,
     commissionHt: commissionHtCents / 100,
