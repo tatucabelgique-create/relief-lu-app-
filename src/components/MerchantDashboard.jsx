@@ -30,6 +30,7 @@ const emptyForm = {
   vegetarian: false,
   vegan: false,
   snack: false,
+  dlcConfirmed: false,
 };
 
 export default function MerchantDashboard({ user, merchant, onMerchantChanged }) {
@@ -172,6 +173,13 @@ export default function MerchantDashboard({ user, merchant, onMerchantChanged })
     }
     if (new Date(form.end) <= new Date(form.start)) {
       setMsg({ type: "error", text: "Le retrait « jusqu'à » doit être après le retrait « à partir de »." });
+      return;
+    }
+    // Attestation légale obligatoire (CGU commerçant, article 3) — bloque la
+    // publication plutôt que de se reposer uniquement sur le texte des CGU,
+    // jamais relu à chaque sachet publié.
+    if (!form.dlcConfirmed) {
+      setMsg({ type: "error", text: t("merchant.f.dlcConfirmedRequired") });
       return;
     }
     // En dessous de ce seuil, les frais fixes de traitement Stripe (~0,25-0,35€,
@@ -387,6 +395,15 @@ export default function MerchantDashboard({ user, merchant, onMerchantChanged })
           <label>{t("merchant.f.photo")}</label>
           <input type="file" accept="image/*" onChange={(e) => setPhoto(e.target.files[0] || null)} />
         </div>
+
+        <label className="checkbox-field">
+          <input type="checkbox" checked={form.dlcConfirmed} onChange={(e) => set("dlcConfirmed", e.target.checked)} />
+          <span>
+            {t("merchant.f.dlcConfirmed")}
+            <span className="field-hint" style={{ display: "block" }}>{t("merchant.f.dlcConfirmedHint")}</span>
+          </span>
+        </label>
+
         <button className="btn" onClick={handlePublish}>
           {t("merchant.publish")}
         </button>
