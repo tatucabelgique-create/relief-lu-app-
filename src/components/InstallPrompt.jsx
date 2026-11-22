@@ -17,6 +17,11 @@ const COOLDOWN_MS = 14 * 24 * 60 * 60 * 1000; // 14 jours
 export default function InstallPrompt() {
   const { t } = useI18n();
   const [show, setShow] = useState(false);
+  // Guide pas-à-pas affiché au clic — iOS n'a aucune API pour déclencher
+  // l'installation, et même sur Android le bouton natif n'apparaît que si
+  // "beforeinstallprompt" a déjà été capté (voir plus bas) : sans ce guide,
+  // le bandeau dit "installe" sans jamais montrer comment, dans les deux cas.
+  const [showGuide, setShowGuide] = useState(false);
   // Chrome/Edge/Android exposent un événement natif permettant de déclencher
   // la vraie boîte de dialogue d'installation au clic — sans lui, on ne peut
   // que dire "installe" sans dire où ni comment, contrairement à iOS qui a
@@ -88,21 +93,56 @@ export default function InstallPrompt() {
   }
 
   return (
-    <div className="install-nudge">
-      <div className="ic">📲</div>
-      <div className="txt">
-        <b>{t("install.title")}</b>
-        {isIOS ? t("install.textIOS") : t("install.textOther")}
-      </div>
-      {!isIOS && deferredPrompt && (
-        <button className="btn small" onClick={handleInstallClick}>
-          {t("install.button")}
+    <>
+      <div className="install-nudge">
+        <div className="ic">📲</div>
+        <button
+          type="button"
+          className="txt"
+          onClick={() => setShowGuide(true)}
+        >
+          <b>{t("install.title")}</b>
+          {isIOS ? t("install.textIOS") : t("install.textOther")}
+          <span className="install-nudge-cta">{t("install.guideCta")}</span>
         </button>
+        {!isIOS && deferredPrompt && (
+          <button className="btn small" onClick={handleInstallClick}>
+            {t("install.button")}
+          </button>
+        )}
+        <button className="close" onClick={dismiss} aria-label="Fermer">
+          ✕
+        </button>
+      </div>
+
+      {showGuide && (
+        <div className="overlay open" onClick={(e) => e.target === e.currentTarget && setShowGuide(false)}>
+          <div className="modal">
+            <button className="close" onClick={() => setShowGuide(false)}>✕</button>
+            <h2>{t("install.guideTitle")}</h2>
+            <ol className="install-guide-steps">
+              {isIOS ? (
+                <>
+                  <li>{t("install.guideStepIOS1")}</li>
+                  <li>{t("install.guideStepIOS2")}</li>
+                  <li>{t("install.guideStepIOS3")}</li>
+                </>
+              ) : (
+                <>
+                  <li>{t("install.guideStepAndroid1")}</li>
+                  <li>{t("install.guideStepAndroid2")}</li>
+                </>
+              )}
+            </ol>
+            {!isIOS && deferredPrompt && (
+              <button className="btn" onClick={() => { setShowGuide(false); handleInstallClick(); }}>
+                {t("install.button")}
+              </button>
+            )}
+          </div>
+        </div>
       )}
-      <button className="close" onClick={dismiss} aria-label="Fermer">
-        ✕
-      </button>
-    </div>
+    </>
   );
 }
 

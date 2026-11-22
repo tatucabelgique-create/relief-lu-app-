@@ -464,11 +464,16 @@ body { padding-bottom: 78px; }
   width: 40px; height: 40px; border-radius: 10px; background: var(--honey);
   display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 20px;
 }
-.install-nudge .txt { flex: 1; font-size: 13px; line-height: 1.4; }
+.install-nudge .txt {
+  flex: 1; font-size: 13px; line-height: 1.4; text-align: left;
+  background: none; border: none; color: var(--paper); padding: 0; cursor: pointer; font-family: inherit;
+}
 .install-nudge .txt b { display: block; font-family: 'Fraunces', serif; font-size: 15px; margin-bottom: 2px; }
+.install-nudge-cta { display: block; color: var(--honey); font-weight: 600; margin-top: 4px; text-decoration: underline; }
 .install-nudge .close {
   background: none; border: none; color: var(--paper-dim); font-size: 18px; padding: 4px 6px; flex-shrink: 0;
 }
+.install-guide-steps { margin: 0; padding-left: 20px; display: flex; flex-direction: column; gap: 14px; font-size: 14px; line-height: 1.5; color: var(--paper); }
 
 /* Page détail d'un sachet, ouverte en plein écran par-dessus le reste. */
 /* La fiche sachet glisse depuis le bas à l'ouverture, façon feuille mobile,
