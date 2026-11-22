@@ -26,7 +26,7 @@ create policy "admin can read pwa installs"
   to authenticated
   using (auth.jwt() ->> 'email' = 'giovanni.ehp@gmail.com');
 
-grant select, insert on public.pwa_installs to anon;
+grant insert on public.pwa_installs to anon;
 grant select, insert on public.pwa_installs to authenticated;
 grant select, insert, update, delete on public.pwa_installs to service_role;
 
