@@ -6,6 +6,7 @@ import LowDemandAlertsToggle from "./LowDemandAlertsToggle.jsx";
 import MerchantVerification from "./MerchantVerification.jsx";
 import MerchantBilling from "./MerchantBilling.jsx";
 import NotificationToggle from "./NotificationToggle.jsx";
+import PwaInstallsStats from "./PwaInstallsStats.jsx";
 import { supabase } from "../lib/supabase";
 import { ADMIN_EMAIL } from "../lib/admin";
 
@@ -165,6 +166,7 @@ export default function AdminView({ user }) {
       </div>
       <MerchantVerification />
       <MerchantBilling />
+      <PwaInstallsStats />
       <MarketingPush />
       <DailyReminderToggle />
       <LowDemandAlertsToggle />

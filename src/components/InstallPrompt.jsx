@@ -1,8 +1,10 @@
 import { useEffect, useState } from "react";
 import { useI18n } from "../lib/i18n.jsx";
+import { logPwaInstall } from "../lib/pwaInstalls";
 
 const DISMISS_KEY = "relief_install_dismissed";
 const COOLDOWN_MS = 14 * 24 * 60 * 60 * 1000; // 14 jours
+const IOS_INSTALL_LOGGED_KEY = "relief_pwa_install_logged_ios";
 
 // Bandeau discret d'invitation à l'installation PWA — se redéclenche
 // périodiquement (à chaque ouverture du détail d'un sachet, voir
@@ -32,6 +34,19 @@ export default function InstallPrompt() {
     typeof window !== "undefined" &&
     (window.matchMedia("(display-mode: standalone)").matches || window.navigator.standalone === true);
   const isIOS = typeof navigator !== "undefined" && /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+  const isAndroid = typeof navigator !== "undefined" && /Android/.test(navigator.userAgent);
+
+  // iOS n'a aucun événement "appinstalled" — on journalise donc la première
+  // fois que cet appareil est vu en mode standalone (lancé depuis l'écran
+  // d'accueil), une seule fois par appareil grâce au flag localStorage.
+  // Android/Chrome sont journalisés au vrai moment de l'installation,
+  // via l'événement "appinstalled" plus bas.
+  useEffect(() => {
+    if (!isStandalone || !isIOS) return;
+    if (localStorage.getItem(IOS_INSTALL_LOGGED_KEY)) return;
+    localStorage.setItem(IOS_INSTALL_LOGGED_KEY, "1");
+    logPwaInstall("ios");
+  }, [isStandalone, isIOS]);
 
   useEffect(() => {
     if (isStandalone) return;
@@ -66,6 +81,7 @@ export default function InstallPrompt() {
     function handleInstalled() {
       setShow(false);
       setDeferredPrompt(null);
+      logPwaInstall(isAndroid ? "android" : "other");
     }
     window.addEventListener("appinstalled", handleInstalled);
 
