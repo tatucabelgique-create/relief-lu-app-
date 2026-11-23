@@ -12,6 +12,7 @@ import { mkdirSync, writeFileSync } from "node:fs";
 import { resolve, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 import { displayPriceCents } from "../src/lib/pricing.js";
+import { slugify } from "../src/lib/slugify.js";
 
 // supabase-js initialise toujours un client Realtime (WebSocket) même pour
 // une simple requête ponctuelle, et Node 20 (utilisé par le workflow de
@@ -25,15 +26,6 @@ const SITE = "https://relief.lu";
 
 const SUPABASE_URL = process.env.VITE_SUPABASE_URL;
 const SUPABASE_ANON_KEY = process.env.VITE_SUPABASE_ANON_KEY;
-
-function slugify(str) {
-  return str
-    .normalize("NFD")
-    .replace(/[̀-ͯ]/g, "") // retire les accents (marques diacritiques après NFD)
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/^-+|-+$/g, "");
-}
 
 function escapeHtml(str) {
   return String(str ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));

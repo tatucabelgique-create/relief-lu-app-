@@ -6,6 +6,7 @@ import { getRecentSoldCount } from "../lib/merchantStats";
 import { notifyNewBag } from "../lib/notify";
 import { getErrorMessage } from "../lib/auth";
 import { arePaymentsLive } from "../lib/payments";
+import { slugify } from "../lib/slugify";
 import MerchantLogoUpload from "./MerchantLogoUpload.jsx";
 import MerchantBannerUpload from "./MerchantBannerUpload.jsx";
 import MerchantStats from "./MerchantStats.jsx";
@@ -268,6 +269,17 @@ export default function MerchantDashboard({ user, merchant, onMerchantChanged })
           <button className="btn secondary small" onClick={() => setEditingInfo(true)}>
             {t("merchant.editInfo")}
           </button>
+          {merchant.verified && (
+            <a
+              className="btn secondary small"
+              style={{ marginLeft: 8 }}
+              href={`/commercant/${slugify(`${merchant.business_name}-${merchant.city || ""}`)}/`}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              {t("merchant.viewPublicPage")}
+            </a>
+          )}
         </div>
       )}
       {merchant && editingInfo && (
