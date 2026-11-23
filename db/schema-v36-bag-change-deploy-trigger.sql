@@ -8,10 +8,15 @@
 -- personne ne poussait de commit.
 --
 -- Le secret partagé (x-webhook-secret, vérifié dans l'edge function
--- trigger-pages-deploy) est lu via un paramètre de configuration Postgres
--- plutôt que codé en dur ici, pour ne jamais committer ce secret dans ce
--- repo public — voir l'étape "ALTER DATABASE" à exécuter séparément après
--- ce script.
+-- trigger-pages-deploy) devait initialement être lu via un paramètre de
+-- configuration Postgres (ALTER DATABASE ... SET) pour ne jamais le
+-- committer dans ce repo public — mais Supabase refuse cette commande au
+-- rôle utilisé par le SQL Editor ("ERROR 42501: permission denied to set
+-- parameter", le rôle "postgres" managé n'est pas un vrai superuser).
+-- Le secret est donc codé en dur ci-dessous (placeholder) : ne jamais
+-- committer la vraie valeur ici — ce fichier sert de référence, la version
+-- réellement exécutée (avec la vraie valeur) n'a existé que dans le SQL
+-- Editor, jamais dans git.
 
 create extension if not exists pg_net;
 
@@ -22,7 +27,7 @@ begin
     url := 'https://ucxsqregeorfjakgomaj.supabase.co/functions/v1/trigger-pages-deploy',
     headers := jsonb_build_object(
       'Content-Type', 'application/json',
-      'x-webhook-secret', current_setting('app.pages_webhook_secret', true)
+      'x-webhook-secret', 'REPLACE_WITH_PAGES_WEBHOOK_SECRET'
     ),
     body := '{}'::jsonb
   );
