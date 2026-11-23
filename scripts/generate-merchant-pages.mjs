@@ -11,6 +11,7 @@ import { WebSocket } from "ws";
 import { mkdirSync, writeFileSync } from "node:fs";
 import { resolve, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
+import { displayPriceCents } from "../src/lib/pricing.js";
 
 // supabase-js initialise toujours un client Realtime (WebSocket) même pour
 // une simple requête ponctuelle, et Node 20 (utilisé par le workflow de
@@ -60,7 +61,7 @@ function formatPrice(cents) {
 // `bag` : le sachet actif le plus récent de ce commerçant (ou null si aucun,
 // cf. main()). `rating` : { avg, count } agrégé depuis `reviews`, ou null si
 // ce commerçant n'a encore aucun avis.
-function renderOfferBlock(bag, rating) {
+function renderOfferBlock(bag, rating, waiveServiceFee) {
   const ratingHtml = rating && rating.count > 0
     ? `<div class="rating">★ ${rating.avg.toFixed(1)} <span>(${rating.count} avis)</span></div>`
     : "";
@@ -105,7 +106,7 @@ function renderOfferBlock(bag, rating) {
       <p class="offer-title">${escapeHtml(bag.title)}</p>
       <div class="offer-price">
         ${hasDiscount ? `<span class="price-old">${formatPrice(bag.original_price_cents)}</span>` : ""}
-        <span class="price-new">${formatPrice(bag.price_cents)}</span>
+        <span class="price-new">${formatPrice(displayPriceCents(bag.price_cents, waiveServiceFee))}</span>
         ${discountPct ? `<span class="discount-badge">-${discountPct}%</span>` : ""}
       </div>
       ${ratingHtml}
@@ -192,7 +193,7 @@ function renderPage(merchant, slug, bag, rating, qrSvg) {
     <h1>${name}</h1>
     ${address ? `<p class="addr">${address}</p>` : ""}
     <p>${name} lutte contre le gaspillage alimentaire au Luxembourg en proposant ses invendus à prix réduit sur relief.lu. Réservez en ligne et récupérez votre panier directement sur place.</p>
-    ${renderOfferBlock(bag, rating)}
+    ${renderOfferBlock(bag, rating, merchant.waive_service_fee)}
     <div class="qr-card">
       ${qrSvg}
       <p class="qr-label">Scannez pour continuer sur votre mobile</p>
@@ -215,7 +216,7 @@ async function main() {
   const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
   const { data: merchants, error } = await supabase
     .from("merchants")
-    .select("id, business_name, address, city, logo_url, lat, lng")
+    .select("id, business_name, address, city, logo_url, lat, lng, waive_service_fee")
     .eq("verified", true)
     .not("address", "is", null);
 
