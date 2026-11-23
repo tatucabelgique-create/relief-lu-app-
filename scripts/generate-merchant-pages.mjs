@@ -149,14 +149,25 @@ function renderPage(merchant, slug, bag, rating, qrSvg) {
   :root{--navy:#16232C;--navy-2:#1E313D;--paper:#EFE6D3;--paper-dim:#B7AB8C;--honey:#E8A33D;}
   *{box-sizing:border-box;}
   body{margin:0;background:var(--navy);color:var(--paper);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;}
-  .wrap{max-width:640px;margin:0 auto;padding:48px 24px;}
+  .wrap{max-width:1040px;margin:0 auto;padding:48px 24px;}
   .logo{display:flex;align-items:center;gap:12px;margin-bottom:40px;}
   .logo img{width:36px;height:36px;border-radius:10px;}
   .logo b{font-size:20px;}
   h1{font-size:32px;line-height:1.2;margin:0 0 12px;}
   .addr{color:var(--paper-dim);font-size:17px;margin:0 0 28px;}
   p{font-size:17px;line-height:1.6;color:var(--paper-dim);}
-  .cta{display:inline-block;margin-top:24px;background:var(--honey);color:var(--navy);font-weight:700;text-decoration:none;padding:16px 28px;border-radius:100px;}
+  .cta{display:block;text-align:center;margin-top:20px;background:var(--honey);color:var(--navy);font-weight:700;text-decoration:none;padding:16px 28px;border-radius:100px;}
+  /* Même structure deux colonnes que la page commerçant de Too Good To Go :
+     contenu principal à gauche, bloc QR fixe à droite — pas empilés l'un
+     sous l'autre. Pensé pour un affichage sur tablette/écran en boutique
+     (le client scanne depuis son propre téléphone), donc une seule colonne
+     en dessous de 860px où il n'y a plus la place pour les deux. */
+  .layout{display:grid;grid-template-columns:1fr 320px;gap:40px;align-items:start;}
+  .side{position:sticky;top:24px;}
+  @media (max-width: 860px){
+    .layout{display:block;}
+    .side{position:static;margin-top:32px;}
+  }
   .back{display:inline-block;margin-top:40px;color:var(--paper-dim);text-decoration:none;font-size:15px;}
   .offer{margin-top:28px;padding:20px 24px;border:1px solid var(--navy-2);border-radius:16px;background:var(--navy-2);}
   .offer-category{display:inline-block;font-size:13px;font-weight:700;letter-spacing:.02em;text-transform:uppercase;color:var(--honey);}
@@ -174,26 +185,30 @@ function renderPage(merchant, slug, bag, rating, qrSvg) {
   .allergens{margin-top:12px;}
   .allergens summary{cursor:pointer;color:var(--paper);font-size:15px;font-weight:700;text-decoration:underline;}
   .allergens p{margin:10px 0 0;font-size:15px;}
-  .qr-card{margin-top:24px;display:flex;align-items:center;gap:16px;padding:16px 20px;border-radius:16px;background:#FFFFFF;}
-  .qr-card svg{display:block;width:88px;height:88px;flex-shrink:0;}
+  .qr-card{display:flex;flex-direction:column;align-items:center;text-align:center;gap:16px;padding:28px 20px;border-radius:16px;background:#FFFFFF;}
+  .qr-card svg{display:block;width:180px;height:180px;}
   .qr-label{margin:0;color:var(--navy);font-size:15px;font-weight:700;line-height:1.4;}
 </style>
 </head>
 <body>
   <div class="wrap">
     <div class="logo"><img src="/icon-192.png" alt=""><b>relief.lu</b></div>
-    <h1>${name}</h1>
-    ${address ? `<p class="addr">${address}</p>` : ""}
-    <p>${name} lutte contre le gaspillage alimentaire au Luxembourg en proposant ses invendus à prix réduit sur relief.lu. Réservez en ligne et récupérez votre panier directement sur place.</p>
-    ${renderOfferBlock(bag, rating, merchant.waive_service_fee)}
-    <div class="qr-card">
-      ${qrSvg}
-      <p class="qr-label">Scannez pour continuer sur votre mobile</p>
+    <div class="layout">
+      <div class="main">
+        <h1>${name}</h1>
+        ${address ? `<p class="addr">${address}</p>` : ""}
+        <p>${name} lutte contre le gaspillage alimentaire au Luxembourg en proposant ses invendus à prix réduit sur relief.lu. Réservez en ligne et récupérez votre panier directement sur place.</p>
+        ${renderOfferBlock(bag, rating, merchant.waive_service_fee)}
+        <a class="back" href="${SITE}/app.html" rel="nofollow">← Tous les commerçants relief.lu</a>
+      </div>
+      <div class="side">
+        <div class="qr-card">
+          ${qrSvg}
+          <p class="qr-label">Scannez pour réserver sur votre mobile</p>
+        </div>
+        <a class="cta" href="${appUrl}" rel="nofollow">Voir les paniers disponibles →</a>
+      </div>
     </div>
-    <br>
-    <a class="cta" href="${appUrl}" rel="nofollow">Voir les paniers disponibles →</a>
-    <br>
-    <a class="back" href="${SITE}/app.html" rel="nofollow">← Tous les commerçants relief.lu</a>
   </div>
 </body>
 </html>`;
