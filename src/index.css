@@ -482,6 +482,15 @@ body { padding-bottom: 78px; }
   from { transform: translateY(100%); }
   to { transform: translateY(0); }
 }
+/* .bag-detail est un plein-écran qui doit entièrement recouvrir la nav du
+   bas de l'app — un décalage de hauteur (grille desktop, env(safe-area),
+   etc.) peut sinon laisser dépasser un filet de la bottom-nav en dessous
+   malgré le z-index plus élevé. Plutôt que de chasser l'écart de hauteur
+   exact, on masque la bottom-nav directement tant que la fiche est
+   ouverte — c'est de toute façon l'intention (un plein-écran ne doit rien
+   laisser voir derrière lui, sur aucune taille d'écran). */
+body:has(.bag-detail) .bottom-nav { display: none; }
+
 .bag-detail {
   position: fixed; inset: 0; z-index: 60; background: var(--navy);
   overflow-y: auto; padding-bottom: 90px;
