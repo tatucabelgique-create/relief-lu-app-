@@ -662,7 +662,8 @@ body { padding-bottom: 78px; }
   .bag-detail {
     display: grid;
     grid-template-columns: 1fr 340px;
-    grid-template-rows: auto 1fr;
+    grid-template-rows: auto auto;
+    align-items: start;
     column-gap: 48px;
     max-width: 1100px; margin: 0 auto; padding: 48px 24px 24px;
   }
