@@ -837,6 +837,8 @@ body:has(.bag-detail) .bottom-nav { display: none; }
 */
 .card-placeholder {
   cursor: default;
+  filter: grayscale(0.85);
+  opacity: 0.72;
 }
 .carousel-track::-webkit-scrollbar { height: 6px; }
 .carousel-track::-webkit-scrollbar-thumb { background: rgba(239,230,211,0.15); border-radius: 6px; }
