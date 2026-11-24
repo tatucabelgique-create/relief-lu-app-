@@ -266,6 +266,14 @@ export default function MerchantDashboard({ user, merchant, onMerchantChanged })
       setMsg({ type: "error", text: "Le retrait « jusqu'à » doit être après le retrait « à partir de »." });
       return;
     }
+    // Un modèle appliqué tard dans la journée peut pré-remplir un horaire de
+    // retrait déjà passé pour aujourd'hui (voir applyTemplate) — on bloque
+    // plutôt que de publier un sachet que personne ne pourra jamais venir
+    // chercher à temps.
+    if (new Date(form.end) <= new Date()) {
+      setMsg({ type: "error", text: t("merchant.f.pickupInPast") });
+      return;
+    }
     // Attestation légale obligatoire (CGU commerçant, article 3) — bloque la
     // publication plutôt que de se reposer uniquement sur le texte des CGU,
     // jamais relu à chaque sachet publié.
