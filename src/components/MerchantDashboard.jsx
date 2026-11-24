@@ -6,6 +6,7 @@ import { getRecentSoldCount } from "../lib/merchantStats";
 import { notifyNewBag } from "../lib/notify";
 import { getErrorMessage } from "../lib/auth";
 import { arePaymentsLive } from "../lib/payments";
+import { loadBagTemplates, createBagTemplate, deleteBagTemplate } from "../lib/bagTemplates";
 import MerchantLogoUpload from "./MerchantLogoUpload.jsx";
 import MerchantBannerUpload from "./MerchantBannerUpload.jsx";
 import MerchantStats from "./MerchantStats.jsx";
@@ -56,6 +57,11 @@ export default function MerchantDashboard({ user, merchant, onMerchantChanged })
   // de conséquence grave (c'est juste un message d'info pour le commerçant,
   // pas un garde-fou de paiement), donc pas besoin du fail-closed.
   const [paymentsLive, setPaymentsLive] = useState(true);
+  // Modèles de paniers (demande PAUL, pilotes Foetz/Kirchberg, 2026-11-24) :
+  // publier le même panier chaque soir sans retaper titre/prix/horaire —
+  // un clic sur un modèle pré-remplit tout sauf la quantité, qui change
+  // chaque jour et reste donc toujours à saisir à la main.
+  const [templates, setTemplates] = useState([]);
 
   async function refreshMyBags() {
     setMyBags(await loadMerchantBags(user.id));
@@ -65,6 +71,10 @@ export default function MerchantDashboard({ user, merchant, onMerchantChanged })
   useEffect(() => {
     arePaymentsLive().then(setPaymentsLive);
   }, []);
+
+  useEffect(() => {
+    loadBagTemplates(user.id).then(setTemplates).catch(() => {});
+  }, [user.id]);
 
   useEffect(() => {
     refreshMyBags();
@@ -163,6 +173,87 @@ export default function MerchantDashboard({ user, merchant, onMerchantChanged })
   // un sachet "Boulangerie" peut très bien être végétarien.
   function setCategory(value) {
     setForm((f) => ({ ...f, category: value, snack: value === "snack" }));
+  }
+
+  // "18:30" + aujourd'hui -> "2026-11-24T18:30", au format attendu par un
+  // <input type="datetime-local"> — en heure locale du commerçant, jamais
+  // UTC (new Date().setHours() travaille déjà en heure locale).
+  function todayAt(timeHHmm) {
+    const [h, m] = timeHHmm.split(":").map(Number);
+    const d = new Date();
+    d.setHours(h, m, 0, 0);
+    const pad = (n) => String(n).padStart(2, "0");
+    return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+  }
+
+  function timeOf(datetimeLocal) {
+    return datetimeLocal.split("T")[1] || "";
+  }
+
+  // Tout pré-rempli sauf la quantité (vidée exprès) et l'attestation DLC
+  // (remise à zéro exprès) : la quantité change chaque jour, et
+  // l'attestation doit rester un vrai geste conscient à chaque publication,
+  // pas quelque chose qu'un modèle pourrait pré-cocher silencieusement.
+  function applyTemplate(tpl) {
+    setForm((f) => ({
+      ...f,
+      title: tpl.title,
+      category: tpl.category,
+      desc: tpl.description,
+      price: (tpl.price_cents / 100).toFixed(2),
+      originalPrice: tpl.original_price_cents ? (tpl.original_price_cents / 100).toFixed(2) : "",
+      qty: "",
+      start: todayAt(tpl.pickup_start_time),
+      end: todayAt(tpl.pickup_end_time),
+      containerProvided: tpl.container_provided,
+      bagProvided: tpl.bag_provided,
+      vegetarian: tpl.vegetarian,
+      vegan: tpl.vegan,
+      snack: tpl.snack,
+      dlcConfirmed: false,
+    }));
+    setPriceTouched(true);
+    setMsg(null);
+  }
+
+  // Enregistre tel quel ce qui est actuellement rempli dans le formulaire —
+  // pas de formulaire séparé à remplir une deuxième fois pour créer un
+  // modèle, juste "ce panier-ci, à republier pareil demain".
+  async function handleSaveAsTemplate() {
+    if (!form.title || !form.start || !form.end) {
+      setMsg({ type: "error", text: "Remplis au moins le titre et l'horaire avant d'enregistrer ce modèle." });
+      return;
+    }
+    try {
+      const tpl = await createBagTemplate({
+        merchant_id: user.id,
+        title: form.title.trim(),
+        category: form.category,
+        description: form.desc.trim(),
+        price_cents: Math.round(parseFloat(form.price || "0") * 100),
+        original_price_cents: form.originalPrice ? Math.round(parseFloat(form.originalPrice) * 100) : null,
+        pickup_start_time: timeOf(form.start),
+        pickup_end_time: timeOf(form.end),
+        container_provided: form.containerProvided,
+        bag_provided: form.bagProvided,
+        vegetarian: form.vegetarian,
+        vegan: form.vegan,
+        snack: form.snack,
+      });
+      setTemplates((list) => [...list, tpl]);
+      setMsg({ type: "success", text: "Modèle enregistré." });
+    } catch (err) {
+      setMsg({ type: "error", text: getErrorMessage(err) });
+    }
+  }
+
+  async function handleDeleteTemplate(id) {
+    setTemplates((list) => list.filter((t) => t.id !== id));
+    try {
+      await deleteBagTemplate(id);
+    } catch {
+      loadBagTemplates(user.id).then(setTemplates).catch(() => {});
+    }
   }
 
   async function handlePublish() {
@@ -303,6 +394,28 @@ export default function MerchantDashboard({ user, merchant, onMerchantChanged })
       {merchant?.verified && (
       <div className="panel">
         <h2>{t("merchant.newBag")}</h2>
+        {templates.length > 0 && (
+          <div style={{ marginBottom: 16 }}>
+            <p className="field-hint" style={{ marginBottom: 8 }}>{t("merchant.templates.pick")}</p>
+            <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
+              {templates.map((tpl) => (
+                <span key={tpl.id} className="pill-base chip-pill-outline" style={{ display: "inline-flex", alignItems: "center", gap: 6 }}>
+                  <button type="button" onClick={() => applyTemplate(tpl)} style={{ background: "none", border: "none", color: "inherit", font: "inherit", cursor: "pointer", padding: 0 }}>
+                    {tpl.title}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => handleDeleteTemplate(tpl.id)}
+                    aria-label={t("merchant.templates.delete")}
+                    style={{ background: "none", border: "none", color: "inherit", cursor: "pointer", padding: 0, opacity: 0.6 }}
+                  >
+                    ✕
+                  </button>
+                </span>
+              ))}
+            </div>
+          </div>
+        )}
         <div className="two-col">
           <div className="field">
             <label>{t("merchant.f.title")}</label>
@@ -404,9 +517,14 @@ export default function MerchantDashboard({ user, merchant, onMerchantChanged })
           </span>
         </label>
 
-        <button className="btn" onClick={handlePublish}>
-          {t("merchant.publish")}
-        </button>
+        <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
+          <button className="btn" onClick={handlePublish}>
+            {t("merchant.publish")}
+          </button>
+          <button className="btn secondary" type="button" onClick={handleSaveAsTemplate}>
+            {t("merchant.templates.saveAsTemplate")}
+          </button>
+        </div>
         {msg && <p className={msg.type === "error" ? "error-msg" : "success-msg"}>{msg.text}</p>}
       </div>
       )}
