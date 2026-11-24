@@ -33,7 +33,7 @@ Deno.serve(async (req) => {
 
     const { data: reservation, error } = await supabase
       .from("reservations")
-      .select("id, quantity, user_id, payment_status, bags(title, price_cents, merchant_id, merchants(stripe_account_id, commission_rate, waive_service_fee))")
+      .select("id, quantity, user_id, payment_status, bags(title, price_cents, merchant_id, merchants(stripe_account_id, commission_rate, waive_service_fee, stripe_fee_cents))")
       .eq("id", reservation_id)
       .single();
 
@@ -61,6 +61,7 @@ Deno.serve(async (req) => {
       stripe_account_id: string | null;
       commission_rate: number | null;
       waive_service_fee: boolean | null;
+      stripe_fee_cents: number | null;
     } | null;
     const COMMISSION_RATE = merchantRow?.commission_rate ?? 0.21;
     const VAT_RATE = 0.17;
@@ -92,11 +93,22 @@ Deno.serve(async (req) => {
 
     const totalCents = reservation.bags.price_cents * reservation.quantity;
     const commissionHtCents = Math.round(totalCents * COMMISSION_RATE);
+    // Contribution négociée séparément d'un commerçant aux frais Stripe
+    // (merchants.stripe_fee_cents, v38 — ex. Boulangerie PAUL, 25 centimes),
+    // en plus de sa commission — un forfait HT par TRANSACTION, pas par
+    // sachet/quantité (contrairement à la commission et au frais de
+    // service), puisque les frais Stripe eux-mêmes sont fixes par paiement
+    // quel que soit le nombre de sachets dans le panier.
+    const STRIPE_FEE_HT_CENTS = merchantRow?.stripe_fee_cents ?? 0;
+    const STRIPE_FEE_VAT_CENTS = Math.round(STRIPE_FEE_HT_CENTS * VAT_RATE);
+
     // Tout ce qui dépasse le prix du commerçant (frais de service + TVA +
     // reste de l'arrondi charme) reste chez relief.lu, en plus de la
     // commission — le commerçant ne voit jamais ce supplément ni n'est
-    // affecté par son montant exact.
-    const commissionTtcCents = commissionHtCents + Math.round(commissionHtCents * VAT_RATE) + unitMarkupCents * reservation.quantity;
+    // affecté par son montant exact. La contribution Stripe négociée
+    // s'ajoute pareillement au prélèvement, jamais au prix affiché au client.
+    const commissionTtcCents =
+      commissionHtCents + Math.round(commissionHtCents * VAT_RATE) + unitMarkupCents * reservation.quantity + STRIPE_FEE_HT_CENTS + STRIPE_FEE_VAT_CENTS;
 
     const merchant = merchantRow;
     // Destination charge : Stripe répartit le paiement au moment de la

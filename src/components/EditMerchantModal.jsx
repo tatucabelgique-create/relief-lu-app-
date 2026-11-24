@@ -12,6 +12,7 @@ export default function EditMerchantModal({ merchant, onClose, onSaved }) {
     email: merchant.email || "",
     commission_rate: merchant.commission_rate != null ? Math.round(merchant.commission_rate * 100) : "",
     waive_service_fee: merchant.waive_service_fee || false,
+    stripe_fee_euros: merchant.stripe_fee_cents != null ? (merchant.stripe_fee_cents / 100).toFixed(2) : "",
     dynamic_pricing_threshold: merchant.dynamic_pricing_threshold ?? "",
   });
   const [logoUrl, setLogoUrl] = useState(merchant.logo_url || null);
@@ -66,6 +67,9 @@ export default function EditMerchantModal({ merchant, onClose, onSaved }) {
         // Commission saisie en % (ex. 21) -> fraction stockée en base (0.21).
         // Champ vide = NULL = taux par défaut (21%), pas 0%.
         commission_rate: form.commission_rate === "" ? null : Number(form.commission_rate) / 100,
+        // Saisi en euros (ex. 0,25) -> centimes stockés en base (25).
+        // Champ vide = NULL = aucune contribution Stripe négociée.
+        stripe_fee_cents: form.stripe_fee_euros === "" ? null : Math.round(Number(form.stripe_fee_euros) * 100),
         dynamic_pricing_threshold: form.dynamic_pricing_threshold === "" ? null : parseInt(form.dynamic_pricing_threshold, 10),
       });
       onSaved();
@@ -145,6 +149,21 @@ export default function EditMerchantModal({ merchant, onClose, onSaved }) {
           <input type="checkbox" checked={form.waive_service_fee} onChange={(e) => set("waive_service_fee", e.target.checked)} />
           Exonérer ce commerçant des frais de service côté client
         </label>
+
+        <div className="field">
+          <label>Contribution négociée aux frais Stripe (€, HT, par transaction)</label>
+          <input
+            type="number"
+            min="0"
+            step="0.01"
+            value={form.stripe_fee_euros}
+            onChange={(e) => set("stripe_fee_euros", e.target.value)}
+            placeholder="0 (aucune, par défaut)"
+          />
+          <span className="field-hint">
+            Prélevé sur la part du commerçant en plus de sa commission, jamais sur le prix payé par le client. TVA (17%) ajoutée automatiquement.
+          </span>
+        </div>
 
         <div className="two-col" style={{ marginTop: 10 }}>
           <div className="field">

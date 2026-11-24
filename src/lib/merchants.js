@@ -70,8 +70,8 @@ export async function setMerchantVerified(merchantId, verified) {
 // contrairement à updateMerchantProfile (upsert réservé à l'auto-édition du
 // commerçant), ceci fait un update ciblé sur une fiche existante et couvre
 // aussi les champs que le commerçant ne peut pas éditer lui-même
-// (commission_rate, waive_service_fee). "verified" reste exclu : il a son
-// propre flux dédié (setMerchantVerified) protégé par trigger.
+// (commission_rate, waive_service_fee, stripe_fee_cents). "verified" reste
+// exclu : il a son propre flux dédié (setMerchantVerified) protégé par trigger.
 export async function updateMerchantAsAdmin(merchantId, patch) {
   const row = {
     business_name: patch.business_name,
@@ -83,6 +83,7 @@ export async function updateMerchantAsAdmin(merchantId, patch) {
     email: patch.email,
     commission_rate: patch.commission_rate,
     waive_service_fee: patch.waive_service_fee,
+    stripe_fee_cents: patch.stripe_fee_cents,
     dynamic_pricing_threshold: patch.dynamic_pricing_threshold,
   };
   const { error } = await supabase.from("merchants").update(row).eq("id", merchantId);
