@@ -6,6 +6,7 @@ import { formatPickupWindow, isToday, isTomorrow } from "./BagCard.jsx";
 import { merchantMarkerIcon } from "../lib/leafletIcon";
 import { notifyEngaged } from "./InstallPrompt.jsx";
 import { displayPriceCents } from "../lib/pricing.js";
+import { trackEvent } from "../lib/analytics";
 
 // Icône "Share2" de Lucide (trois points reliés) — même icône que celle
 // utilisée pour "Partager" dans tatuca, pour rester cohérent entre les apps.
@@ -65,6 +66,18 @@ export default function BagDetail({ bag, rating, isFavorite, onToggleFavorite, o
   // d'un sachet montre un vrai intérêt, pas besoin d'attendre un paiement.
   useEffect(() => {
     notifyEngaged();
+  }, [bag.id]);
+
+  // Premier maillon du funnel mesurable (Parcourir -> ouvrir un panier ->
+  // réserver -> payer) — jusqu'ici seuls CompleteRegistration et Purchase
+  // étaient suivis, impossible de voir où les gens décrochent entre les deux.
+  useEffect(() => {
+    trackEvent("ViewContent", {
+      content_ids: [bag.id],
+      content_type: "product",
+      value: displayPriceCents(bag.price_cents, bag.merchants?.waive_service_fee) / 100,
+      currency: "EUR",
+    });
   }, [bag.id]);
 
   const address = [merchant?.address, merchant?.city].filter(Boolean).join(", ");

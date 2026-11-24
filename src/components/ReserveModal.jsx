@@ -6,6 +6,7 @@ import { formatPickupWindow, isToday, isTomorrow } from "./BagCard.jsx";
 import AuthPrompt from "./AuthPrompt.jsx";
 import { notifyEngaged } from "./InstallPrompt.jsx";
 import { displayPriceCents } from "../lib/pricing.js";
+import { trackEvent } from "../lib/analytics";
 
 export default function ReserveModal({ bag, user, onClose, onReserved, onOpenLegal }) {
   const { lang, t } = useI18n();
@@ -64,6 +65,16 @@ export default function ReserveModal({ bag, user, onClose, onReserved, onOpenLeg
     try {
       const row = await reserveBag(bag.id, qty);
       onReserved();
+      // Deuxième maillon du funnel (voir ViewContent dans BagDetail.jsx) —
+      // juste après la réservation réelle (stock décrémenté), avant la
+      // redirection Stripe : tout décrochage après ce point (abandon sur la
+      // page Stripe, carte refusée...) se verra comme un écart avec Purchase.
+      trackEvent("InitiateCheckout", {
+        content_ids: [bag.id],
+        content_type: "product",
+        value: (displayPriceCents(bag.price_cents, bag.merchants?.waive_service_fee) * qty) / 100,
+        currency: "EUR",
+      });
       const url = await createCheckoutSession(row.reservation_id);
       window.location.href = url;
     } catch (err) {
