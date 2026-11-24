@@ -8,6 +8,7 @@ import { haversineKm, loadSavedPosition, locate, savePosition, reverseGeocode } 
 import { useFavorites } from "../lib/favorites";
 import { getMerchantRatings } from "../lib/reviews";
 import BagCard, { isToday, isTomorrow } from "./BagCard.jsx";
+import MerchantPlaceholderCard from "./MerchantPlaceholderCard.jsx";
 import BagDetail from "./BagDetail.jsx";
 import MerchantProfile from "./MerchantProfile.jsx";
 import ReserveModal from "./ReserveModal.jsx";
@@ -420,22 +421,6 @@ export default function PublicView({ user, pendingReserveBagId, onPendingReserve
         </>
       )}
 
-      {!compact && newMerchants.length > 0 && (
-        <div className="carousel-section">
-          <h2>{t("public.newMerchants")}</h2>
-          <div className="carousel-track">
-            {newMerchants.map((m) => (
-              <div className="new-merchant-card" key={m.id}>
-                {m.logo_url && <img src={m.logo_url} alt="" loading="lazy" />}
-                <div className="new-merchant-name">{m.business_name}</div>
-                <div className="page-sub" style={{ margin: "2px 0 10px" }}>{m.city}</div>
-                <span className="pill-base badge-availability" style={{ position: "static" }}>{t("public.comingSoon")}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
-
       {!compact && showCarousel && (
         <div className="carousel-section">
           <h2>{t("public.closingSoon")}</h2>
@@ -483,21 +468,31 @@ export default function PublicView({ user, pendingReserveBagId, onPendingReserve
       <div className="grid" id="discover-results">
         {bags === null ? (
           <div className="empty">{t("public.loading")}</div>
-        ) : !filtered.length ? (
-          <div className="empty">{t("public.empty")}</div>
         ) : (
-          filtered.map((bag) => (
-            <BagCard
-              key={bag.id}
-              bag={bag}
-              onReserve={setReserving}
-              onOpenDetail={setViewingDetail}
-              distanceKm={bag.distanceKm}
-              onToggleFavorite={user ? toggleFavorite : undefined}
-              isFavorite={favoriteIds.has(bag.merchant_id)}
-              rating={ratings[bag.merchant_id]}
-            />
-          ))
+          <>
+            {!filtered.length && !newMerchants.length && <div className="empty">{t("public.empty")}</div>}
+            {filtered.map((bag) => (
+              <BagCard
+                key={bag.id}
+                bag={bag}
+                onReserve={setReserving}
+                onOpenDetail={setViewingDetail}
+                distanceKm={bag.distanceKm}
+                onToggleFavorite={user ? toggleFavorite : undefined}
+                isFavorite={favoriteIds.has(bag.merchant_id)}
+                rating={ratings[bag.merchant_id]}
+              />
+            ))}
+            {/* Mélangés directement dans la grille, comme des vrais paniers
+                (façon Too Good To Go — capture de référence fournie par
+                l'utilisateur) plutôt que relégués à un carousel séparé —
+                ignorent volontairement les filtres catégorie/régime,
+                puisqu'un commerçant sans panier n'a pas encore de catégorie
+                à filtrer. */}
+            {newMerchants.map((m) => (
+              <MerchantPlaceholderCard key={m.id} merchant={m} />
+            ))}
+          </>
         )}
       </div>
       {modalsPortal}
