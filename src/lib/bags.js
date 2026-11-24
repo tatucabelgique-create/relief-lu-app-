@@ -6,10 +6,15 @@ import { supabase } from "./supabase";
 // commerçants vérifiés puis on exclut ceux qui ont déjà au moins un sachet
 // (tous statuts confondus). Volume attendu faible à ce stade du projet.
 export async function loadNewMerchantsWithoutBags() {
+  // Sans ce tri, Postgres renvoie les lignes dans un ordre non garanti —
+  // au fur et à mesure que la liste grandit, un commerçant tout juste
+  // signé pouvait atterrir n'importe où dedans plutôt qu'en tête, et
+  // devenait invisible sans faire défiler le carousel jusqu'au bout.
   const { data: merchants, error: merchErr } = await supabase
     .from("merchants")
     .select("id, business_name, city, logo_url")
-    .eq("verified", true);
+    .eq("verified", true)
+    .order("created_at", { ascending: false });
   if (merchErr) throw merchErr;
   if (!merchants?.length) return [];
 
