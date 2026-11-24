@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { MapContainer, TileLayer, Marker } from "react-leaflet";
+import QRCode from "qrcode";
 import { useI18n } from "../lib/i18n.jsx";
 import { formatPickupWindow, isToday, isTomorrow } from "./BagCard.jsx";
 import { merchantMarkerIcon } from "../lib/leafletIcon";
@@ -33,6 +34,23 @@ export default function BagDetail({ bag, rating, isFavorite, onToggleFavorite, o
   const soldOut = bag.status === "sold_out";
   const [scrolled, setScrolled] = useState(false);
   const [allergensOpen, setAllergensOpen] = useState(false);
+  // QR code affiché uniquement sur grand écran (voir .bag-detail-side dans
+  // index.css) — façon TGTG, pour qu'un visiteur sur ordinateur puisse
+  // continuer sur son téléphone plutôt que de réserver depuis le web. Même
+  // URL et mêmes couleurs que le QR de la page statique commerçant
+  // (scripts/generate-merchant-pages.mjs), généré ici côté client puisque
+  // cette vue est la vraie page vivante de l'app, pas un fichier statique.
+  const [qrSvg, setQrSvg] = useState(null);
+  useEffect(() => {
+    if (!bag.merchant_id) return;
+    QRCode.toString(`${window.location.origin}/app.html?merchant=${bag.merchant_id}`, {
+      type: "svg",
+      margin: 0,
+      color: { dark: "#16232C", light: "#FFFFFF" },
+    })
+      .then(setQrSvg)
+      .catch(() => {});
+  }, [bag.merchant_id]);
 
   useEffect(() => {
     const el = document.querySelector(".bag-detail");
@@ -288,14 +306,26 @@ export default function BagDetail({ bag, rating, isFavorite, onToggleFavorite, o
         {allergensOpen && <p className="page-sub" style={{ marginTop: 10 }}>{t("bagDetail.allergens.text")}</p>}
       </div>
 
-      <div className="bag-detail-sticky">
-        <span>
-          {hasDiscount && <span className="price-original">{(bag.original_price_cents / 100).toFixed(2)} €</span>}
-          <span className="price">{(displayPriceCents(bag.price_cents, bag.merchants?.waive_service_fee) / 100).toFixed(2)} €</span>
-        </span>
-        <button className="btn" disabled={soldOut} onClick={() => !soldOut && onReserve(bag)}>
-          {soldOut ? t("badge.soldOut") : t("reserve")}
-        </button>
+      {/* .bag-detail-side n'existe que pour le repositionnement CSS sur
+          grand écran (voir index.css) — sur mobile c'est un simple
+          conteneur neutre, le QR reste masqué et .bag-detail-sticky garde
+          son comportement fixe en bas d'écran habituel. */}
+      <div className="bag-detail-side">
+        {qrSvg && (
+          <>
+            <div className="bag-detail-qr-card" dangerouslySetInnerHTML={{ __html: qrSvg }} />
+            <p className="bag-detail-qr-label">{t("bagDetail.continueOnMobile")}</p>
+          </>
+        )}
+        <div className="bag-detail-sticky">
+          <span>
+            {hasDiscount && <span className="price-original">{(bag.original_price_cents / 100).toFixed(2)} €</span>}
+            <span className="price">{(displayPriceCents(bag.price_cents, bag.merchants?.waive_service_fee) / 100).toFixed(2)} €</span>
+          </span>
+          <button className="btn" disabled={soldOut} onClick={() => !soldOut && onReserve(bag)}>
+            {soldOut ? t("badge.soldOut") : t("reserve")}
+          </button>
+        </div>
       </div>
     </div>
   );

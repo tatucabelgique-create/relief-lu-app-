@@ -639,6 +639,61 @@ body { padding-bottom: 78px; }
   padding: 14px 20px calc(14px + env(safe-area-inset-bottom));
   display: flex; align-items: center; justify-content: space-between;
 }
+/* QR code "continuer sur mobile" — masqué sur mobile (réserver se fait sur
+   place, pas besoin de rescanner son propre écran), affiché uniquement
+   dans la colonne de droite au-dessus de 860px, voir plus bas. */
+.bag-detail-qr-card, .bag-detail-qr-label { display: none; }
+
+/* Mise en page deux colonnes façon TGTG sur grand écran : le détail d'un
+   sachet reste une fenêtre plein écran en dessous de 860px (expérience
+   mobile inchangée), mais devient une page centrée avec le contenu à
+   gauche et un panneau fixe à droite (QR code + prix + réserver) au-dessus
+   — pensé pour le web desktop, qui n'a pas besoin de forcer un format
+   mobile. Pure CSS, aucun changement de structure HTML : chaque bloc est
+   juste repositionné dans la grille. */
+@media (min-width: 860px) {
+  /* .bag-detail reste la fenêtre plein écran (position:fixed, son propre
+     scroll) qu'elle est déjà sur mobile — seul l'agencement interne change
+     ici. C'est un rendu via portail (voir PublicView.jsx, createPortal),
+     donc passer en position:static le laisserait s'empiler après le reste
+     de la page dans le DOM au lieu de la remplacer : il doit garder son
+     propre scroll interne, sur lequel .bag-detail-side peut s'accrocher
+     (position:sticky fonctionne par rapport à ce scroll-là). */
+  .bag-detail {
+    display: grid;
+    grid-template-columns: 1fr 340px;
+    grid-template-rows: auto 1fr;
+    column-gap: 48px;
+    max-width: 1100px; margin: 0 auto; padding: 48px 24px 24px;
+  }
+  .bag-detail-compact-header { display: none; }
+  .bag-detail-hero {
+    grid-column: 1 / -1; grid-row: 1;
+    height: 360px; border-radius: 20px; margin-bottom: 28px;
+  }
+  .bag-detail-body { grid-column: 1; grid-row: 2; padding: 0; padding-bottom: 48px; }
+  /* Un seul conteneur sticky pour tout le panneau de droite (QR + prix +
+     réserver) plutôt que trois éléments sticky indépendants dans la même
+     cellule de grille, qui se chevaucheraient. */
+  .bag-detail-side {
+    grid-column: 2; grid-row: 2; align-self: start; position: sticky; top: 24px;
+    display: flex; flex-direction: column; gap: 16px;
+  }
+  .bag-detail-qr-card {
+    display: flex; align-items: center; justify-content: center;
+    background: #FFFFFF; border-radius: 16px; padding: 24px;
+  }
+  .bag-detail-qr-card svg { width: 180px; height: 180px; }
+  .bag-detail-qr-label {
+    display: block; margin: -4px 0 0; text-align: center;
+    color: var(--paper-dim); font-size: 13px; padding: 0 12px;
+  }
+  .bag-detail-sticky {
+    position: static; border-top: none; border-radius: 16px;
+    flex-direction: column; align-items: stretch; gap: 12px; padding: 20px;
+  }
+  .bag-detail-sticky .btn { width: 100%; }
+}
 
 .cookie-banner {
   position: fixed; left: 12px; right: 12px; bottom: calc(78px + env(safe-area-inset-bottom) + 10px); z-index: 70;
