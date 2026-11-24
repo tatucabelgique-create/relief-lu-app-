@@ -1,11 +1,16 @@
 import { supabase } from "./supabase";
 
-// Met en avant un commerçant vérifié qui vient de rejoindre relief.lu mais
-// n'a encore publié aucun sachet (ex. pendant qu'on prépare son lancement) —
-// pas de "NOT EXISTS" simple côté client Supabase, donc on récupère les
-// commerçants vérifiés puis on exclut ceux qui ont déjà au moins un sachet
-// (tous statuts confondus). Volume attendu faible à ce stade du projet.
-export async function loadNewMerchantsWithoutBags() {
+// Montre TOUT commerçant vérifié qui n'a pas de sachet en vente là, tout de
+// suite — un tout nouveau partenaire qui n'a encore rien publié, aussi bien
+// qu'un partenaire de longue date simplement épuisé/entre deux fournées.
+// Donne une vue complète et toujours vivante du réseau de partenaires,
+// grisée plutôt qu'absente, au lieu de ne montrer que les tout nouveaux
+// (l'ancien comportement excluait à tort tout commerçant ayant déjà publié
+// ne serait-ce qu'un sachet, même s'il n'en a plus aucun d'actif).
+// Pas de "NOT EXISTS" simple côté client Supabase, donc on récupère les
+// commerçants vérifiés puis on exclut ceux qui ont un sachet actif au sens
+// de loadActiveBags() (même critère, à garder synchronisé).
+export async function loadMerchantsWithoutActiveBag() {
   // Sans ce tri, Postgres renvoie les lignes dans un ordre non garanti —
   // au fur et à mesure que la liste grandit, un commerçant tout juste
   // signé pouvait atterrir n'importe où dedans plutôt qu'en tête, et
@@ -18,11 +23,16 @@ export async function loadNewMerchantsWithoutBags() {
   if (merchErr) throw merchErr;
   if (!merchants?.length) return [];
 
-  const { data: bagRows, error: bagErr } = await supabase.from("bags").select("merchant_id");
+  const { data: activeBagRows, error: bagErr } = await supabase
+    .from("bags")
+    .select("merchant_id")
+    .eq("status", "active")
+    .gt("quantity_left", 0)
+    .gt("pickup_end", new Date().toISOString());
   if (bagErr) throw bagErr;
-  const withBags = new Set((bagRows ?? []).map((b) => b.merchant_id));
+  const withActiveBag = new Set((activeBagRows ?? []).map((b) => b.merchant_id));
 
-  return merchants.filter((m) => !withBags.has(m.id));
+  return merchants.filter((m) => !withActiveBag.has(m.id));
 }
 
 export async function loadActiveBags() {

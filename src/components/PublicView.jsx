@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { createPortal } from "react-dom";
 import { useI18n } from "../lib/i18n.jsx";
 import { supabase } from "../lib/supabase";
-import { loadActiveBags, loadSoldOutToday, loadNewMerchantsWithoutBags } from "../lib/bags";
+import { loadActiveBags, loadSoldOutToday, loadMerchantsWithoutActiveBag } from "../lib/bags";
 import { getMerchantOrNull } from "../lib/merchants";
 import { haversineKm, loadSavedPosition, locate, savePosition, reverseGeocode } from "../lib/geolocation";
 import { useFavorites } from "../lib/favorites";
@@ -59,7 +59,7 @@ export default function PublicView({ user, pendingReserveBagId, onPendingReserve
   async function refresh() {
     setBags(await loadActiveBags());
     setSoldOutToday(await loadSoldOutToday());
-    setNewMerchants(await loadNewMerchantsWithoutBags());
+    setNewMerchants(await loadMerchantsWithoutActiveBag());
   }
 
   useEffect(() => {
