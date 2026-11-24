@@ -39,7 +39,7 @@ export async function generateWeeklyInvoices(weekStart, weekEnd) {
 
   const { data: reservations, error } = await supabase
     .from("reservations")
-    .select("id, quantity, created_at, bags(title, price_cents, merchant_id, merchants(business_name, commission_rate))")
+    .select("id, quantity, created_at, bags(title, price_cents, merchant_id, merchants(business_name, commission_rate, stripe_fee_cents))")
     .eq("payment_status", "paid")
     .gte("created_at", rangeStart.toISOString())
     .lte("created_at", rangeEnd.toISOString());
@@ -54,9 +54,14 @@ export async function generateWeeklyInvoices(weekStart, weekEnd) {
         merchantId: bag.merchant_id,
         businessName: bag.merchants?.business_name || "—",
         commissionRate: bag.merchants?.commission_rate ?? DEFAULT_COMMISSION_RATE,
+        // HT, par transaction (voir create-checkout-session/index.ts) — pas
+        // multiplié par la quantité, additionné une fois par réservation
+        // (chaque réservation = un paiement Stripe) juste en dessous.
+        stripeFeeHtCentsPerTxn: bag.merchants?.stripe_fee_cents ?? 0,
         reservationCount: 0,
         unitsSold: 0,
         revenueCents: 0,
+        stripeFeeTotalHtCents: 0,
         lines: [],
       };
     }
@@ -64,6 +69,7 @@ export async function generateWeeklyInvoices(weekStart, weekEnd) {
     m.reservationCount += 1;
     m.unitsSold += r.quantity;
     m.revenueCents += bag.price_cents * r.quantity;
+    m.stripeFeeTotalHtCents += m.stripeFeeHtCentsPerTxn;
     m.lines.push({
       title: bag.title,
       quantity: r.quantity,
@@ -77,13 +83,16 @@ export async function generateWeeklyInvoices(weekStart, weekEnd) {
       const commissionHtCents = Math.round(m.revenueCents * m.commissionRate);
       const vatCents = Math.round(commissionHtCents * VAT_RATE);
       const commissionTtcCents = commissionHtCents + vatCents;
+      const stripeFeeVatCents = Math.round(m.stripeFeeTotalHtCents * VAT_RATE);
+      const stripeFeeTtcCents = m.stripeFeeTotalHtCents + stripeFeeVatCents;
       return {
         ...m,
         revenue: m.revenueCents / 100,
         commissionHt: commissionHtCents / 100,
         vat: vatCents / 100,
         commissionTtc: commissionTtcCents / 100,
-        netAmount: (m.revenueCents - commissionTtcCents) / 100,
+        stripeFeeTtc: stripeFeeTtcCents / 100,
+        netAmount: (m.revenueCents - commissionTtcCents - stripeFeeTtcCents) / 100,
       };
     })
     .sort((a, b) => b.revenue - a.revenue);
@@ -99,6 +108,7 @@ export function invoicesToCsv(invoices, weekStart, weekEnd) {
     "Commission HT (€)",
     "TVA 17% (€)",
     "Commission TTC (€)",
+    "Frais Stripe négociés TTC (€)",
     "Net à verser (€)",
   ];
   const rows = invoices.map((inv) => [
@@ -110,6 +120,7 @@ export function invoicesToCsv(invoices, weekStart, weekEnd) {
     inv.commissionHt.toFixed(2),
     inv.vat.toFixed(2),
     inv.commissionTtc.toFixed(2),
+    inv.stripeFeeTtc.toFixed(2),
     inv.netAmount.toFixed(2),
   ]);
   const lines = [
