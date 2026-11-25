@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useI18n } from "../lib/i18n.jsx";
-import { reserveBag } from "../lib/reservations";
+import { reserveBag, hasCashNoShowHistory } from "../lib/reservations";
 import { createCheckoutSession, arePaymentsLive } from "../lib/payments";
 import { formatPickupWindow, isToday, isTomorrow } from "./BagCard.jsx";
 import AuthPrompt from "./AuthPrompt.jsx";
@@ -19,6 +19,21 @@ export default function ReserveModal({ bag, user, onClose, onReserved, onOpenLeg
   // de garantie sur la composition/les allergènes (voir LegalModal.jsx,
   // article 8) au moment précis où ça compte le plus pour le client.
   const [showDisclaimer, setShowDisclaimer] = useState(false);
+  // "card" ou "cash" — choisi sur l'écran principal quand le commerçant
+  // accepte les espèces (merchants.cash_enabled, schema-v39), sinon reste
+  // "card" par défaut (seul chemin possible dans ce cas).
+  const [paymentChoice, setPaymentChoice] = useState("card");
+  const [showCashDetails, setShowCashDetails] = useState(false);
+  const [cashPhone, setCashPhone] = useState("");
+  const [cashConsent, setCashConsent] = useState(false);
+  // Résultat d'une réservation en espèces confirmée : {reservation_id,
+  // pickup_code} — affiché directement dans ce composant (pas de retour
+  // Stripe à attendre comme pour le carte, voir PaymentResult.jsx).
+  const [cashReservation, setCashReservation] = useState(null);
+  // Un seul no-show en espèces désactive l'option pour ce compte
+  // (schema-v39) — vrai par défaut pour ne pas montrer le bouton une
+  // fraction de seconde avant la vérification.
+  const [cashEligible, setCashEligible] = useState(true);
   // Démarre bloqué (fail-closed) : mieux vaut un très bref flash du message
   // "bientôt disponible" le temps du fetch, que risquer d'autoriser un clic
   // avant d'avoir confirmé que les paiements sont réellement en mode live.
@@ -33,7 +48,20 @@ export default function ReserveModal({ bag, user, onClose, onReserved, onOpenLeg
   useEffect(() => {
     if (bag) notifyEngaged();
     setShowDisclaimer(false);
+    setPaymentChoice("card");
+    setShowCashDetails(false);
+    setCashPhone("");
+    setCashConsent(false);
+    setCashReservation(null);
   }, [bag]);
+
+  useEffect(() => {
+    if (bag && user && bag.merchants?.cash_enabled) {
+      hasCashNoShowHistory(user.id).then((hasNoShow) => setCashEligible(!hasNoShow));
+    } else {
+      setCashEligible(true);
+    }
+  }, [bag, user]);
 
   // Vérifié une fois au montage (flag global, pas lié à un sachet précis) —
   // voir arePaymentsLive() dans payments.js : tant que le compte Stripe
@@ -58,7 +86,7 @@ export default function ReserveModal({ bag, user, onClose, onReserved, onOpenLeg
   // payment_status='pending' — la redirection vers Stripe Checkout est
   // l'étape suivante ; le code de retrait n'est montré qu'après paiement
   // confirmé (voir PaymentResult.jsx, appelé par App.jsx via ?paid=1).
-  async function handleConfirm() {
+  async function handleConfirmCard() {
     if (!paymentsLive) return; // double sécurité, le bouton est déjà masqué dans ce cas
     setError("");
     setRedirecting(true);
@@ -81,6 +109,116 @@ export default function ReserveModal({ bag, user, onClose, onReserved, onOpenLeg
       setError(err.message || "Une erreur est survenue.");
       setRedirecting(false);
     }
+  }
+
+  // Accepté par l'écran "Ce que tu dois savoir" (voir plus bas) : pour le
+  // carte, enchaîne directement sur Stripe comme avant ; pour l'espèces,
+  // ouvre l'écran téléphone + consentement avant toute réservation réelle.
+  function handleDisclaimerAccept() {
+    if (paymentChoice === "cash") {
+      setShowDisclaimer(false);
+      setShowCashDetails(true);
+    } else {
+      handleConfirmCard();
+    }
+  }
+
+  // Aucune redirection externe ici (contrairement au carte) — la réservation
+  // espèces est définitive dès cet appel (payment_status reste 'pending'
+  // jusqu'au retrait, voir schema-v39), donc le code de retrait est montré
+  // tout de suite plutôt que d'attendre un retour de paiement qui n'existe pas.
+  async function handleConfirmCash() {
+    if (!paymentsLive || !cashPhone.trim() || !cashConsent) return;
+    setError("");
+    setRedirecting(true);
+    try {
+      const row = await reserveBag(bag.id, qty, {
+        paymentMethod: "cash",
+        customerPhone: cashPhone.trim(),
+        phoneContactConsent: true,
+      });
+      onReserved();
+      trackEvent("InitiateCheckout", {
+        content_ids: [bag.id],
+        content_type: "product",
+        value: (displayPriceCents(bag.price_cents, bag.merchants?.waive_service_fee) * qty) / 100,
+        currency: "EUR",
+      });
+      setCashReservation(row);
+    } catch (err) {
+      setError(err.message || "Une erreur est survenue.");
+    } finally {
+      setRedirecting(false);
+    }
+  }
+
+  // Écran terminal du chemin espèces : affiché à la place de tout le reste
+  // une fois la réservation créée — pas de retour Stripe à attendre, donc
+  // c'est ici, et seulement ici, que le code de retrait apparaît pour ce
+  // chemin (même rôle que PaymentResult.jsx pour le carte).
+  if (user && cashReservation) {
+    return (
+      <div className="overlay open" onClick={(e) => e.target === e.currentTarget && onClose()}>
+        <div className="modal">
+          <button className="close" onClick={onClose}>
+            ✕
+          </button>
+          <h2>{t("reserve.doneTitle")}</h2>
+          <p className="desc">{t("reserve.cashDoneDesc")}</p>
+          <div className="code-box">
+            <div className="code">{cashReservation.pickup_code}</div>
+            <div className="code-label">{t("reserve.codeLabel")}</div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (user && showCashDetails) {
+    return (
+      <div className="location-sheet-overlay" onClick={(e) => e.target === e.currentTarget && setShowCashDetails(false)}>
+        <div className="location-sheet reserve-disclaimer-sheet">
+          <div className="location-sheet-handle" />
+          <button className="close" onClick={onClose}>
+            ✕
+          </button>
+          <h2>{t("reserve.payCash")}</h2>
+          <div className="field" style={{ marginTop: 16 }}>
+            <label>{t("reserve.cashPhoneLabel")}</label>
+            <input
+              type="tel"
+              value={cashPhone}
+              onChange={(e) => setCashPhone(e.target.value)}
+              placeholder="+352 621 234 567"
+              disabled={redirecting}
+            />
+          </div>
+          <label className="checkbox-field">
+            <input type="checkbox" checked={cashConsent} onChange={(e) => setCashConsent(e.target.checked)} disabled={redirecting} />
+            {t("reserve.cashConsent")}
+          </label>
+          <button
+            className="btn"
+            style={{ marginTop: 10, width: "100%" }}
+            onClick={handleConfirmCash}
+            disabled={redirecting || !cashPhone.trim() || !cashConsent}
+          >
+            {redirecting ? t("reserve.redirecting") : t("reserve.cashConfirm")}
+          </button>
+          <button
+            className="location-sheet-close"
+            onClick={() => {
+              setShowCashDetails(false);
+              setShowDisclaimer(true);
+            }}
+            disabled={redirecting}
+          >
+            {t("reserve.disclaimerBack")}
+          </button>
+          {error && <p className="error-msg">{error}</p>}
+        </div>
+      </div>
+    );
   }
 
   // Feuille ancrée en bas (même coquille que LocationPicker/CategoryPicker)
@@ -110,7 +248,7 @@ export default function ReserveModal({ bag, user, onClose, onReserved, onOpenLeg
             </button>
             {t("reserve.legalPost")}
           </p>
-          <button className="btn" style={{ marginTop: 10, width: "100%" }} onClick={handleConfirm} disabled={redirecting}>
+          <button className="btn" style={{ marginTop: 10, width: "100%" }} onClick={handleDisclaimerAccept} disabled={redirecting}>
             {redirecting ? t("reserve.redirecting") : t("reserve.disclaimerAccept")}
           </button>
           <button className="location-sheet-close" onClick={() => setShowDisclaimer(false)} disabled={redirecting}>
@@ -164,9 +302,44 @@ export default function ReserveModal({ bag, user, onClose, onReserved, onOpenLeg
             </div>
 
             {paymentsLive ? (
-              <button className="btn" onClick={() => setShowDisclaimer(true)}>
-                {t("reserve.confirm")}
-              </button>
+              bag.merchants?.cash_enabled ? (
+                <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+                  <button
+                    className="btn"
+                    onClick={() => {
+                      setPaymentChoice("card");
+                      setShowDisclaimer(true);
+                    }}
+                  >
+                    {t("reserve.payCard")}
+                  </button>
+                  {cashEligible ? (
+                    <button
+                      className="btn secondary"
+                      onClick={() => {
+                        setPaymentChoice("cash");
+                        setShowDisclaimer(true);
+                      }}
+                    >
+                      {t("reserve.payCash")}
+                    </button>
+                  ) : (
+                    <p className="page-sub" style={{ textAlign: "center", margin: 0 }}>
+                      {t("reserve.cashUnavailable")}
+                    </p>
+                  )}
+                </div>
+              ) : (
+                <button
+                  className="btn"
+                  onClick={() => {
+                    setPaymentChoice("card");
+                    setShowDisclaimer(true);
+                  }}
+                >
+                  {t("reserve.confirm")}
+                </button>
+              )
             ) : (
               <p className="page-sub" style={{ textAlign: "center" }}>
                 {t("reserve.paymentsComingSoon")}

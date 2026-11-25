@@ -39,7 +39,7 @@ export default function MerchantBilling() {
     URL.revokeObjectURL(url);
   }
 
-  const totalNet = invoices?.reduce((sum, inv) => sum + inv.netAmount, 0) ?? 0;
+  const totalFinal = invoices?.reduce((sum, inv) => sum + inv.finalBalance, 0) ?? 0;
 
   return (
     <div className="panel">
@@ -47,7 +47,9 @@ export default function MerchantBilling() {
       <p className="page-sub">
         Calcule, pour chaque commerçant, le chiffre d'affaires payé sur la période, la commission relief.lu (son propre
         taux négocié, 21% par défaut, + TVA 17%), une éventuelle contribution Stripe négociée séparément (+ TVA, par
-        transaction) et le montant net à leur reverser. Usage interne — rien n'est envoyé aux commerçants.
+        transaction) et le montant net à leur reverser. Les ventes en espèces ne passent jamais par Stripe : le
+        commerçant garde l'argent en main et doit la commission directement à relief.lu — c'est la colonne "Dû
+        (espèces)", déduite du solde final. Usage interne — rien n'est envoyé aux commerçants.
       </p>
 
       <div className="two-col" style={{ marginTop: 16 }}>
@@ -80,9 +82,12 @@ export default function MerchantBilling() {
                       <th style={{ padding: "8px 6px" }}>Résa.</th>
                       <th style={{ padding: "8px 6px" }}>Unités</th>
                       <th style={{ padding: "8px 6px" }}>CA brut</th>
+                      <th style={{ padding: "8px 6px" }}>dont espèces</th>
                       <th style={{ padding: "8px 6px" }}>Commission TTC</th>
                       <th style={{ padding: "8px 6px" }}>Frais Stripe TTC</th>
-                      <th style={{ padding: "8px 6px" }}>Net à verser</th>
+                      <th style={{ padding: "8px 6px" }}>Net Stripe</th>
+                      <th style={{ padding: "8px 6px" }}>Dû (espèces)</th>
+                      <th style={{ padding: "8px 6px" }}>Solde final</th>
                       <th style={{ padding: "8px 6px" }}></th>
                     </tr>
                   </thead>
@@ -95,9 +100,12 @@ export default function MerchantBilling() {
                           <td style={{ padding: "8px 6px" }}>{inv.reservationCount}</td>
                           <td style={{ padding: "8px 6px" }}>{inv.unitsSold}</td>
                           <td style={{ padding: "8px 6px" }}>{fmt(inv.revenue)} €</td>
+                          <td style={{ padding: "8px 6px" }}>{inv.cashRevenue > 0 ? `${fmt(inv.cashRevenue)} €` : "—"}</td>
                           <td style={{ padding: "8px 6px" }}>{fmt(inv.commissionTtc)} €</td>
                           <td style={{ padding: "8px 6px" }}>{inv.stripeFeeTtc > 0 ? `${fmt(inv.stripeFeeTtc)} €` : "—"}</td>
-                          <td style={{ padding: "8px 6px", fontWeight: 700 }}>{fmt(inv.netAmount)} €</td>
+                          <td style={{ padding: "8px 6px" }}>{fmt(inv.netAmount)} €</td>
+                          <td style={{ padding: "8px 6px" }}>{inv.cashOwed > 0 ? `${fmt(inv.cashOwed)} €` : "—"}</td>
+                          <td style={{ padding: "8px 6px", fontWeight: 700 }}>{fmt(inv.finalBalance)} €</td>
                           <td style={{ padding: "8px 6px" }}>
                             <button
                               className="btn secondary small"
@@ -109,7 +117,7 @@ export default function MerchantBilling() {
                         </tr>
                         {openMerchantId === inv.merchantId && (
                           <tr key={`${inv.merchantId}-details`}>
-                            <td colSpan={9} style={{ padding: "0 6px 14px" }}>
+                            <td colSpan={12} style={{ padding: "0 6px 14px" }}>
                               <table style={{ width: "100%", fontSize: 12.5, color: "var(--paper-dim)" }}>
                                 <tbody>
                                   {inv.lines.map((line, i) => (
@@ -125,6 +133,7 @@ export default function MerchantBilling() {
                                       <td style={{ padding: "3px 6px" }}>{line.title}</td>
                                       <td style={{ padding: "3px 6px" }}>× {line.quantity}</td>
                                       <td style={{ padding: "3px 6px" }}>{fmt((line.unitPriceCents * line.quantity) / 100)} €</td>
+                                      <td style={{ padding: "3px 6px" }}>{line.paymentMethod === "cash" ? "Espèces" : "Carte"}</td>
                                     </tr>
                                   ))}
                                 </tbody>
@@ -137,10 +146,10 @@ export default function MerchantBilling() {
                   </tbody>
                   <tfoot>
                     <tr style={{ borderTop: "1px solid rgba(239,230,211,0.2)", fontWeight: 700 }}>
-                      <td style={{ padding: "8px 6px" }} colSpan={7}>
-                        Total net à verser
+                      <td style={{ padding: "8px 6px" }} colSpan={10}>
+                        Total solde final
                       </td>
-                      <td style={{ padding: "8px 6px" }}>{fmt(totalNet)} €</td>
+                      <td style={{ padding: "8px 6px" }}>{fmt(totalFinal)} €</td>
                       <td></td>
                     </tr>
                   </tfoot>

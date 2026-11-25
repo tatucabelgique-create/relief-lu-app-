@@ -1,7 +1,13 @@
 import { useState } from "react";
 import { useI18n } from "../lib/i18n.jsx";
 import { cancelBag, stopRecurring, updateBagPrice } from "../lib/bags";
-import { getReservationsForBag, updateReservationStatus, requestRefund } from "../lib/reservations";
+import {
+  getReservationsForBag,
+  updateReservationStatus,
+  confirmCashPickup,
+  cancelPendingReservationsForBag,
+  requestRefund,
+} from "../lib/reservations";
 
 const MIN_PRICE = 3.99;
 
@@ -50,6 +56,12 @@ export default function MerchantBagRow({ bag, onChanged }) {
     onChanged();
   }
 
+  async function handleCashPickup(reservationId) {
+    await confirmCashPickup(reservationId);
+    setReservations(await getReservationsForBag(bag.id));
+    onChanged();
+  }
+
   // Annuler un sachet ne doit jamais laisser ses clients déjà payés de côté
   // — façon TGTG ("si le commerçant annule, pas besoin de demander un
   // remboursement") : on rembourse automatiquement chaque réservation payée
@@ -59,15 +71,29 @@ export default function MerchantBagRow({ bag, onChanged }) {
     setActionError(null);
     const current = reservations ?? (await getReservationsForBag(bag.id));
     const paid = current.filter((r) => r.payment_status === "paid" && r.status === "confirmed");
+    // "pending" = jamais payée : carte abandonnée avant Stripe (rare, le cron
+    // de 5 min en nettoie la plupart) ou espèces en attente du retrait (voir
+    // schema-v39, peut rester pending des heures) — aucune des deux n'est
+    // couverte par le remboursement ci-dessus, et sans l'avertissement
+    // séparé ci-dessous elles resteraient silencieusement "confirmed" sur un
+    // sachet qui n'existe plus.
+    const pending = current.filter((r) => r.payment_status === "pending" && r.status === "confirmed");
+    const pendingCashPhones = pending.filter((r) => r.payment_method === "cash" && r.customer_phone).map((r) => r.customer_phone);
 
     if (paid.length && !window.confirm(`${paid.length} ${t("merchant.cancelBagConfirmPaid")}`)) return;
     if (!paid.length && !window.confirm(t("merchant.cancelBagConfirm"))) return;
+
+    if (pending.length) {
+      const phoneHint = pendingCashPhones.length ? ` ${t("merchant.cancelBagCashPhones")} ${pendingCashPhones.join(", ")}` : "";
+      if (!window.confirm(`${pending.length} ${t("merchant.cancelBagConfirmPending")}${phoneHint}`)) return;
+    }
 
     setCancellingBag(true);
     try {
       for (const r of paid) {
         await requestRefund(r.id);
       }
+      if (pending.length) await cancelPendingReservationsForBag(bag.id);
       await cancelBag(bag.id);
       onChanged();
     } catch (err) {
@@ -175,7 +201,7 @@ export default function MerchantBagRow({ bag, onChanged }) {
                     className={`pill-base chip-pill-outline payment-chip-${r.payment_status}`}
                     style={{ display: "inline-block", width: "fit-content", marginTop: 6 }}
                   >
-                    {t(`payment.status.${r.payment_status}`)}
+                    {t(`payment.status.${r.payment_status}`)} · {t(`payment.method.${r.payment_method || "card"}`)}
                   </span>
                 </div>
                 {r.status === "confirmed" && r.payment_status === "paid" && (
@@ -188,6 +214,16 @@ export default function MerchantBagRow({ bag, onChanged }) {
                     </button>
                     <button className="btn secondary small" onClick={() => handleRefund(r.id)} disabled={refundingId === r.id}>
                       {refundingId === r.id ? t("merchant.refunding") : t("merchant.refund")}
+                    </button>
+                  </div>
+                )}
+                {r.status === "confirmed" && r.payment_status === "pending" && r.payment_method === "cash" && (
+                  <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
+                    <button className="btn small" onClick={() => handleCashPickup(r.id)}>
+                      {t("merchant.markPaidAndPickedUp")}
+                    </button>
+                    <button className="btn secondary small" onClick={() => setStatus(r.id, "no_show")}>
+                      {t("merchant.markNoShow")}
                     </button>
                   </div>
                 )}

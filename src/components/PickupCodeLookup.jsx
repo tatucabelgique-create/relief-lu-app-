@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useI18n } from "../lib/i18n.jsx";
-import { findReservationByCode, updateReservationStatus } from "../lib/reservations";
+import { findReservationByCode, updateReservationStatus, confirmCashPickup } from "../lib/reservations";
 
 // Remplace le défilement visuel de la liste de réservations par une vraie
 // vérification : le commerçant tape le code affiché par le client, l'app
@@ -33,6 +33,17 @@ export default function PickupCodeLookup({ onChanged }) {
     try {
       await updateReservationStatus(result.id, status);
       setResult({ ...result, status });
+      onChanged?.();
+    } finally {
+      setUpdating(false);
+    }
+  }
+
+  async function handleCashPickup() {
+    setUpdating(true);
+    try {
+      await confirmCashPickup(result.id);
+      setResult({ ...result, payment_status: "paid", status: "picked_up" });
       onChanged?.();
     } finally {
       setUpdating(false);
@@ -80,13 +91,22 @@ export default function PickupCodeLookup({ onChanged }) {
               className={`pill-base chip-pill-outline payment-chip-${result.payment_status}`}
               style={{ display: "inline-block", width: "fit-content", marginTop: 6 }}
             >
-              {t(`payment.status.${result.payment_status}`)}
+              {t(`payment.status.${result.payment_status}`)} · {t(`payment.method.${result.payment_method || "card"}`)}
             </span>
           </div>
           {result.status === "confirmed" && result.payment_status === "paid" ? (
             <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
               <button className="btn small" onClick={() => setStatus("picked_up")} disabled={updating}>
                 {t("merchant.markPickedUp")}
+              </button>
+              <button className="btn secondary small" onClick={() => setStatus("no_show")} disabled={updating}>
+                {t("merchant.markNoShow")}
+              </button>
+            </div>
+          ) : result.status === "confirmed" && result.payment_status === "pending" && result.payment_method === "cash" ? (
+            <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
+              <button className="btn small" onClick={handleCashPickup} disabled={updating}>
+                {t("merchant.markPaidAndPickedUp")}
               </button>
               <button className="btn secondary small" onClick={() => setStatus("no_show")} disabled={updating}>
                 {t("merchant.markNoShow")}

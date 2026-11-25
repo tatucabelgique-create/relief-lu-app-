@@ -12,6 +12,7 @@ export default function EditMerchantModal({ merchant, onClose, onSaved }) {
     email: merchant.email || "",
     commission_rate: merchant.commission_rate != null ? Math.round(merchant.commission_rate * 100) : "",
     waive_service_fee: merchant.waive_service_fee || false,
+    cash_enabled: merchant.cash_enabled || false,
     stripe_fee_euros: merchant.stripe_fee_cents != null ? (merchant.stripe_fee_cents / 100).toFixed(2) : "",
     dynamic_pricing_threshold: merchant.dynamic_pricing_threshold ?? "",
   });
@@ -149,6 +150,18 @@ export default function EditMerchantModal({ merchant, onClose, onSaved }) {
           <input type="checkbox" checked={form.waive_service_fee} onChange={(e) => set("waive_service_fee", e.target.checked)} />
           Exonérer ce commerçant des frais de service côté client
         </label>
+
+        <label className="checkbox-field">
+          <input type="checkbox" checked={form.cash_enabled} onChange={(e) => set("cash_enabled", e.target.checked)} />
+          Accepter le paiement en espèces sur place
+        </label>
+        {form.cash_enabled && (
+          <span className="field-hint">
+            Le client confirme un numéro de téléphone et accepte d'être recontacté avant de pouvoir réserver en espèces.
+            Un no-show en espèces désactive l'option pour ce client. La commission due sur les ventes espèces apparaît
+            séparément dans la facturation hebdomadaire (panneau Facturation).
+          </span>
+        )}
 
         <div className="field">
           <label>Contribution négociée aux frais Stripe (€, HT, par transaction)</label>

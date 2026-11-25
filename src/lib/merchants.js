@@ -84,6 +84,7 @@ export async function updateMerchantAsAdmin(merchantId, patch) {
     commission_rate: patch.commission_rate,
     waive_service_fee: patch.waive_service_fee,
     stripe_fee_cents: patch.stripe_fee_cents,
+    cash_enabled: patch.cash_enabled,
     dynamic_pricing_threshold: patch.dynamic_pricing_threshold,
   };
   const { error } = await supabase.from("merchants").update(row).eq("id", merchantId);

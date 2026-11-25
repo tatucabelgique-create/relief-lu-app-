@@ -5,13 +5,30 @@ import { supabase } from "./supabase";
 // 2026-10-19, source supabase/functions/refund-reservation/.
 const REFUND_FUNCTION_NAME = "smart-task";
 
-export async function reserveBag(bagId, quantity) {
+export async function reserveBag(bagId, quantity, options = {}) {
   const { data, error } = await supabase.rpc("reserve_bag", {
     p_bag_id: bagId,
     p_quantity: quantity,
+    p_payment_method: options.paymentMethod || "card",
+    p_customer_phone: options.customerPhone ?? null,
+    p_phone_contact_consent: options.phoneContactConsent ?? false,
   });
   if (error) throw error;
   return Array.isArray(data) ? data[0] : data;
+}
+
+// Un seul no-show en espèces suffit à désactiver l'option pour ce compte
+// (voir schema-v39) — revérifié côté serveur dans reserve_bag(), mais on
+// évite ici de proposer un bouton qui échouera de toute façon à l'appel.
+export async function hasCashNoShowHistory(userId) {
+  const { count, error } = await supabase
+    .from("reservations")
+    .select("id", { count: "exact", head: true })
+    .eq("user_id", userId)
+    .eq("payment_method", "cash")
+    .eq("status", "no_show");
+  if (error) throw error;
+  return (count ?? 0) > 0;
 }
 
 // Appelée quand le client revient de Stripe Checkout sans avoir payé
@@ -91,6 +108,42 @@ export async function getReservationsForBag(bagId) {
 
 export async function updateReservationStatus(reservationId, status) {
   const { error } = await supabase.from("reservations").update({ status }).eq("id", reservationId);
+  if (error) throw error;
+}
+
+// Spécifique au paiement en espèces : l'encaissement et le retrait ont lieu
+// au même instant physique (le comptoir), contrairement au carte où le
+// paiement est déjà acquis avant le retrait — un seul geste commerçant doit
+// donc faire passer payment_status à 'paid' ET status à 'picked_up' (voir
+// schema-v39 ; la policy RLS "merchants can update reservations on their
+// own bags" autorise déjà les deux colonnes).
+export async function confirmCashPickup(reservationId) {
+  const { error } = await supabase
+    .from("reservations")
+    .update({ payment_status: "paid", status: "picked_up" })
+    .eq("id", reservationId);
+  if (error) throw error;
+}
+
+// Annuler un sachet (voir MerchantBagRow.jsx handleCancelBag) ne doit pas
+// laisser de réservation "confirmed"/"pending" orpheline derrière lui — ni
+// une résa carte abandonnée pas encore nettoyée par le cron de 5 minutes
+// (schema-v35), ni surtout une résa espèces qui peut légitimement rester
+// pending des heures (schema-v39). release_reservation() ne convient pas
+// ici : elle refuse tout appelant qui n'est pas le propriétaire de la résa
+// ou le webhook (auth.uid() null), et le commerçant qui annule est un tiers
+// de ce point de vue. On fait donc un update direct — la policy RLS
+// "merchants can update reservations on their own bags" l'autorise déjà sur
+// toutes les colonnes. Pas de restauration de stock : le sachet lui-même
+// passe à 'cancelled' juste après (voir cancelBag), la quantité n'a plus de
+// sens à ce moment-là.
+export async function cancelPendingReservationsForBag(bagId) {
+  const { error } = await supabase
+    .from("reservations")
+    .update({ status: "cancelled", payment_status: "failed" })
+    .eq("bag_id", bagId)
+    .eq("status", "confirmed")
+    .eq("payment_status", "pending");
   if (error) throw error;
 }
 
