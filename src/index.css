@@ -449,6 +449,14 @@ h1.page-title {
   background: var(--honey); color: var(--navy); font-size: 20px;
   display: flex; align-items: center; justify-content: center;
   box-shadow: 0 4px 14px rgba(0,0,0,0.35); cursor: pointer;
+  /* Au repos, à moitié "caché" (réduit, un peu décalé vers le bord, moins
+     opaque) — grossit et se révèle pleinement au survol/appui, façon TGTG,
+     plutôt qu'un badge plein format en permanence. */
+  transform: scale(0.72) translateX(-6px); opacity: 0.75;
+  transition: transform 0.18s ease, opacity 0.18s ease;
+}
+.cookie-fab:hover, .cookie-fab:focus-visible, .cookie-fab:active {
+  transform: scale(1) translateX(0); opacity: 1;
 }
 body:has(.bag-detail) .cookie-fab { display: none; }
 .bottom-nav-item {
