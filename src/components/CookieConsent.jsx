@@ -14,6 +14,16 @@ export default function CookieConsent({ onOpenLegal }) {
   const { t } = useI18n();
   const [visible, setVisible] = useState(false);
   const [marketing, setMarketing] = useState(false);
+  // Même pattern que LegalModal.jsx (voir .overlay.closing dans index.css).
+  const [closing, setClosing] = useState(false);
+  function requestHide() {
+    if (closing) return;
+    setClosing(true);
+    setTimeout(() => {
+      setVisible(false);
+      setClosing(false);
+    }, 220);
+  }
 
   useEffect(() => {
     const saved = localStorage.getItem(STORAGE_KEY);
@@ -24,18 +34,18 @@ export default function CookieConsent({ onOpenLegal }) {
   function save(marketingEnabled) {
     localStorage.setItem(STORAGE_KEY, marketingEnabled ? "accepted" : "declined");
     if (marketingEnabled) loadAnalytics();
-    setVisible(false);
+    requestHide();
   }
 
   function openLegal(type) {
-    setVisible(false);
+    requestHide();
     onOpenLegal?.(type);
   }
 
   if (!visible) return null;
 
   return (
-    <div className="overlay open">
+    <div className={`overlay ${closing ? "closing" : "open"}`}>
       <div className="modal cookie-modal" style={{ maxHeight: "85vh", overflowY: "auto" }}>
         <div className="cookie-modal-logo">
           <img src={`${import.meta.env.BASE_URL}icon-192.png`} alt="relief.lu" loading="lazy" />

@@ -35,6 +35,15 @@ export default function BagDetail({ bag, rating, isFavorite, onToggleFavorite, o
   const soldOut = bag.status === "sold_out";
   const [scrolled, setScrolled] = useState(false);
   const [allergensOpen, setAllergensOpen] = useState(false);
+  // Même pattern que .overlay.closing (voir LegalModal.jsx / index.css) :
+  // sans ce délai, onBack() démonte la page instantanément et l'animation
+  // de sortie (sheet-down) n'a jamais le temps de jouer.
+  const [closing, setClosing] = useState(false);
+  function requestBack() {
+    if (closing) return;
+    setClosing(true);
+    setTimeout(onBack, 220);
+  }
   // QR code affiché uniquement sur grand écran (voir .bag-detail-side dans
   // index.css) — façon TGTG, pour qu'un visiteur sur ordinateur puisse
   // continuer sur son téléphone plutôt que de réserver depuis le web. Même
@@ -91,12 +100,12 @@ export default function BagDetail({ bag, rating, isFavorite, onToggleFavorite, o
   }
 
   return (
-    <div className="bag-detail">
+    <div className={`bag-detail${closing ? " closing" : ""}`}>
       {/* En-tête compacte qui remplace la grande photo une fois qu'on a
           scrollé — même bascule que sur la référence, pour garder le nom du
           commerçant et les actions (retour/partage/favori) visibles. */}
       <div className={`bag-detail-compact-header ${scrolled ? "visible" : ""}`}>
-        <button className="icon-circle" onClick={onBack} aria-label="back">
+        <button className="icon-circle" onClick={requestBack} aria-label="back">
           ←
         </button>
         <b>{merchant?.business_name}</b>
@@ -125,7 +134,7 @@ export default function BagDetail({ bag, rating, isFavorite, onToggleFavorite, o
       >
         {!bag.image_url && !bag.merchants?.banner_url && <span className="bag-detail-hero-fallback">🥡</span>}
         <div className="bag-detail-hero-top">
-          <button className="icon-circle" onClick={onBack} aria-label="back">
+          <button className="icon-circle" onClick={requestBack} aria-label="back">
             ←
           </button>
           <div style={{ display: "flex", gap: 10 }}>

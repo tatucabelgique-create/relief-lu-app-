@@ -24,6 +24,18 @@ export default function InstallPrompt() {
   // "beforeinstallprompt" a déjà été capté (voir plus bas) : sans ce guide,
   // le bandeau dit "installe" sans jamais montrer comment, dans les deux cas.
   const [showGuide, setShowGuide] = useState(false);
+  // Même pattern que LegalModal.jsx (voir .overlay.closing dans index.css) :
+  // showGuide reste true le temps de l'animation de sortie (démontage
+  // différé de 220ms), guideClosing ne pilote que la classe CSS.
+  const [guideClosing, setGuideClosing] = useState(false);
+  function requestCloseGuide() {
+    if (guideClosing) return;
+    setGuideClosing(true);
+    setTimeout(() => {
+      setShowGuide(false);
+      setGuideClosing(false);
+    }, 220);
+  }
   // Chrome/Edge/Android exposent un événement natif permettant de déclencher
   // la vraie boîte de dialogue d'installation au clic — sans lui, on ne peut
   // que dire "installe" sans dire où ni comment, contrairement à iOS qui a
@@ -132,9 +144,9 @@ export default function InstallPrompt() {
       </div>
 
       {showGuide && (
-        <div className="overlay open" onClick={(e) => e.target === e.currentTarget && setShowGuide(false)}>
+        <div className={`overlay ${guideClosing ? "closing" : "open"}`} onClick={(e) => e.target === e.currentTarget && requestCloseGuide()}>
           <div className="modal">
-            <button className="close" onClick={() => setShowGuide(false)}>✕</button>
+            <button className="close" onClick={requestCloseGuide}>✕</button>
             <h2>{t("install.guideTitle")}</h2>
             <ol className="install-guide-steps">
               {isIOS ? (

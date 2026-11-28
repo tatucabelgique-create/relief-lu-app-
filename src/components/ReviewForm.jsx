@@ -21,6 +21,13 @@ export default function ReviewForm({ reservation, onClose, onSubmitted }) {
   const [scores, setScores] = useState({ collecte: 5, qualite: 5, variete: 5, quantite: 5 });
   const [comment, setComment] = useState("");
   const [error, setError] = useState("");
+  // Même pattern que LegalModal.jsx (voir .overlay.closing dans index.css).
+  const [closing, setClosing] = useState(false);
+  function requestClose() {
+    if (closing) return;
+    setClosing(true);
+    setTimeout(onClose, 220);
+  }
 
   if (!reservation) return null;
 
@@ -34,16 +41,16 @@ export default function ReviewForm({ reservation, onClose, onSubmitted }) {
       const overall = Math.round((scores.collecte + scores.qualite + scores.variete + scores.quantite) / 4);
       await addReview(reservation.id, reservation.bags.merchant_id, overall, comment.trim(), scores);
       onSubmitted();
-      onClose();
+      requestClose();
     } catch (err) {
       setError(err.message || "Une erreur est survenue.");
     }
   }
 
   return (
-    <div className="overlay open" onClick={(e) => e.target === e.currentTarget && onClose()}>
+    <div className={`overlay ${closing ? "closing" : "open"}`} onClick={(e) => e.target === e.currentTarget && requestClose()}>
       <div className="modal">
-        <button className="close" onClick={onClose}>
+        <button className="close" onClick={requestClose}>
           ✕
         </button>
         <h2>{t("review.title")}</h2>

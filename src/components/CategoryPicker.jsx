@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { useI18n } from "../lib/i18n.jsx";
 
 // Les 6 catégories TGTG (voir leur feuille "Catégorie" sur Parcourir),
@@ -21,6 +22,14 @@ const CATEGORIES = [
 // filtres" retire toute sélection et ferme.
 export default function CategoryPicker({ categories, setCategories, onClose }) {
   const { t } = useI18n();
+  // Même pattern que LegalModal.jsx (voir .location-sheet-overlay.closing
+  // dans index.css).
+  const [closing, setClosing] = useState(false);
+  function requestClose() {
+    if (closing) return;
+    setClosing(true);
+    setTimeout(onClose, 220);
+  }
 
   // Forme fonctionnelle indispensable ici : deux taps rapprochés sur deux
   // pills différentes peuvent être batchés par React dans le même cycle de
@@ -33,7 +42,7 @@ export default function CategoryPicker({ categories, setCategories, onClose }) {
   }
 
   return (
-    <div className="location-sheet-overlay" onClick={onClose}>
+    <div className={`location-sheet-overlay${closing ? " closing" : ""}`} onClick={requestClose}>
       <div className="location-sheet" onClick={(e) => e.stopPropagation()}>
         <div className="location-sheet-handle" />
         <h2>{t("category.title")}</h2>
@@ -56,12 +65,12 @@ export default function CategoryPicker({ categories, setCategories, onClose }) {
             className="btn secondary"
             onClick={() => {
               setCategories([]);
-              onClose();
+              requestClose();
             }}
           >
             {t("category.clear")}
           </button>
-          <button className="btn" onClick={onClose}>
+          <button className="btn" onClick={requestClose}>
             {t("category.apply")}
           </button>
         </div>

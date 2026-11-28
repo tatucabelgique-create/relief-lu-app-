@@ -38,6 +38,17 @@ export default function ReserveModal({ bag, user, onClose, onReserved, onOpenLeg
   // "bientôt disponible" le temps du fetch, que risquer d'autoriser un clic
   // avant d'avoir confirmé que les paiements sont réellement en mode live.
   const [paymentsLive, setPaymentsLive] = useState(false);
+  // Ce composant ne se démonte jamais (seul `bag` passe à null, voir
+  // `if (!bag) return null` plus bas) — sans cet état, fermer via n'importe
+  // lequel des 4 écrans (✕ ou fond) ferait disparaître la fenêtre d'un coup
+  // dès que le parent efface `bag`, avant que l'animation de sortie
+  // (.overlay.closing / .location-sheet-overlay.closing) ait pu jouer.
+  const [modalClosing, setModalClosing] = useState(false);
+  function requestFullClose() {
+    if (modalClosing) return;
+    setModalClosing(true);
+    setTimeout(onClose, 220);
+  }
 
   // Ce composant reste monté en permanence (bag passe de null à un sachet à
   // l'ouverture, voir PublicView) — un simple useEffect au montage ne
@@ -53,6 +64,7 @@ export default function ReserveModal({ bag, user, onClose, onReserved, onOpenLeg
     setCashPhone("");
     setCashConsent(false);
     setCashReservation(null);
+    setModalClosing(false);
   }, [bag]);
 
   useEffect(() => {
@@ -158,9 +170,9 @@ export default function ReserveModal({ bag, user, onClose, onReserved, onOpenLeg
   // chemin (même rôle que PaymentResult.jsx pour le carte).
   if (user && cashReservation) {
     return (
-      <div className="overlay open" onClick={(e) => e.target === e.currentTarget && onClose()}>
+      <div className={`overlay ${modalClosing ? "closing" : "open"}`} onClick={(e) => e.target === e.currentTarget && requestFullClose()}>
         <div className="modal">
-          <button className="close" onClick={onClose}>
+          <button className="close" onClick={requestFullClose}>
             ✕
           </button>
           <h2>{t("reserve.doneTitle")}</h2>
@@ -176,10 +188,13 @@ export default function ReserveModal({ bag, user, onClose, onReserved, onOpenLeg
 
   if (user && showCashDetails) {
     return (
-      <div className="location-sheet-overlay" onClick={(e) => e.target === e.currentTarget && setShowCashDetails(false)}>
+      <div
+        className={`location-sheet-overlay${modalClosing ? " closing" : ""}`}
+        onClick={(e) => e.target === e.currentTarget && setShowCashDetails(false)}
+      >
         <div className="location-sheet reserve-disclaimer-sheet">
           <div className="location-sheet-handle" />
-          <button className="close" onClick={onClose}>
+          <button className="close" onClick={requestFullClose}>
             ✕
           </button>
           <h2>{t("reserve.payCash")}</h2>
@@ -227,10 +242,13 @@ export default function ReserveModal({ bag, user, onClose, onReserved, onOpenLeg
   // le reste de ReserveModal gardant la carte centrée du système existant.
   if (user && showDisclaimer) {
     return (
-      <div className="location-sheet-overlay" onClick={(e) => e.target === e.currentTarget && setShowDisclaimer(false)}>
+      <div
+        className={`location-sheet-overlay${modalClosing ? " closing" : ""}`}
+        onClick={(e) => e.target === e.currentTarget && setShowDisclaimer(false)}
+      >
         <div className="location-sheet reserve-disclaimer-sheet">
           <div className="location-sheet-handle" />
-          <button className="close" onClick={onClose}>
+          <button className="close" onClick={requestFullClose}>
             ✕
           </button>
           <h2>{t("reserve.disclaimerTitle")}</h2>
@@ -261,9 +279,9 @@ export default function ReserveModal({ bag, user, onClose, onReserved, onOpenLeg
   }
 
   return (
-    <div className="overlay open" onClick={(e) => e.target === e.currentTarget && onClose()}>
+    <div className={`overlay ${modalClosing ? "closing" : "open"}`} onClick={(e) => e.target === e.currentTarget && requestFullClose()}>
       <div className="modal">
-        <button className="close" onClick={onClose}>
+        <button className="close" onClick={requestFullClose}>
           ✕
         </button>
         {!user ? (

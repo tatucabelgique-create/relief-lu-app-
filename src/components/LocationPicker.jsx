@@ -21,6 +21,15 @@ export default function LocationPicker({ onSelect, onLocate, onClose }) {
   const [places, setPlaces] = useState(() => loadSavedPlaces());
   const debounceRef = useRef(null);
   const inputRef = useRef(null);
+  // Même pattern que LegalModal.jsx (voir .location-sheet-overlay.closing
+  // dans index.css) — cette feuille se fermait jusqu'ici d'un coup, sans
+  // laisser jouer l'animation de sortie.
+  const [closing, setClosing] = useState(false);
+  function requestClose() {
+    if (closing) return;
+    setClosing(true);
+    setTimeout(onClose, 220);
+  }
 
   useEffect(() => {
     if (!query.trim()) {
@@ -65,7 +74,7 @@ export default function LocationPicker({ onSelect, onLocate, onClose }) {
   }
 
   return (
-    <div className="location-sheet-overlay" onClick={onClose}>
+    <div className={`location-sheet-overlay${closing ? " closing" : ""}`} onClick={requestClose}>
       <div className="location-sheet" onClick={(e) => e.stopPropagation()}>
         <div className="location-sheet-handle" />
         <h2>{t("location.title")}</h2>
@@ -101,7 +110,7 @@ export default function LocationPicker({ onSelect, onLocate, onClose }) {
               className="location-row"
               onClick={() => {
                 onLocate();
-                onClose();
+                requestClose();
               }}
             >
               <span className="location-row-icon">🧭</span>
@@ -121,7 +130,7 @@ export default function LocationPicker({ onSelect, onLocate, onClose }) {
           </div>
         )}
 
-        <button className="location-sheet-close" onClick={onClose}>
+        <button className="location-sheet-close" onClick={requestClose}>
           {t("location.close")}
         </button>
       </div>

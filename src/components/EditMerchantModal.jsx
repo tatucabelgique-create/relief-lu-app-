@@ -2,6 +2,14 @@ import { useState } from "react";
 import { updateMerchantAsAdmin, uploadMerchantLogo, uploadMerchantBanner } from "../lib/merchants";
 
 export default function EditMerchantModal({ merchant, onClose, onSaved }) {
+  // Même pattern que LegalModal.jsx (voir .overlay.closing dans index.css) :
+  // laisse l'animation de sortie jouer avant le démontage réel.
+  const [closing, setClosing] = useState(false);
+  function requestClose() {
+    if (closing) return;
+    setClosing(true);
+    setTimeout(onClose, 220);
+  }
   const [form, setForm] = useState({
     business_name: merchant.business_name || "",
     address: merchant.address || "",
@@ -82,9 +90,9 @@ export default function EditMerchantModal({ merchant, onClose, onSaved }) {
   }
 
   return (
-    <div className="overlay open" onClick={(e) => e.target === e.currentTarget && onClose()}>
+    <div className={`overlay ${closing ? "closing" : "open"}`} onClick={(e) => e.target === e.currentTarget && requestClose()}>
       <div className="modal" style={{ maxWidth: 480, maxHeight: "86vh", overflowY: "auto" }}>
-        <button className="close" onClick={onClose}>✕</button>
+        <button className="close" onClick={requestClose}>✕</button>
         <h2>Modifier {merchant.business_name}</h2>
 
         <div className="field">

@@ -12,6 +12,13 @@ export default function PaymentResult({ reservationId, success, onClose }) {
   const { t } = useI18n();
   const [reservation, setReservation] = useState(undefined);
   const [error, setError] = useState(null);
+  // Même pattern que LegalModal.jsx (voir .overlay.closing dans index.css).
+  const [closing, setClosing] = useState(false);
+  function requestClose() {
+    if (closing) return;
+    setClosing(true);
+    setTimeout(onClose, 220);
+  }
 
   useEffect(() => {
     if (!success) {
@@ -36,9 +43,9 @@ export default function PaymentResult({ reservationId, success, onClose }) {
   }, [reservationId, success]);
 
   return (
-    <div className="overlay open" onClick={(e) => e.target === e.currentTarget && onClose()}>
+    <div className={`overlay ${closing ? "closing" : "open"}`} onClick={(e) => e.target === e.currentTarget && requestClose()}>
       <div className="modal">
-        <button className="close" onClick={onClose}>
+        <button className="close" onClick={requestClose}>
           ✕
         </button>
         {!success ? (
