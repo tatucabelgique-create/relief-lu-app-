@@ -438,6 +438,19 @@ h1.page-title {
   display: flex; background: var(--navy-2); border-top: 1px solid rgba(239,230,211,0.1);
   padding: 8px 6px calc(8px + env(safe-area-inset-bottom));
 }
+
+/* Badge flottant "Cookies" — toujours accessible, peu importe l'onglet ou
+   le défilement, contrairement au lien du footer (voir App.jsx). Posé
+   au-dessus de .bottom-nav (env(safe-area-inset-bottom) inclus dans son
+   décalage) pour ne jamais le chevaucher en bas d'écran. */
+.cookie-fab {
+  position: fixed; left: 14px; bottom: calc(74px + env(safe-area-inset-bottom));
+  z-index: 40; width: 44px; height: 44px; border-radius: 50%; border: none;
+  background: var(--honey); color: var(--navy); font-size: 20px;
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 4px 14px rgba(0,0,0,0.35); cursor: pointer;
+}
+body:has(.bag-detail) .cookie-fab { display: none; }
 .bottom-nav-item {
   flex: 1; display: flex; flex-direction: column; align-items: center; gap: 3px;
   background: none; border: none; color: var(--paper-dim);

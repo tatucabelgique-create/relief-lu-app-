@@ -202,6 +202,15 @@ export default function App() {
 
       <BottomNav view={view} onNavigate={setView} />
 
+      {/* Icône flottante toujours accessible (bas-gauche) pour rouvrir la
+          gestion des cookies — le lien "Cookies" du footer existe déjà mais
+          n'est atteignable qu'en scrollant tout en bas d'une page, jamais
+          visible depuis les autres onglets (façon TGTG/la plupart des sites
+          avec bandeau cookies : un badge permanent plutôt qu'un lien enfoui). */}
+      <button className="cookie-fab" onClick={reopenCookieConsent} aria-label="Gérer les cookies">
+        🍪
+      </button>
+
       {paymentResult && (
         <PaymentResult
           reservationId={paymentResult.reservationId}
